@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.datasource;
+package com.globusltd.recyclerview;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-
-import java.io.Closeable;
 
 /**
  * Datasource is an abstraction over elements storage.
@@ -27,7 +25,7 @@ import java.io.Closeable;
  * @param <E> Type of elements handled by datastore.
  */
 @MainThread
-public interface Datasource<E> extends Closeable {
+public interface Datasource<E> {
 
     /**
      * Returns the element at the specified position.
@@ -47,5 +45,33 @@ public interface Datasource<E> extends Closeable {
      * @return The number of elements in this datastore.
      */
     int size();
+
+    /**
+     * Register a new observer to listen for data changes.
+     * <p>
+     * <p>The datasource may publish a variety of events describing specific changes.
+     * Not all datasource may support all change types and some may fall back to a generic
+     * {@link DatasourceObserver#onChanged()} "something changed" event
+     * if more specific data is not available.</p>
+     * <p>
+     * <p>Components registering observers with a datasource are responsible for
+     * {@link #unregisterDatasourceObserver(DatasourceObserver)
+     * unregistering} those observers when finished.</p>
+     *
+     * @param observer Observer to register.
+     * @see #unregisterDatasourceObserver(DatasourceObserver)
+     */
+    void registerDatasourceObserver(@NonNull final DatasourceObserver observer);
+
+    /**
+     * Unregister an observer currently listening for data changes.
+     * <p>
+     * <p>The unregistered observer will no longer receive events about changes
+     * to the datasource.</p>
+     *
+     * @param observer Observer to unregister.
+     * @see #registerDatasourceObserver(DatasourceObserver)
+     */
+    void unregisterDatasourceObserver(@NonNull final DatasourceObserver observer);
 
 }

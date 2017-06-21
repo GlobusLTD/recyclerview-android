@@ -17,35 +17,63 @@ package com.globusltd.recyclerview;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 
 import java.util.List;
 
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> {
+        extends RecyclerView.Adapter<VH> implements Swappable<Datasource<? extends E>> {
 
     @NonNull
-    private final Datastore<? extends E> mDatastore;
+    private final DatasourceProxy<? extends E> mDatasource;
 
     public Adapter() {
-        this(null);
+        this(Datasources.<E>empty());
     }
 
-    public Adapter(@Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
+    public Adapter(@NonNull final Datasource<? extends E> datasource) {
+        this(datasource, null);
+    }
+
+    public Adapter(@NonNull final Datasource<? extends E> datasource,
+                   @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
-        final ListUpdateCallback listUpdateCallback = new AdapterListUpdateCallback();
-        mDatastore = new Datastore<>(diffCallbackFactory, listUpdateCallback);
+        mDatasource = new DatasourceProxy<>(diffCallbackFactory);
+        // TODO: mDatasource.swap(datasource);
     }
 
     @NonNull
-    public Datastore<? extends E> getDatastore() {
-        return mDatastore;
+    public Datasource<? extends E> getDatasource() {
+        return mDatasource;
+    }
+
+    @Override
+    public void swap(@NonNull final Datasource<? extends E> datasource) {
+        // TODO: mDatasource.swap(datasource);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        // TODO: mDatasource.registerDatasourceObserver();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        // TODO: mDatasource.unregisterDatasourceObserver();
     }
 
     /**
@@ -53,7 +81,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      */
     @Override
     public int getItemCount() {
-        return mDatastore.size();
+        return mDatasource.size();
     }
 
     /**
@@ -116,7 +144,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
 
     @Override
     public final void onBindViewHolder(final VH holder, final int position) {
-        final E item = mDatastore.get(position);
+        final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
     }
 
@@ -138,7 +166,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * @param item     The item at the given position in the data set.
      * @param position The position of the item within the adapter's data set.
      */
-    public abstract void onBindViewHolder(@NonNull final VH holder, final E item, final int position);
+    public abstract void onBindViewHolder(@NonNull final VH holder, @NonNull final E item, final int position);
 
     /**
      * {@inheritDoc}
@@ -154,30 +182,6 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @Override
     public void onViewRecycled(final VH holder) {
         super.onViewRecycled(holder);
-    }
-
-    private class AdapterListUpdateCallback implements ListUpdateCallback {
-
-        @Override
-        public void onInserted(final int position, final int count) {
-            notifyItemRangeInserted(position, count);
-        }
-
-        @Override
-        public void onRemoved(final int position, final int count) {
-            notifyItemRangeRemoved(position, count);
-        }
-
-        @Override
-        public void onMoved(final int fromPosition, final int toPosition) {
-            notifyItemMoved(fromPosition, toPosition);
-        }
-
-        @Override
-        public void onChanged(final int position, final int count, final Object payload) {
-            notifyItemRangeChanged(position, count, payload);
-        }
-
     }
 
 }

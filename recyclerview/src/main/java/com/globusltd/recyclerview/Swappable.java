@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.diff;
+package com.globusltd.recyclerview;
 
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
-import com.globusltd.recyclerview.Datasource;
-
 /**
- * Factory that allows to create {@link DiffCallback} for two {@link Datasource}s.
+ * Interface describes component that supports replacing internal components
+ * without interruption to the system.
  *
- * @param <E> The type of an item that will be handled.
+ * @param <E> Type of elements handled by component.
  */
-public interface DiffCallbackFactory<E> {
+@MainThread
+public interface Swappable<E> {
 
-    @NonNull
-    DiffCallback createDiffCallback(@NonNull final Datasource<? extends E> oldDatasource,
-                                    @NonNull final Datasource<? extends E> newDatasource);
+    /**
+     * Performs swapping the internal components.
+     *
+     * @param component The new component that should replace the old one.
+     */
+    void swap(@NonNull final E component);
 
 }

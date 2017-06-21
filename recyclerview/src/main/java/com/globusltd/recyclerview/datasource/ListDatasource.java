@@ -19,29 +19,36 @@ import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
-import java.io.IOException;
+import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.DatasourceObservable;
+import com.globusltd.recyclerview.DatasourceObserver;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Datasource implementation that uses {@link List} of elements as
+ * Datasource implementation that uses {@link ArrayList} of the elements as
  * the underlying data storage.
  */
 @MainThread
-public class ListDatasource<E> implements ModifiableDatasource<E> {
-    
+public class ListDatasource<E> implements Datasource<E> {
+
     @NonNull
     private final List<E> mItems;
-    
+
+    @NonNull
+    private final DatasourceObservable mDatasourceObservable;
+
     public ListDatasource() {
         this(Collections.<E>emptyList());
     }
-    
-    public ListDatasource(@NonNull final List<E> items) {
+
+    public ListDatasource(@NonNull final List<? extends E> items) {
         mItems = new ArrayList<>(items);
+        mDatasourceObservable = new DatasourceObservable();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -50,84 +57,108 @@ public class ListDatasource<E> implements ModifiableDatasource<E> {
     public E get(@IntRange(from = 0) final int position) {
         return mItems.get(position);
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Adds a data entity to the end.
+     *
+     * @param e a data entity
      */
-    @Override
     public void add(@NonNull final E e) {
-        mItems.add(e);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void add(@IntRange(from = 0) final int position, @NonNull final E e) {
-        mItems.add(position, e);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addAll(@NonNull final Datasource<? extends E> datasource) {
-        final int position = mItems.size();
-        addAll(position, datasource);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addAll(@IntRange(from = 0) final int position,
-                       @NonNull final Datasource<? extends E> datasource) {
-        final int itemCount = datasource.size();
-        for (int i = 0; i < itemCount; i++) {
-            final int toPosition = position + i;
-            final E item = datasource.get(position);
-            mItems.add(toPosition, item);
+        if (mItems.add(e)) {
+            final int position = mItems.size() - 1;
+            mDatasourceObservable.notifyItemRangeInserted(position, 1);
         }
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Adds a data entity to a given position.
+     *
+     * @param position an index in the data set.
+     * @param e        a data entity.
      */
-    @Override
+    public void add(@IntRange(from = 0) final int position, @NonNull final E e) {
+        mItems.add(position, e);
+        mDatasourceObservable.notifyItemRangeInserted(position, 1);
+    }
+
+    /**
+     * Adds all data entities to the end.
+     *
+     * @param items a non-null {@link List} of data entities.
+     */
+    public void addAll(@NonNull final List<? extends E> items) {
+        final int positionStart = mItems.size();
+        if (mItems.addAll(items)) {
+            final int itemCount = items.size();
+            mDatasourceObservable.notifyItemRangeInserted(positionStart, itemCount);
+        }
+    }
+
+    /**
+     * Adds all data entities after the specified position.
+     *
+     * @param position position at which to insert the first element
+     *                 from the specified collection.
+     * @param items    a non-null {@link List} of data entities.
+     */
+    public void addAll(@IntRange(from = 0) final int position,
+                       @NonNull final List<? extends E> items) {
+        if (mItems.addAll(position, items)) {
+            final int itemCount = items.size();
+            mDatasourceObservable.notifyItemRangeInserted(position, itemCount);
+        }
+    }
+
+    /**
+     * Moves entity from one position to another.
+     *
+     * @param fromPosition an initial index.
+     * @param toPosition   a new index.
+     */
     public void move(@IntRange(from = 0) final int fromPosition,
                      @IntRange(from = 0) final int toPosition) {
-        final E item = mItems.remove(fromPosition);
-        mItems.add(toPosition, item);
+        final E e = mItems.remove(fromPosition);
+        mItems.add(toPosition, e);
+        mDatasourceObservable.notifyItemMoved(fromPosition, toPosition);
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Removes entity at a given position.
+     *
+     * @param position an index in the list of entities.
+     * @return removed entity.
      */
     @NonNull
-    @Override
     public E remove(@IntRange(from = 0) final int position) {
-        return mItems.remove(position);
+        final E e = mItems.remove(position);
+        mDatasourceObservable.notifyItemRangeRemoved(position, 1);
+        return e;
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Removes a range of elements.
+     *
+     * @param fromPosition Position of the first item that be removed.
+     * @param itemCount    Number of items removed from the data set.
      */
-    @Override
     public void removeRange(@IntRange(from = 0) final int fromPosition,
-                            @IntRange(from = 0) final int itemCount) {
+                            @IntRange(from = 1) final int itemCount) {
         for (int position = fromPosition + itemCount - 1; position >= fromPosition; position--) {
             mItems.remove(position);
         }
+        mDatasourceObservable.notifyItemRangeRemoved(fromPosition, itemCount);
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Removes all of the elements from this datastore.
+     * The datastore will be empty after this call returns.
      */
-    @Override
     public void clear() {
+        final int itemCount = mItems.size();
         mItems.clear();
+        mDatasourceObservable.notifyItemRangeRemoved(0, itemCount);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -135,13 +166,21 @@ public class ListDatasource<E> implements ModifiableDatasource<E> {
     public int size() {
         return mItems.size();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void close() throws IOException {
-        // Do nothing
+    public void registerDatasourceObserver(@NonNull final DatasourceObserver observer) {
+        mDatasourceObservable.registerObserver(observer);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterDatasourceObserver(@NonNull final DatasourceObserver observer) {
+        mDatasourceObservable.unregisterObserver(observer);
+    }
+
 }

@@ -22,23 +22,19 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 
-import com.globusltd.recyclerview.datasource.Datasource;
-import com.globusltd.recyclerview.datasource.ListDatasource;
-import com.globusltd.recyclerview.datasource.ModifiableDatasource;
+import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-
-import java.io.IOException;
 
 /**
  * Default observable datastore that handles data diffs and data change events.
  */
 @MainThread
-public class Datastore<E> implements ModifiableDatasource<E> {
+public class Datastore<E> /*implements Swappable<Datasource<? extends E>>*/ {
     
-    @Nullable
+    /*@Nullable
     private final DiffCallbackFactory<E> mDiffCallbackFactory;
-    
+
     @NonNull
     private final ListUpdateCallback mListUpdateCallback;
     
@@ -49,31 +45,29 @@ public class Datastore<E> implements ModifiableDatasource<E> {
                      @NonNull final ListUpdateCallback listUpdateCallback) {
         mDiffCallbackFactory = diffCallbackFactory;
         mListUpdateCallback = listUpdateCallback;
-        mDatasource = new ListDatasource<>();
+        mDatasource = Datasources.<E>empty();
     }
     
     @NonNull
     public E get(@IntRange(from = 0) final int index) {
         return mDatasource.get(index);
     }
-    
-    public void swap(@NonNull final Datasource<? extends E> datasource) throws IOException {
+
+    @Override
+    public void swap(@NonNull final Datasource<? extends E> datasource) {
         final int itemCount = datasource.size();
         if (mDatasource.size() == 0) {
-            mDatasource.close();
             mDatasource = datasource;
             mListUpdateCallback.onInserted(0, itemCount);
             
         } else if (mDiffCallbackFactory != null) {
             final DiffCallback diffCallback = mDiffCallbackFactory
                     .createDiffCallback(mDatasource, datasource);
-            mDatasource.close();
             mDatasource = datasource;
             DiffUtil.calculateDiff(diffCallback, diffCallback.shouldDetectMoves())
                     .dispatchUpdatesTo(mListUpdateCallback);
             
         } else {
-            mDatasource.close();
             mDatasource = datasource;
             mListUpdateCallback.onChanged(0, itemCount, null);
         }
@@ -93,27 +87,26 @@ public class Datastore<E> implements ModifiableDatasource<E> {
             
         } else {
             throw new UnsupportedOperationException("Datasource instance does not support adding elements. " +
-                    "Please provide instance of ModifiableDatasource via calling Datastore#swap.");
+                    "Please provide instance of ModifiableDatasource via calling Datasource#swap.");
         }
     }
-    
-    public void addAll(@NonNull final Datasource<? extends E> datasource) throws IOException {
+
+    public void addAll(@NonNull final Datasource<? extends E> datasource) {
         final int position = mDatasource.size();
         addAll(position, datasource);
     }
     
     @SuppressWarnings("unchecked")
     public void addAll(@IntRange(from = 0) final int position,
-                       @NonNull final Datasource<? extends E> datasource) throws IOException {
+                       @NonNull final Datasource<? extends E> datasource) {
         if (mDatasource instanceof ModifiableDatasource) {
             final int itemCount = datasource.size();
             ((ModifiableDatasource<E>) mDatasource).addAll(position, datasource);
-            mDatasource.close();
             mListUpdateCallback.onInserted(position, itemCount);
             
         } else {
             throw new UnsupportedOperationException("Datasource instance does not support adding elements. " +
-                    "Please provide instance of ModifiableDatasource via calling Datastore#swap.");
+                    "Please provide instance of ModifiableDatasource via calling Datasource#swap.");
         }
     }
     
@@ -126,7 +119,7 @@ public class Datastore<E> implements ModifiableDatasource<E> {
             
         } else {
             throw new UnsupportedOperationException("Datasource instance does not support moving elements. " +
-                    "Please provide instance of ModifiableDatasource via calling Datastore#swap.");
+                    "Please provide instance of ModifiableDatasource via calling Datasource#swap.");
         }
     }
     
@@ -139,7 +132,7 @@ public class Datastore<E> implements ModifiableDatasource<E> {
             return e;
         } else {
             throw new UnsupportedOperationException("Datasource instance does not support removing elements. " +
-                    "Please provide instance of ModifiableDatasource via calling Datastore#swap.");
+                    "Please provide instance of ModifiableDatasource via calling Datasource#swap.");
         }
     }
     
@@ -151,17 +144,12 @@ public class Datastore<E> implements ModifiableDatasource<E> {
             mListUpdateCallback.onRemoved(fromPosition, itemCount);
         } else {
             throw new UnsupportedOperationException("Datasource instance does not support removing elements. " +
-                    "Please provide instance of ModifiableDatasource via calling Datastore#swap.");
+                    "Please provide instance of ModifiableDatasource via calling Datasource#swap.");
         }
     }
-    
+
     public int size() {
         return mDatasource.size();
-    }
-    
-    @Override
-    public void close() throws IOException {
-        mDatasource.close();
-    }
+    }*/
     
 }

@@ -22,7 +22,10 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
+import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.DatasourceObserver;
+
+import java.io.Closeable;
 
 /**
  * Datasource implementation that uses {@link Cursor} as the underlying data storage.
@@ -35,15 +38,15 @@ import java.io.IOException;
  * @see MergeCursor
  */
 @MainThread
-public class CursorDatasource implements Datasource<Cursor> {
-    
+public class CursorDatasource implements Datasource<Cursor>, Closeable {
+
     @Nullable
     private final Cursor mCursor;
-    
+
     public CursorDatasource(@Nullable final Cursor cursor) {
         mCursor = cursor;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +59,7 @@ public class CursorDatasource implements Datasource<Cursor> {
         }
         throw new IndexOutOfBoundsException("The underlying cursor is null");
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -64,15 +67,31 @@ public class CursorDatasource implements Datasource<Cursor> {
     public int size() {
         return (mCursor != null ? mCursor.getCount() : 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (mCursor != null) {
             mCursor.close();
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerDatasourceObserver(@NonNull final DatasourceObserver observer) {
+        // Do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterDatasourceObserver(@NonNull final DatasourceObserver observer) {
+        // Do nothing
+    }
+
 }
