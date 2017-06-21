@@ -16,21 +16,34 @@
 package com.globusltd.recyclerview.datasource;
 
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.support.annotation.IntRange;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
 
+/**
+ * Datasource implementation that uses {@link Cursor} as the underlying data storage.
+ * <p>
+ * Note that {@link CursorDatasource} does not allow to merge cursors,
+ * but you are able to create that datasource with {@link MergeCursor} instance
+ * when you want to merge a few cursors to the new one.
+ *
+ * @see Cursor
+ * @see MergeCursor
+ */
+@MainThread
 public class CursorDatasource implements Datasource<Cursor> {
-
+    
     @Nullable
     private final Cursor mCursor;
-
+    
     public CursorDatasource(@Nullable final Cursor cursor) {
         mCursor = cursor;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -43,7 +56,7 @@ public class CursorDatasource implements Datasource<Cursor> {
         }
         throw new IndexOutOfBoundsException("The underlying cursor is null");
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -51,7 +64,7 @@ public class CursorDatasource implements Datasource<Cursor> {
     public int size() {
         return (mCursor != null ? mCursor.getCount() : 0);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -61,5 +74,5 @@ public class CursorDatasource implements Datasource<Cursor> {
             mCursor.close();
         }
     }
-
+    
 }

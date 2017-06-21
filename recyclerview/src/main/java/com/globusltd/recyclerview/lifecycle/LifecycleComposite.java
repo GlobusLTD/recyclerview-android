@@ -25,11 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * {@link LifecycleDispatcher} provides activity or fragment lifecycle events to
+ * {@link LifecycleComposite} provides activity or fragment lifecycle events to
  * the registered {@link LifecycleCallbacks} objects.
  */
 @MainThread
-public class LifecycleDispatcher implements LifecycleCallbacks {
+public class LifecycleComposite implements LifecycleCallbacks {
 
     private static final int NONE = 0;
     private static final int STARTED = 1;
@@ -46,18 +46,18 @@ public class LifecycleDispatcher implements LifecycleCallbacks {
     @NonNull
     private final Map<LifecycleCallbacks, Integer> mLifecycleCallbacks;
 
-    public LifecycleDispatcher() {
+    public LifecycleComposite() {
         mLifecycleCallbacks = new LinkedHashMap<>();
     }
 
     /**
-     * Add a new {@link LifecycleCallbacks} to the {@link LifecycleDispatcher},
+     * Add a new {@link LifecycleCallbacks} to the {@link LifecycleComposite},
      * which will be called at the same times as the lifecycle methods of
      * activities or fragments are called. Note that you
      * <em>must</em> be sure to use {@link #unregisterLifecycleCallbacks(LifecycleCallbacks)}
      * when appropriate in the future; this will not be removed for you.
      * <p>
-     * The {@link LifecycleDispatcher} holds latest known lifecycle state to be sent
+     * The {@link LifecycleComposite} holds latest known lifecycle state to be sent
      * to any later registrations.
      *
      * @param lifecycleCallbacks The interface to call.

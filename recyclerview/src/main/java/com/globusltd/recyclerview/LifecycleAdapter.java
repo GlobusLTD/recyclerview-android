@@ -20,7 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.lifecycle.LifecycleCallbacks;
-import com.globusltd.recyclerview.lifecycle.LifecycleDispatcher;
+import com.globusltd.recyclerview.lifecycle.LifecycleComposite;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @param <VH> Type of {@link RecyclerView.ViewHolder}.
  * @see LifecycleCallbacks
- * @see LifecycleDispatcher
+ * @see LifecycleComposite
  */
 public final class LifecycleAdapter<VH extends RecyclerView.ViewHolder & LifecycleCallbacks>
         extends RecyclerView.Adapter<VH> {
@@ -39,14 +39,14 @@ public final class LifecycleAdapter<VH extends RecyclerView.ViewHolder & Lifecyc
     private final RecyclerView.Adapter<VH> mAdapter;
 
     @NonNull
-    private final LifecycleDispatcher mLifecycleDispatcher;
+    private final LifecycleComposite mLifecycleComposite;
 
     public LifecycleAdapter(@NonNull final RecyclerView.Adapter<VH> adapter,
-                            @NonNull final LifecycleDispatcher lifecycleDispatcher) {
+                            @NonNull final LifecycleComposite lifecycleComposite) {
         super();
         mAdapter = adapter;
         setHasStableIds(mAdapter.hasStableIds());
-        mLifecycleDispatcher = lifecycleDispatcher;
+        mLifecycleComposite = lifecycleComposite;
     }
 
     /**
@@ -111,7 +111,7 @@ public final class LifecycleAdapter<VH extends RecyclerView.ViewHolder & Lifecyc
     @Override
     public void onBindViewHolder(final VH holder, final int position) {
         mAdapter.onBindViewHolder(holder, position);
-        mLifecycleDispatcher.registerLifecycleCallbacks(holder);
+        mLifecycleComposite.registerLifecycleCallbacks(holder);
     }
 
     /**
@@ -120,7 +120,7 @@ public final class LifecycleAdapter<VH extends RecyclerView.ViewHolder & Lifecyc
     @Override
     public void onBindViewHolder(final VH holder, final int position, final List<Object> payloads) {
         mAdapter.onBindViewHolder(holder, position, payloads);
-        mLifecycleDispatcher.registerLifecycleCallbacks(holder);
+        mLifecycleComposite.registerLifecycleCallbacks(holder);
     }
 
     /**
@@ -129,7 +129,7 @@ public final class LifecycleAdapter<VH extends RecyclerView.ViewHolder & Lifecyc
     @Override
     public void onViewRecycled(final VH holder) {
         mAdapter.onViewRecycled(holder);
-        mLifecycleDispatcher.unregisterLifecycleCallbacks(holder);
+        mLifecycleComposite.unregisterLifecycleCallbacks(holder);
     }
 
     /**

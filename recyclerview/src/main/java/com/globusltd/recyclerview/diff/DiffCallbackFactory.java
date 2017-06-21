@@ -27,7 +27,7 @@ import com.globusltd.recyclerview.datasource.Datasource;
 public interface DiffCallbackFactory<E> {
 
     @NonNull
-    DiffCallback createDiffCallback(@NonNull final Datasource<E> oldDatasource,
-                                    @NonNull final Datasource<E> newDatasource);
+    DiffCallback createDiffCallback(@NonNull final Datasource<? extends E> oldDatasource,
+                                    @NonNull final Datasource<? extends E> newDatasource);
 
 }
