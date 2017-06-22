@@ -16,25 +16,13 @@
 package com.globusltd.recyclerview;
 
 import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
- * Interface describes component that supports replacing internal components
+ * Interface describes component that supports replacing internal {@link Datasource}
  * without interruption to the system.
  *
- * @param <E> Type of elements handled by component.
+ * @param <E> Type of elements handled by datasource.
  */
 @MainThread
-public interface Swappable<E> {
-    
-    /**
-     * Performs swapping the internal components and returns the previous component.
-     *
-     * @param component The new component that should replace the old one.
-     * @return The previous component.
-     */
-    @Nullable
-    E swap(@NonNull final E component);
-    
+public interface DatasourceSwappable<E> extends Swappable<Datasource<? extends E>> {
 }

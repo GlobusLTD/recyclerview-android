@@ -28,36 +28,41 @@ import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import java.util.List;
 
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements Swappable<Datasource<? extends E>> {
-
+        extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E> {
+    
     @NonNull
-    private final DatasourceProxy<? extends E> mDatasource;
-
+    private final DatasourceObserver mDatasourceObserver;
+    
+    @NonNull
+    private final DatasourceProxy<E> mDatasource;
+    
     public Adapter() {
         this(Datasources.<E>empty());
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
         this(datasource, null);
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
+        mDatasourceObserver = new AdapterDatasourceObserver(this);
         mDatasource = new DatasourceProxy<>(diffCallbackFactory);
-        // TODO: mDatasource.swap(datasource);
+        mDatasource.swap(datasource);
     }
-
+    
     @NonNull
     public Datasource<? extends E> getDatasource() {
         return mDatasource;
     }
-
+    
+    @Nullable
     @Override
-    public void swap(@NonNull final Datasource<? extends E> datasource) {
-        // TODO: mDatasource.swap(datasource);
+    public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
+        return mDatasource.swap(datasource);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -66,7 +71,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         super.onAttachedToRecyclerView(recyclerView);
         // TODO: mDatasource.registerDatasourceObserver();
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -75,7 +80,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         super.onDetachedFromRecyclerView(recyclerView);
         // TODO: mDatasource.unregisterDatasourceObserver();
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -83,7 +88,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public int getItemCount() {
         return mDatasource.size();
     }
-
+    
     /**
      * Indicates whether all the items in this adapter are enabled. If the
      * value returned by this method changes over time, there is no guarantee
@@ -96,7 +101,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public boolean areAllItemsEnabled() {
         return true;
     }
-
+    
     /**
      * Returns true if the item at the specified position is clickable.
      * <p/>
@@ -110,13 +115,13 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public boolean isEnabled(final int position) {
         return true;
     }
-
+    
     @Override
     public final VH onCreateViewHolder(final ViewGroup parent, final int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return onCreateViewHolder(inflater, parent, viewType);
     }
-
+    
     /**
      * Called when RecyclerView needs a new {@link RecyclerView.ViewHolder} of the given type to represent
      * an item.
@@ -141,13 +146,13 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @NonNull
     public abstract VH onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                           @NonNull final ViewGroup parent, final int viewType);
-
+    
     @Override
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
     }
-
+    
     /**
      * Called by RecyclerView to display the data at the specified position. This method should
      * update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect the item at the given
@@ -166,16 +171,50 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * @param item     The item at the given position in the data set.
      * @param position The position of the item within the adapter's data set.
      */
-    public abstract void onBindViewHolder(@NonNull final VH holder, @NonNull final E item, final int position);
-
-    /**
-     * {@inheritDoc}
-     */
+    public abstract void onBindViewHolder(@NonNull final VH holder, @NonNull final E item,
+                                          final int position);
+    
     @Override
-    public final void onBindViewHolder(final VH holder, final int position, final List<Object> payloads) {
-        super.onBindViewHolder(holder, position, payloads);
+    public final void onBindViewHolder(final VH holder, final int position,
+                                       final List<Object> payloads) {
+        final E item = mDatasource.get(position);
+        onBindViewHolder(holder, item, position, payloads);
     }
-
+    
+    /**
+     * Called by RecyclerView to display the data at the specified position. This method
+     * should update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect
+     * the item at the given position.
+     * <p>
+     * Note that unlike {@link android.widget.ListView}, RecyclerView will not call this method
+     * again if the position of the item changes in the data set unless the item itself is
+     * invalidated or the new position cannot be determined. For this reason, you should only
+     * use the <code>position</code> parameter while acquiring the related data item inside
+     * this method and should not keep a copy of it. If you need the position of an item later
+     * on (e.g. in a click listener), use {@link RecyclerView.ViewHolder#getAdapterPosition()}
+     * which will have the updated adapter position.
+     * <p>
+     * Partial bind vs full bind:
+     * <p>
+     * The payloads parameter is a merge list from {@link #notifyItemChanged(int, Object)} or
+     * {@link #notifyItemRangeChanged(int, int, Object)}.  If the payloads list is not empty,
+     * the ViewHolder is currently bound to old data and Adapter may run an efficient partial
+     * update using the payload info.  If the payload is empty,  Adapter must run a full bind.
+     * Adapter should not assume that the payload passed in notify methods will be received by
+     * onBindViewHolder(). For example when the view is not attached to the screen, the
+     * payload in notifyItemChange() will be simply dropped.
+     *
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     * @param payloads A non-null list of merged payloads. Can be empty list if requires full
+     *                 update.
+     */
+    public void onBindViewHolder(@NonNull final VH holder, @NonNull final E item,
+                                 final int position, final List<Object> payloads) {
+        onBindViewHolder(holder, item, position);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -183,5 +222,5 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void onViewRecycled(final VH holder) {
         super.onViewRecycled(holder);
     }
-
+    
 }

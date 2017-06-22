@@ -28,10 +28,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        
         final ListDatasource<String> datastore = new ListDatasource<>();
-        final Adapter<String, ?> adapter = new SampleAdapter(datastore);
+        final Adapter<CharSequence, ?> adapter = new SampleAdapter(datastore);
         datastore.clear();
     }
 

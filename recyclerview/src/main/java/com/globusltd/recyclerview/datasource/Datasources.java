@@ -43,8 +43,8 @@ public class Datasources {
      * @see #EMPTY_DATASOURCE
      */
     @SuppressWarnings("unchecked")
-    public static <T> Datasource<T> empty() {
-        return (Datasource<T>) EMPTY_DATASOURCE;
+    public static <T> Datasource<? extends T> empty() {
+        return (Datasource<? extends T>) EMPTY_DATASOURCE;
     }
 
     private static class EmptyDatasource<E> implements Datasource<E> {

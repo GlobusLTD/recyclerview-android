@@ -33,22 +33,22 @@ import java.util.List;
  */
 @MainThread
 public class ListDatasource<E> implements Datasource<E> {
-
+    
     @NonNull
     private final List<E> mItems;
-
+    
     @NonNull
     private final DatasourceObservable mDatasourceObservable;
-
+    
     public ListDatasource() {
         this(Collections.<E>emptyList());
     }
-
+    
     public ListDatasource(@NonNull final List<? extends E> items) {
         mItems = new ArrayList<>(items);
         mDatasourceObservable = new DatasourceObservable();
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -57,7 +57,7 @@ public class ListDatasource<E> implements Datasource<E> {
     public E get(@IntRange(from = 0) final int position) {
         return mItems.get(position);
     }
-
+    
     /**
      * Adds a data entity to the end.
      *
@@ -69,7 +69,7 @@ public class ListDatasource<E> implements Datasource<E> {
             mDatasourceObservable.notifyItemRangeInserted(position, 1);
         }
     }
-
+    
     /**
      * Adds a data entity to a given position.
      *
@@ -80,7 +80,7 @@ public class ListDatasource<E> implements Datasource<E> {
         mItems.add(position, e);
         mDatasourceObservable.notifyItemRangeInserted(position, 1);
     }
-
+    
     /**
      * Adds all data entities to the end.
      *
@@ -93,7 +93,7 @@ public class ListDatasource<E> implements Datasource<E> {
             mDatasourceObservable.notifyItemRangeInserted(positionStart, itemCount);
         }
     }
-
+    
     /**
      * Adds all data entities after the specified position.
      *
@@ -108,7 +108,7 @@ public class ListDatasource<E> implements Datasource<E> {
             mDatasourceObservable.notifyItemRangeInserted(position, itemCount);
         }
     }
-
+    
     /**
      * Moves entity from one position to another.
      *
@@ -121,7 +121,7 @@ public class ListDatasource<E> implements Datasource<E> {
         mItems.add(toPosition, e);
         mDatasourceObservable.notifyItemMoved(fromPosition, toPosition);
     }
-
+    
     /**
      * Removes entity at a given position.
      *
@@ -134,7 +134,7 @@ public class ListDatasource<E> implements Datasource<E> {
         mDatasourceObservable.notifyItemRangeRemoved(position, 1);
         return e;
     }
-
+    
     /**
      * Removes a range of elements.
      *
@@ -148,7 +148,7 @@ public class ListDatasource<E> implements Datasource<E> {
         }
         mDatasourceObservable.notifyItemRangeRemoved(fromPosition, itemCount);
     }
-
+    
     /**
      * Removes all of the elements from this datastore.
      * The datastore will be empty after this call returns.
@@ -158,7 +158,7 @@ public class ListDatasource<E> implements Datasource<E> {
         mItems.clear();
         mDatasourceObservable.notifyItemRangeRemoved(0, itemCount);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -166,7 +166,7 @@ public class ListDatasource<E> implements Datasource<E> {
     public int size() {
         return mItems.size();
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -174,7 +174,7 @@ public class ListDatasource<E> implements Datasource<E> {
     public void registerDatasourceObserver(@NonNull final DatasourceObserver observer) {
         mDatasourceObservable.registerObserver(observer);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -182,5 +182,5 @@ public class ListDatasource<E> implements Datasource<E> {
     public void unregisterDatasourceObserver(@NonNull final DatasourceObserver observer) {
         mDatasourceObservable.unregisterObserver(observer);
     }
-
+    
 }

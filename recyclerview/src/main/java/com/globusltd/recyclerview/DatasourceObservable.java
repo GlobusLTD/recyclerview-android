@@ -17,21 +17,48 @@ package com.globusltd.recyclerview;
 
 import android.database.Observable;
 import android.support.annotation.IntRange;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 
+/**
+ * {@link DatasourceObservable} provides methods for registering, unregistering
+ * and dispatching data changes in the datasources to the registered {@link DatasourceObserver}s.
+ */
+@MainThread
 public class DatasourceObservable extends Observable<DatasourceObserver> {
-
+    
     public DatasourceObservable() {
         super();
     }
-
+    
+    /**
+     * Checks if this observable has any registered observers.
+     *
+     * @return true if this observable has any registered observers, false otherwise.
+     */
+    public boolean hasObservers() {
+        return !mObservers.isEmpty();
+    }
+    
+    /**
+     * Notifies the registered observers that the data in the datasource have been changed.
+     * Note that method can be called multiple times.
+     */
     public void notifyChanged() {
         final int size = mObservers.size();
         for (int i = size - 1; i >= 0; i--) {
             mObservers.get(i).onChanged();
         }
     }
-
+    
+    /**
+     * Notifies the registered observers that the data in the datasource have been changed.
+     * Note that method can be called multiple times.
+     *
+     * @param positionStart Position of the first data item that has changed.
+     * @param itemCount     Number of the data items that have changed.
+     * @param payload       Optional parameter, use null to identify a "full" update.
+     */
     public void notifyItemRangeChanged(@IntRange(from = 0) final int positionStart,
                                        @IntRange(from = 0) final int itemCount,
                                        @Nullable final Object payload) {
@@ -40,7 +67,14 @@ public class DatasourceObservable extends Observable<DatasourceObserver> {
             mObservers.get(i).onItemRangeChanged(positionStart, itemCount, payload);
         }
     }
-
+    
+    /**
+     * Notifies the registered observers that the new data have been inserted to the datasource.
+     * Note that method can be called multiple times.
+     *
+     * @param positionStart Position of the first data item that was inserted.
+     * @param itemCount     Number of the data items inserted.
+     */
     public void notifyItemRangeInserted(@IntRange(from = 0) final int positionStart,
                                         @IntRange(from = 0) final int itemCount) {
         final int size = mObservers.size();
@@ -48,7 +82,14 @@ public class DatasourceObservable extends Observable<DatasourceObserver> {
             mObservers.get(i).onItemRangeInserted(positionStart, itemCount);
         }
     }
-
+    
+    /**
+     * Notifies the registered observers that the data have been removed from the datasource.
+     * Note that method can be called multiple times.
+     *
+     * @param positionStart Position of the first data item that was removed.
+     * @param itemCount     Number of the data items removed.
+     */
     public void notifyItemRangeRemoved(@IntRange(from = 0) final int positionStart,
                                        @IntRange(from = 0) final int itemCount) {
         final int size = mObservers.size();
@@ -56,13 +97,21 @@ public class DatasourceObservable extends Observable<DatasourceObserver> {
             mObservers.get(i).onItemRangeRemoved(positionStart, itemCount);
         }
     }
-
+    
+    /**
+     * Notifies the registered observers that the data have been moved to the another position
+     * in the datasource.
+     * Note that method can be called multiple times.
+     *
+     * @param fromPosition Previous position of the data item.
+     * @param toPosition   New position of the data item.
+     */
     public void notifyItemMoved(@IntRange(from = 0) final int fromPosition,
                                 @IntRange(from = 0) final int toPosition) {
         final int size = mObservers.size();
         for (int i = size - 1; i >= 0; i--) {
-            mObservers.get(i).onItemRangeMoved(fromPosition, toPosition, 1);
+            mObservers.get(i).onItemMoved(fromPosition, toPosition);
         }
     }
-
+    
 }

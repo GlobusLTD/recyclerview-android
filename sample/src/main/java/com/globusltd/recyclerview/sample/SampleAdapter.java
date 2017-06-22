@@ -29,7 +29,7 @@ import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 
-class SampleAdapter extends Adapter<String, SampleAdapter.SampleViewHolder> {
+class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder> {
 
     SampleAdapter(@NonNull final Datasource<? extends String> datasource) {
         super(datasource, new StringDiffCallbackFactory());
@@ -46,7 +46,7 @@ class SampleAdapter extends Adapter<String, SampleAdapter.SampleViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final SampleViewHolder holder,
-                                 @NonNull final String item, final int position) {
+                                 @NonNull final CharSequence item, final int position) {
         holder.setText1(item);
     }
 
@@ -60,27 +60,27 @@ class SampleAdapter extends Adapter<String, SampleAdapter.SampleViewHolder> {
             mTextView1 = (TextView) itemView.findViewById(android.R.id.text1);
         }
 
-        void setText1(@NonNull final String item) {
+        void setText1(@NonNull final CharSequence item) {
             mTextView1.setText(item);
         }
 
     }
 
-    private static class StringDiffCallbackFactory implements DiffCallbackFactory<String> {
+    private static class StringDiffCallbackFactory implements DiffCallbackFactory<CharSequence> {
 
         @NonNull
         @Override
-        public DiffCallback createDiffCallback(@NonNull final Datasource<? extends String> oldDatasource,
-                                               @NonNull final Datasource<? extends String> newDatasource) {
-            return new SimpleDatasourcesDiffCallback<String>(oldDatasource, newDatasource) {
+        public DiffCallback createDiffCallback(@NonNull final Datasource<? extends CharSequence> oldDatasource,
+                                               @NonNull final Datasource<? extends CharSequence> newDatasource) {
+            return new SimpleDatasourcesDiffCallback<CharSequence>(oldDatasource, newDatasource) {
 
                 @Override
-                public boolean areItemsTheSame(@NonNull final String oldItem, @NonNull final String newItem) {
+                public boolean areItemsTheSame(@NonNull final CharSequence oldItem, @NonNull final CharSequence newItem) {
                     return TextUtils.equals(oldItem, newItem);
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull final String oldItem, @NonNull final String newItem) {
+                public boolean areContentsTheSame(@NonNull final CharSequence oldItem, @NonNull final CharSequence newItem) {
                     return true;
                 }
 
