@@ -5,16 +5,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
+/**
+ * Observer class for watching changes to a {@link Datasource} and
+ * dispatching them to the {@link RecyclerView.Adapter}.
+ */
 class AdapterDatasourceObserver extends DatasourceObserver {
-    
+
     @NonNull
     private final RecyclerView.Adapter<?> mAdapter;
-    
+
     AdapterDatasourceObserver(@NonNull final RecyclerView.Adapter<?> adapter) {
         super();
         mAdapter = adapter;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -22,7 +26,7 @@ class AdapterDatasourceObserver extends DatasourceObserver {
     public void onChanged() {
         mAdapter.notifyDataSetChanged();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -32,7 +36,7 @@ class AdapterDatasourceObserver extends DatasourceObserver {
                                    @Nullable final Object payload) {
         mAdapter.notifyItemRangeChanged(positionStart, itemCount, payload);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -41,7 +45,7 @@ class AdapterDatasourceObserver extends DatasourceObserver {
                                     @IntRange(from = 0) final int itemCount) {
         mAdapter.notifyItemRangeInserted(positionStart, itemCount);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -50,7 +54,7 @@ class AdapterDatasourceObserver extends DatasourceObserver {
                                    @IntRange(from = 0) final int itemCount) {
         mAdapter.notifyItemRangeRemoved(positionStart, itemCount);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -59,5 +63,5 @@ class AdapterDatasourceObserver extends DatasourceObserver {
                             @IntRange(from = 0) final int toPosition) {
         mAdapter.notifyItemMoved(fromPosition, toPosition);
     }
-    
+
 }

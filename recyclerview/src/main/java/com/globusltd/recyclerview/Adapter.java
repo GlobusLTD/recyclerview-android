@@ -17,6 +17,7 @@ package com.globusltd.recyclerview;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,61 +27,72 @@ import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E> {
-    
-    @NonNull
-    private final DatasourceObserver mDatasourceObserver;
-    
+
     @NonNull
     private final DatasourceProxy<E> mDatasource;
-    
+
+    @NonNull
+    private final DatasourceObserver mDatasourceObserver;
+
+    @NonNull
+    private final Set<RecyclerView> mAttachedRecyclerViews;
+
     public Adapter() {
         this(Datasources.<E>empty());
     }
-    
+
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
         this(datasource, null);
     }
-    
+
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
+        mDatasource = new DatasourceProxy<>(datasource, diffCallbackFactory);
         mDatasourceObserver = new AdapterDatasourceObserver(this);
-        mDatasource = new DatasourceProxy<>(diffCallbackFactory);
-        mDatasource.swap(datasource);
+        mAttachedRecyclerViews = new ArraySet<>();
     }
-    
+
     @NonNull
     public Datasource<? extends E> getDatasource() {
         return mDatasource;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     @Override
     public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
         return mDatasource.swap(datasource);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        // TODO: mDatasource.registerDatasourceObserver();
+        if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
+            mDatasource.registerDatasourceObserver(mDatasourceObserver);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        // TODO: mDatasource.unregisterDatasourceObserver();
+        if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
+            mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,7 +100,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public int getItemCount() {
         return mDatasource.size();
     }
-    
+
     /**
      * Indicates whether all the items in this adapter are enabled. If the
      * value returned by this method changes over time, there is no guarantee
@@ -101,7 +113,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public boolean areAllItemsEnabled() {
         return true;
     }
-    
+
     /**
      * Returns true if the item at the specified position is clickable.
      * <p/>
@@ -115,13 +127,13 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public boolean isEnabled(final int position) {
         return true;
     }
-    
+
     @Override
     public final VH onCreateViewHolder(final ViewGroup parent, final int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return onCreateViewHolder(inflater, parent, viewType);
     }
-    
+
     /**
      * Called when RecyclerView needs a new {@link RecyclerView.ViewHolder} of the given type to represent
      * an item.
@@ -146,13 +158,13 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @NonNull
     public abstract VH onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                           @NonNull final ViewGroup parent, final int viewType);
-    
+
     @Override
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
     }
-    
+
     /**
      * Called by RecyclerView to display the data at the specified position. This method should
      * update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect the item at the given
@@ -173,14 +185,14 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      */
     public abstract void onBindViewHolder(@NonNull final VH holder, @NonNull final E item,
                                           final int position);
-    
+
     @Override
     public final void onBindViewHolder(final VH holder, final int position,
                                        final List<Object> payloads) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position, payloads);
     }
-    
+
     /**
      * Called by RecyclerView to display the data at the specified position. This method
      * should update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect
@@ -214,7 +226,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                  final int position, final List<Object> payloads) {
         onBindViewHolder(holder, item, position);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -222,5 +234,5 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void onViewRecycled(final VH holder) {
         super.onViewRecycled(holder);
     }
-    
+
 }
