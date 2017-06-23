@@ -31,8 +31,8 @@ import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 
 class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder> {
 
-    SampleAdapter(@NonNull final Datasource<? extends String> datasource) {
-        super(datasource, new StringDiffCallbackFactory());
+    SampleAdapter(@NonNull final Datasource<? extends CharSequence> datasource) {
+        super(datasource, new CharSequenceDiffCallbackFactory());
     }
 
     @NonNull
@@ -66,7 +66,7 @@ class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder
 
     }
 
-    private static class StringDiffCallbackFactory implements DiffCallbackFactory<CharSequence> {
+    private static class CharSequenceDiffCallbackFactory implements DiffCallbackFactory<CharSequence> {
 
         @NonNull
         @Override
@@ -75,12 +75,14 @@ class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder
             return new SimpleDatasourcesDiffCallback<CharSequence>(oldDatasource, newDatasource) {
 
                 @Override
-                public boolean areItemsTheSame(@NonNull final CharSequence oldItem, @NonNull final CharSequence newItem) {
+                public boolean areItemsTheSame(@NonNull final CharSequence oldItem,
+                                               @NonNull final CharSequence newItem) {
                     return TextUtils.equals(oldItem, newItem);
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull final CharSequence oldItem, @NonNull final CharSequence newItem) {
+                public boolean areContentsTheSame(@NonNull final CharSequence oldItem,
+                                                  @NonNull final CharSequence newItem) {
                     return true;
                 }
 

@@ -47,14 +47,14 @@ class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
         oldDatasource.unregisterDatasourceObserver(mDatasourceObserver);
 
         final int itemCount = datasource.size();
-        if (mDatasource.size() == 0) {
+        if (oldDatasource.size() == 0) {
             mDatasource = datasource;
             mDatasource.registerDatasourceObserver(mDatasourceObserver);
             mDatasourceObservable.notifyItemRangeInserted(0, itemCount);
 
         } else if (mDiffCallbackFactory != null) {
             final DiffCallback diffCallback = mDiffCallbackFactory
-                    .createDiffCallback(mDatasource, datasource);
+                    .createDiffCallback(oldDatasource, datasource);
             mDatasource = datasource;
             mDatasource.registerDatasourceObserver(mDatasourceObserver);
             DiffUtil.calculateDiff(diffCallback, diffCallback.shouldDetectMoves())

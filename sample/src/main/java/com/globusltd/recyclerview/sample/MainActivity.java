@@ -29,28 +29,28 @@ import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.datasource.ListDatasource;
 
 public class MainActivity extends AppCompatActivity {
-
+    
     private RecyclerView mRecyclerView;
-
+    
     private Handler mHandler = new Handler(Looper.getMainLooper());
-
+    
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         final ListDatasource<String> datasource = new ListDatasource<>();
         final Adapter<CharSequence, ?> adapter = new SampleAdapter(datasource);
-
+        
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
-
+        
         mHandler.postDelayed(() -> datasource.add("Test1 String"), 2000L);
         mHandler.postDelayed(() -> datasource.add("Test2 String"), 2100L);
         mHandler.postDelayed(() -> datasource.add("Test3 String"), 2200L);
-
+        
         final ListDatasource<String> changedDatasource = new ListDatasource<>();
         changedDatasource.add("Test3 String");
         changedDatasource.add("Test5 String");
@@ -59,17 +59,17 @@ public class MainActivity extends AppCompatActivity {
         changedDatasource.add("Test2 String");
         changedDatasource.add("Test6 String");
         mHandler.postDelayed(() -> adapter.swap(changedDatasource), 5000L);
-
+        
         mHandler.postDelayed(() -> changedDatasource.removeRange(1, 3), 8000L);
-
+        
         mHandler.postDelayed(() -> adapter.swap(Datasources.empty()), 11000L);
     }
-
+    
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacksAndMessages(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }
-
+    
 }
