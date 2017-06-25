@@ -3,12 +3,14 @@ package com.globusltd.recyclerview;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v7.widget.RecyclerView;
 
 /**
  * Observer class for watching changes to a {@link Datasource} and
  * dispatching them to the {@link RecyclerView.Adapter}.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 class AdapterDatasourceObserver extends DatasourceObserver {
 
     @NonNull

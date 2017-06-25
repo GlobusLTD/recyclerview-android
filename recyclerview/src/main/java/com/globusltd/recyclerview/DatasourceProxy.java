@@ -4,6 +4,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 
@@ -11,6 +12,7 @@ import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 
 @MainThread
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
 
     @Nullable

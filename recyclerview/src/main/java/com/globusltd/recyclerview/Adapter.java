@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
@@ -25,6 +26,10 @@ import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
+import com.globusltd.recyclerview.view.ClickableInfo;
+import com.globusltd.recyclerview.view.ItemClickBehavior;
+import com.globusltd.recyclerview.view.OnItemClickListener;
+import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
 import java.util.List;
 import java.util.Set;
@@ -37,6 +42,9 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
 
     @NonNull
     private final DatasourceObserver mDatasourceObserver;
+
+    @NonNull
+    private final ItemClickBehavior<E> mItemClickBehavior;
 
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
@@ -54,6 +62,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         super();
         mDatasource = new DatasourceProxy<>(datasource, diffCallbackFactory);
         mDatasourceObserver = new AdapterDatasourceObserver(this);
+        mItemClickBehavior = new ItemClickBehavior<>(this);
         mAttachedRecyclerViews = new ArraySet<>();
     }
 
@@ -75,36 +84,34 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
-            mDatasource.registerDatasourceObserver(mDatasourceObserver);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
-            mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int getItemCount() {
         return mDatasource.size();
     }
 
     /**
+     * Register a callback to be invoked when an item in this adapter has
+     * been clicked.
+     *
+     * @param onItemClickListener the callback that will be invoked.
+     */
+    public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
+        mItemClickBehavior.setOnItemClickListener(onItemClickListener);
+    }
+
+    /**
+     * Register a callback to be invoked when an item in this adapter has
+     * been long clicked.
+     *
+     * @param onItemLongClickListener the callback that will be invoked.
+     */
+    public void setOnLongItemClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
+        mItemClickBehavior.setOnLongItemClickListener(onItemLongClickListener);
+    }
+
+    /**
      * Indicates whether all the items in this adapter are enabled. If the
      * value returned by this method changes over time, there is no guarantee
-     * it will take effect.  If true, it means all items are selectable and
+     * it will take effect. If true, it means all items are selectable and
      * clickable (there is no separator.)
      *
      * @return True if all items are enabled, false otherwise.
@@ -117,10 +124,10 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     /**
      * Returns true if the item at the specified position is clickable.
      * <p/>
-     * The result is unspecified if position is invalid. An {@link ArrayIndexOutOfBoundsException}
+     * The result is unspecified if position is invalid. An {@link IndexOutOfBoundsException}
      * should be thrown in that case for fast failure.
      *
-     * @param position an index of the item
+     * @param position an index of the item.
      * @return {@code true} if item is clickable, {@code false} otherwise.
      * @see #areAllItemsEnabled()
      */
@@ -128,8 +135,21 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         return true;
     }
 
+    /**
+     * Returns information about all of the clickable views at specified position.
+     *
+     * @param position an index of the item.
+     * @return A (@link ClickableInfo} instance.
+     * @see #areAllItemsEnabled()
+     * @see #isEnabled(int)
+     */
+    @NonNull
+    public ClickableInfo getClickableInfo(final int position) {
+        return ClickableInfo.NO_INFO;
+    }
+
     @Override
-    public final VH onCreateViewHolder(final ViewGroup parent, final int viewType) {
+    public final VH onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return onCreateViewHolder(inflater, parent, viewType);
     }
@@ -163,6 +183,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
+        mItemClickBehavior.attachViewHolder(holder);
     }
 
     /**
@@ -191,6 +212,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                        final List<Object> payloads) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position, payloads);
+        mItemClickBehavior.attachViewHolder(holder);
     }
 
     /**
@@ -213,7 +235,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * the ViewHolder is currently bound to old data and Adapter may run an efficient partial
      * update using the payload info.  If the payload is empty,  Adapter must run a full bind.
      * Adapter should not assume that the payload passed in notify methods will be received by
-     * onBindViewHolder(). For example when the view is not attached to the screen, the
+     * attachViewHolder(). For example when the view is not attached to the screen, the
      * payload in notifyItemChange() will be simply dropped.
      *
      * @param holder   The ViewHolder which should be updated to represent the contents of the
@@ -230,9 +252,45 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void onViewRecycled(final VH holder) {
+        mItemClickBehavior.detachViewHolder(holder);
         super.onViewRecycled(holder);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @CallSuper
+    @Override
+    public boolean onFailedToRecycleView(final VH holder) {
+        mItemClickBehavior.detachViewHolder(holder);
+        return super.onFailedToRecycleView(holder);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @CallSuper
+    @Override
+    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
+            mDatasource.registerDatasourceObserver(mDatasourceObserver);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @CallSuper
+    @Override
+    public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
+            mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
+        }
     }
 
 }

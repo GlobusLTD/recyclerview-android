@@ -13,27 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.view;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-import android.view.View;
+import android.support.annotation.RestrictTo;
+import android.support.v7.widget.RecyclerView;
 
-/**
- * Interface definition for a callback to be invoked when an item in this
- * AdapterView has been clicked.
- */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 @MainThread
-public interface OnItemClickListener<E> {
+public interface ViewHolderBehavior {
 
-    /**
-     * Callback method to be invoked when an item in this AdapterView has
-     * been clicked.
-     *
-     * @param view     the view that was clicked (this will be a view provided by the adapter).
-     * @param item     the data entity that was clicked.
-     * @param position the position of the data entity in the adapter.
-     */
-    void onItemClick(@NonNull final View view, final E item, final int position);
+    void attachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
+
+    void detachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
 
 }

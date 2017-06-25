@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.view;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -21,20 +21,19 @@ import android.view.View;
 
 /**
  * Interface definition for a callback to be invoked when an item in this
- * AdapterView has been clicked and held.
+ * AdapterView has been clicked.
  */
 @MainThread
-public interface OnItemLongClickListener<E> {
+public interface OnItemClickListener<E> {
 
     /**
      * Callback method to be invoked when an item in this AdapterView has
-     * been clicked and held.
+     * been clicked.
      *
-     * @param view     the view that was clicked and held (this will be a view provided by the adapter).
-     * @param item     the data entity that was clicked and held.
+     * @param view     the view that was clicked (this will be a view provided by the adapter).
+     * @param item     the data entity that was clicked.
      * @param position the position of the data entity in the adapter.
-     * @return true if the callback consumed the long click, false otherwise.
      */
-    boolean onItemLongClick(@NonNull final View view, final E item, final int position);
+    void onItemClick(@NonNull final View view, final E item, final int position);
 
 }
