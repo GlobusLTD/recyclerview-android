@@ -20,12 +20,12 @@ import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.globusltd.recyclerview.Adapter;
+import com.globusltd.recyclerview.ViewHolderBehavior;
 import com.globusltd.recyclerview.util.ArrayPool;
 import com.globusltd.recyclerview.util.Pool;
 
@@ -37,7 +37,6 @@ import java.util.Map;
  *
  * @param <E> Type of elements handled by click listeners.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 @MainThread
 public class ItemClickBehavior<E> implements ViewHolderBehavior {
     
@@ -86,7 +85,7 @@ public class ItemClickBehavior<E> implements ViewHolderBehavior {
      * {@inheritDoc}
      */
     @Override
-    public void attachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
         final int position = holder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount()) {
             final ViewHolderClickListener listener = mActiveViewHolders.containsKey(holder) ?
@@ -114,7 +113,7 @@ public class ItemClickBehavior<E> implements ViewHolderBehavior {
     /**
      * {@inheritDoc}
      */
-    public void detachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
         final ViewHolderClickListener listener = mActiveViewHolders.remove(holder);
         if (listener != null) {
             final ClickableViews clickableViews = mAdapter.getClickableViews(listener.position, listener.viewType);

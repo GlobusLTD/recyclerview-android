@@ -176,7 +176,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
-        mItemClickBehavior.attachViewHolder(holder);
+        mItemClickBehavior.onAttachViewHolder(holder);
     }
     
     /**
@@ -205,7 +205,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                        final List<Object> payloads) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position, payloads);
-        mItemClickBehavior.attachViewHolder(holder);
+        mItemClickBehavior.onAttachViewHolder(holder);
     }
     
     /**
@@ -228,7 +228,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * the ViewHolder is currently bound to old data and Adapter may run an efficient partial
      * update using the payload info.  If the payload is empty,  Adapter must run a full bind.
      * Adapter should not assume that the payload passed in notify methods will be received by
-     * attachViewHolder(). For example when the view is not attached to the screen, the
+     * onAttachViewHolder(). For example when the view is not attached to the screen, the
      * payload in notifyItemChange() will be simply dropped.
      *
      * @param holder   The ViewHolder which should be updated to represent the contents of the
@@ -248,7 +248,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public void onViewRecycled(final VH holder) {
-        mItemClickBehavior.detachViewHolder(holder);
+        mItemClickBehavior.onDetachViewHolder(holder);
         super.onViewRecycled(holder);
     }
     
@@ -258,7 +258,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public boolean onFailedToRecycleView(final VH holder) {
-        mItemClickBehavior.detachViewHolder(holder);
+        mItemClickBehavior.onDetachViewHolder(holder);
         return super.onFailedToRecycleView(holder);
     }
     

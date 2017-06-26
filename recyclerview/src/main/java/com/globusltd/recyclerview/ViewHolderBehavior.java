@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.view;
+package com.globusltd.recyclerview;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -33,16 +33,16 @@ public interface ViewHolderBehavior {
      * Keep in mind that same data may be attached to the same ViewHolder multiple times.
      *
      * @param viewHolder Holder of the view being attached.
-     * @see #detachViewHolder(RecyclerView.ViewHolder)
+     * @see #onDetachViewHolder(RecyclerView.ViewHolder)
      */
-    void attachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
+    void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view created by this adapter has been detached from its data.
      *
      * @param viewHolder Holder of the view being detached.
-     * @see #attachViewHolder(RecyclerView.ViewHolder)
+     * @see #onAttachViewHolder(RecyclerView.ViewHolder)
      */
-    void detachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
+    void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
     
 }

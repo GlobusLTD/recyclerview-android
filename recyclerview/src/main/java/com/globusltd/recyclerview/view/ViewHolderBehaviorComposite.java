@@ -18,16 +18,28 @@ package com.globusltd.recyclerview.view;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
-public class EnableBehavior implements ViewHolderBehavior {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ViewHolderBehaviorComposite implements ViewHolderBehavior {
 
     @NonNull
-    private final Adapter<?, ?> mAdapter;
+    private final List<ViewHolderBehavior> mBehaviors;
 
-    public EnableBehavior(@NonNull final Adapter<?, ?> adapter) {
-        mAdapter = adapter;
+    public ViewHolderBehaviorComposite() {
+        mBehaviors = new ArrayList<>();
+    }
+
+    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+        if (!mBehaviors.contains(viewHolderBehavior)) {
+            mBehaviors.add(viewHolderBehavior);
+        }
+    }
+
+    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+        mBehaviors.remove(viewHolderBehavior);
     }
 
     /**
@@ -35,12 +47,8 @@ public class EnableBehavior implements ViewHolderBehavior {
      */
     @Override
     public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        final int position = viewHolder.getAdapterPosition();
-        if (position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount()) {
-            final boolean isEnabled = mAdapter.isEnabled(position);
-            viewHolder.itemView.setEnabled(isEnabled);
-        } else {
-            viewHolder.itemView.setEnabled(false);
+        for (final ViewHolderBehavior behavior : mBehaviors) {
+            behavior.onAttachViewHolder(viewHolder);
         }
     }
 
@@ -49,7 +57,11 @@ public class EnableBehavior implements ViewHolderBehavior {
      */
     @Override
     public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setEnabled(false);
+        final int size = mBehaviors.size();
+        for (int i = size - 1; i >= 0; i--) {
+            final ViewHolderBehavior behavior = mBehaviors.get(i);
+            behavior.onDetachViewHolder(viewHolder);
+        }
     }
 
 }
