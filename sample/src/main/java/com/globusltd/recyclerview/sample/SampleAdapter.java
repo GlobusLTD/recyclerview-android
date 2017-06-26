@@ -15,9 +15,11 @@
  */
 package com.globusltd.recyclerview.sample;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,67 +30,81 @@ import com.globusltd.recyclerview.Datasource;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
+import com.globusltd.recyclerview.view.ClickableViews;
 
 class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder> {
-
+    
     SampleAdapter(@NonNull final Datasource<? extends CharSequence> datasource) {
         super(datasource, new CharSequenceDiffCallbackFactory());
     }
-
+    
+    @NonNull
+    @Override
+    public ClickableViews getClickableViews(final int position, final int viewType) {
+        return ClickableViews.ITEM_VIEW;
+    }
+    
     @NonNull
     @Override
     public SampleViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                                @NonNull final ViewGroup parent,
                                                final int viewType) {
         final View itemView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        
+        final Resources.Theme theme = parent.getContext().getTheme();
+        final TypedValue outValue = new TypedValue();
+        if (theme.resolveAttribute(R.attr.selectableItemBackground, outValue, true)) {
+            itemView.setBackgroundResource(outValue.resourceId);
+        }
+        
         return new SampleViewHolder(itemView);
     }
-
+    
     @Override
     public void onBindViewHolder(@NonNull final SampleViewHolder holder,
                                  @NonNull final CharSequence item, final int position) {
         holder.setText1(item);
     }
-
+    
     static class SampleViewHolder extends RecyclerView.ViewHolder {
-
+        
         @NonNull
         private final TextView mTextView1;
-
+        
         SampleViewHolder(@NonNull final View itemView) {
             super(itemView);
             mTextView1 = (TextView) itemView.findViewById(android.R.id.text1);
         }
-
+        
         void setText1(@NonNull final CharSequence item) {
             mTextView1.setText(item);
         }
-
+        
     }
-
+    
     private static class CharSequenceDiffCallbackFactory implements DiffCallbackFactory<CharSequence> {
-
+        
         @NonNull
         @Override
         public DiffCallback createDiffCallback(@NonNull final Datasource<? extends CharSequence> oldDatasource,
                                                @NonNull final Datasource<? extends CharSequence> newDatasource) {
             return new SimpleDatasourcesDiffCallback<CharSequence>(oldDatasource, newDatasource) {
-
+                
                 @Override
                 public boolean areItemsTheSame(@NonNull final CharSequence oldItem,
                                                @NonNull final CharSequence newItem) {
                     return TextUtils.equals(oldItem, newItem);
                 }
-
+                
                 @Override
                 public boolean areContentsTheSame(@NonNull final CharSequence oldItem,
                                                   @NonNull final CharSequence newItem) {
                     return true;
                 }
-
+                
             };
         }
-
+        
     }
-
+    
 }

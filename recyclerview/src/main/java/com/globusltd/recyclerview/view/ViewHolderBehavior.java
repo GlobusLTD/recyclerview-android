@@ -20,12 +20,29 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.v7.widget.RecyclerView;
 
+/**
+ * Interface describes {@link RecyclerView.ViewHolder} attachable behavior.
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @MainThread
 public interface ViewHolderBehavior {
-
+    
+    /**
+     * Called when a view created by this adapter has been attached to a data.
+     * <p>
+     * Keep in mind that same data may be attached to the same ViewHolder multiple times.
+     *
+     * @param viewHolder Holder of the view being attached.
+     * @see #detachViewHolder(RecyclerView.ViewHolder)
+     */
     void attachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
-
+    
+    /**
+     * Called when a view created by this adapter has been detached from its data.
+     *
+     * @param viewHolder Holder of the view being detached.
+     * @see #attachViewHolder(RecyclerView.ViewHolder)
+     */
     void detachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
-
+    
 }

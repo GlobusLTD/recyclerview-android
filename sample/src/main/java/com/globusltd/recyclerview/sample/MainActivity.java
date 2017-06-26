@@ -23,21 +23,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.datasource.ListDatasource;
 
 public class MainActivity extends AppCompatActivity {
-
+    
     private RecyclerView mRecyclerView;
-
+    
     private Handler mHandler = new Handler(Looper.getMainLooper());
-
+    
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         final ListDatasource<String> datasource = new ListDatasource<>();
         datasource.add("Test3 String");
         datasource.add("Test5 String");
@@ -45,9 +46,15 @@ public class MainActivity extends AppCompatActivity {
         datasource.add("Test4 String");
         datasource.add("Test2 String");
         datasource.add("Test6 String");
-
+        
         final Adapter<CharSequence, ?> adapter = new SampleAdapter(datasource);
-
+        adapter.setOnItemClickListener((view, item, position) ->
+                Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show());
+        adapter.setOnLongItemClickListener((view, item, position) -> {
+            Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
+            return true;
+        });
+        
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -70,12 +77,12 @@ public class MainActivity extends AppCompatActivity {
         
         mHandler.postDelayed(() -> adapter.swap(Datasources.empty()), 11000L);*/
     }
-
+    
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacksAndMessages(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }
-
+    
 }

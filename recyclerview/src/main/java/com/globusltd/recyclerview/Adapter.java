@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-import com.globusltd.recyclerview.view.ClickableInfo;
+import com.globusltd.recyclerview.view.ClickableViews;
 import com.globusltd.recyclerview.view.ItemClickBehavior;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
@@ -36,27 +36,27 @@ import java.util.Set;
 
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E> {
-
+    
     @NonNull
     private final DatasourceProxy<E> mDatasource;
-
+    
     @NonNull
     private final DatasourceObserver mDatasourceObserver;
-
+    
     @NonNull
     private final ItemClickBehavior<E> mItemClickBehavior;
-
+    
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
-
+    
     public Adapter() {
         this(Datasources.<E>empty());
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
         this(datasource, null);
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
@@ -65,12 +65,18 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         mItemClickBehavior = new ItemClickBehavior<>(this);
         mAttachedRecyclerViews = new ArraySet<>();
     }
-
+    
+    /**
+     * Returns an immutable {@link Datasource} instance.
+     *
+     * @return An immutable {@link Datasource} instance.
+     * @see #swap(Datasource)
+     */
     @NonNull
     public Datasource<? extends E> getDatasource() {
         return mDatasource;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -79,7 +85,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
         return mDatasource.swap(datasource);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -87,7 +93,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public int getItemCount() {
         return mDatasource.size();
     }
-
+    
     /**
      * Register a callback to be invoked when an item in this adapter has
      * been clicked.
@@ -97,7 +103,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
         mItemClickBehavior.setOnItemClickListener(onItemClickListener);
     }
-
+    
     /**
      * Register a callback to be invoked when an item in this adapter has
      * been long clicked.
@@ -107,20 +113,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void setOnLongItemClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
         mItemClickBehavior.setOnLongItemClickListener(onItemLongClickListener);
     }
-
-    /**
-     * Indicates whether all the items in this adapter are enabled. If the
-     * value returned by this method changes over time, there is no guarantee
-     * it will take effect. If true, it means all items are selectable and
-     * clickable (there is no separator.)
-     *
-     * @return True if all items are enabled, false otherwise.
-     * @see #isEnabled(int)
-     */
-    public boolean areAllItemsEnabled() {
-        return true;
-    }
-
+    
     /**
      * Returns true if the item at the specified position is clickable.
      * <p/>
@@ -128,32 +121,32 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * should be thrown in that case for fast failure.
      *
      * @param position an index of the item.
-     * @return {@code true} if item is clickable, {@code false} otherwise.
-     * @see #areAllItemsEnabled()
+     * @return {@code true} if item is enabled, {@code false} otherwise.
      */
     public boolean isEnabled(final int position) {
         return true;
     }
-
+    
     /**
      * Returns information about all of the clickable views at specified position.
+     * Note that it's better to preallocate ClickableViews instance for each view type
+     * and enable/disable clicks by providing enabled flag via {@link #isEnabled(int)}.
      *
      * @param position an index of the item.
-     * @return A (@link ClickableInfo} instance.
-     * @see #areAllItemsEnabled()
+     * @return A {@link ClickableViews} instance.
      * @see #isEnabled(int)
      */
     @NonNull
-    public ClickableInfo getClickableInfo(final int position) {
-        return ClickableInfo.NO_INFO;
+    public ClickableViews getClickableViews(final int position, final int viewType) {
+        return ClickableViews.NONE;
     }
-
+    
     @Override
     public final VH onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return onCreateViewHolder(inflater, parent, viewType);
     }
-
+    
     /**
      * Called when RecyclerView needs a new {@link RecyclerView.ViewHolder} of the given type to represent
      * an item.
@@ -178,14 +171,14 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @NonNull
     public abstract VH onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                           @NonNull final ViewGroup parent, final int viewType);
-
+    
     @Override
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
         mItemClickBehavior.attachViewHolder(holder);
     }
-
+    
     /**
      * Called by RecyclerView to display the data at the specified position. This method should
      * update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect the item at the given
@@ -206,7 +199,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      */
     public abstract void onBindViewHolder(@NonNull final VH holder, @NonNull final E item,
                                           final int position);
-
+    
     @Override
     public final void onBindViewHolder(final VH holder, final int position,
                                        final List<Object> payloads) {
@@ -214,7 +207,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         onBindViewHolder(holder, item, position, payloads);
         mItemClickBehavior.attachViewHolder(holder);
     }
-
+    
     /**
      * Called by RecyclerView to display the data at the specified position. This method
      * should update the contents of the {@link RecyclerView.ViewHolder#itemView} to reflect
@@ -248,7 +241,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                  final int position, final List<Object> payloads) {
         onBindViewHolder(holder, item, position);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -258,7 +251,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         mItemClickBehavior.detachViewHolder(holder);
         super.onViewRecycled(holder);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -268,7 +261,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         mItemClickBehavior.detachViewHolder(holder);
         return super.onFailedToRecycleView(holder);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -280,7 +273,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
             mDatasource.registerDatasourceObserver(mDatasourceObserver);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -292,5 +285,5 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
             mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
         }
     }
-
+    
 }
