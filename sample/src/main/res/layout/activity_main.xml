@@ -13,4 +13,13 @@
         android:scrollbars="vertical"
         tools:listitem="@android:layout/simple_list_item_1"/>
 
+    <Button
+        android:id="@+id/pause"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/pause"
+        android:layout_gravity="bottom|center_horizontal"/>
+
 </FrameLayout>

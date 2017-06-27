@@ -19,6 +19,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +32,17 @@ import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 import com.globusltd.recyclerview.view.ClickableViews;
+import com.globusltd.recyclerview.view.LifecycleCallbacks;
 
 class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder> {
     
     SampleAdapter(@NonNull final Datasource<? extends CharSequence> datasource) {
         super(datasource, new CharSequenceDiffCallbackFactory());
+    }
+    
+    @Override
+    public boolean isEnabled(final int position) {
+        return position % 2 == 0;
     }
     
     @NonNull
@@ -66,7 +73,9 @@ class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder
         holder.setText1(item);
     }
     
-    static class SampleViewHolder extends RecyclerView.ViewHolder {
+    static class SampleViewHolder extends RecyclerView.ViewHolder implements LifecycleCallbacks {
+        
+        private static final String TAG = "SampleViewHolder";
         
         @NonNull
         private final TextView mTextView1;
@@ -78,6 +87,34 @@ class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder
         
         void setText1(@NonNull final CharSequence item) {
             mTextView1.setText(item);
+        }
+        
+        @Override
+        public void onStart() {
+            if (getAdapterPosition() == 0) {
+                Log.d(TAG, "onStart()");
+            }
+        }
+        
+        @Override
+        public void onResume() {
+            if (getAdapterPosition() == 0) {
+                Log.d(TAG, "onResume()");
+            }
+        }
+        
+        @Override
+        public void onPause() {
+            if (getAdapterPosition() == 0) {
+                Log.d(TAG, "onPause()");
+            }
+        }
+        
+        @Override
+        public void onStop() {
+            if (getAdapterPosition() == 0) {
+                Log.d(TAG, "onStop()");
+            }
         }
         
     }

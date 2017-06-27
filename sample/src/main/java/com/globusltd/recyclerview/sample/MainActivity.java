@@ -15,72 +15,102 @@
  */
 package com.globusltd.recyclerview.sample;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
-import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.datasource.ListDatasource;
+import com.globusltd.recyclerview.view.LifecycleComposite;
+import com.globusltd.recyclerview.view.EnableBehavior;
+import com.globusltd.recyclerview.view.ItemClickBehavior;
+import com.globusltd.recyclerview.view.LifecycleBehavior;
+import com.globusltd.recyclerview.view.OnItemClickListener;
+import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity implements OnItemClickListener<CharSequence>,
+        OnItemLongClickListener<CharSequence> {
     
     private RecyclerView mRecyclerView;
     
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private LifecycleComposite mLifecycleComposite;
     
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        final ListDatasource<String> datasource = new ListDatasource<>();
-        datasource.add("Test3 String");
-        datasource.add("Test5 String");
-        datasource.add("Test1 String");
-        datasource.add("Test4 String");
-        datasource.add("Test2 String");
-        datasource.add("Test6 String");
+        mLifecycleComposite = new LifecycleComposite();
         
-        final Adapter<CharSequence, ?> adapter = new SampleAdapter(datasource);
-        adapter.setOnItemClickListener((view, item, position) ->
-                Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show());
-        adapter.setOnLongItemClickListener((view, item, position) -> {
-            Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
-            return true;
-        });
+        final ListDatasource<String> datasource = new ListDatasource<>();
+        for (int i = 1; i < 101; i++) {
+            datasource.add(String.format(Locale.getDefault(), "Test%1$s String", i));
+        }
+        
+        final SampleAdapter adapter = new SampleAdapter(datasource);
+        adapter.addViewHolderBehavior(new ItemClickBehavior<>(this, this));
+        adapter.addViewHolderBehavior(new EnableBehavior<>());
+        adapter.addViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
         
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
         
-        /*mHandler.postDelayed(() -> datasource.add("Test1 String"), 2000L);
-        mHandler.postDelayed(() -> datasource.add("Test2 String"), 2100L);
-        mHandler.postDelayed(() -> datasource.add("Test3 String"), 2200L);
-        
-        final ListDatasource<String> changedDatasource = new ListDatasource<>();
-        changedDatasource.add("Test3 String");
-        changedDatasource.add("Test5 String");
-        changedDatasource.add("Test1 String");
-        changedDatasource.add("Test4 String");
-        changedDatasource.add("Test2 String");
-        changedDatasource.add("Test6 String");
-        mHandler.postDelayed(() -> adapter.swap(changedDatasource), 5000L);
-        
-        mHandler.postDelayed(() -> changedDatasource.removeRange(1, 3), 8000L);
-        
-        mHandler.postDelayed(() -> adapter.swap(Datasources.empty()), 11000L);*/
+        findViewById(R.id.pause).setOnClickListener(v -> pauseActivity());
+    }
+    
+    private void pauseActivity() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        startActivity(Intent.createChooser(intent, getString(R.string.app_name)));
+    }
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mLifecycleComposite.onStart();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLifecycleComposite.onResume();
+    }
+    
+    @Override
+    public void onItemClick(@NonNull final View view, final CharSequence item, final int position) {
+        Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show();
+    }
+    
+    @Override
+    public boolean onItemLongClick(@NonNull final View view, final CharSequence item, final int position) {
+        Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
+        return true;
+    }
+    
+    @Override
+    protected void onPause() {
+        mLifecycleComposite.onPause();
+        super.onPause();
+    }
+    
+    @Override
+    protected void onStop() {
+        mLifecycleComposite.onStop();
+        super.onStop();
     }
     
     @Override
     protected void onDestroy() {
-        mHandler.removeCallbacksAndMessages(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }

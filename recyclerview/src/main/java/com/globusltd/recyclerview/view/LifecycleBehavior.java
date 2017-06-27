@@ -19,14 +19,18 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.globusltd.recyclerview.ClickableAdapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class EnableBehavior<A extends RecyclerView.Adapter<VH> & ClickableAdapter<?>,
-        VH extends RecyclerView.ViewHolder> implements ViewHolderBehavior<A, VH> {
+public class LifecycleBehavior<A extends RecyclerView.Adapter<VH>,
+        VH extends RecyclerView.ViewHolder & LifecycleCallbacks>
+        implements ViewHolderBehavior<A, VH> {
     
-    public EnableBehavior() {
+    @NonNull
+    private final LifecycleComposite mLifecycleComposite;
+    
+    public LifecycleBehavior(@NonNull final LifecycleComposite lifecycleComposite) {
+        mLifecycleComposite = lifecycleComposite;
     }
     
     /**
@@ -34,13 +38,7 @@ public class EnableBehavior<A extends RecyclerView.Adapter<VH> & ClickableAdapte
      */
     @Override
     public void onAttachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
-        final int position = viewHolder.getAdapterPosition();
-        if (position > RecyclerView.NO_POSITION && position < adapter.getDatasource().size()) {
-            final boolean isEnabled = adapter.isEnabled(position);
-            viewHolder.itemView.setEnabled(isEnabled);
-        } else {
-            viewHolder.itemView.setEnabled(false);
-        }
+        mLifecycleComposite.registerLifecycleCallbacks(viewHolder);
     }
     
     /**
@@ -48,7 +46,7 @@ public class EnableBehavior<A extends RecyclerView.Adapter<VH> & ClickableAdapte
      */
     @Override
     public void onDetachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
-        viewHolder.itemView.setEnabled(false);
+        mLifecycleComposite.unregisterLifecycleCallbacks(viewHolder);
     }
     
 }

@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview.view;
 
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
@@ -23,45 +24,47 @@ import com.globusltd.recyclerview.ViewHolderBehavior;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewHolderBehaviorComposite implements ViewHolderBehavior {
-
+@MainThread
+public class ViewHolderBehaviorComposite<A extends RecyclerView.Adapter<VH>, VH extends RecyclerView.ViewHolder>
+        implements ViewHolderBehavior<A, VH> {
+    
     @NonNull
-    private final List<ViewHolderBehavior> mBehaviors;
-
+    private final List<ViewHolderBehavior<A, VH>> mBehaviors;
+    
     public ViewHolderBehaviorComposite() {
         mBehaviors = new ArrayList<>();
     }
-
-    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+    
+    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<A, VH> viewHolderBehavior) {
         if (!mBehaviors.contains(viewHolderBehavior)) {
             mBehaviors.add(viewHolderBehavior);
         }
     }
-
-    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+    
+    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<A, VH> viewHolderBehavior) {
         mBehaviors.remove(viewHolderBehavior);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        for (final ViewHolderBehavior behavior : mBehaviors) {
-            behavior.onAttachViewHolder(viewHolder);
+    public void onAttachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
+        for (final ViewHolderBehavior<A, VH> behavior : mBehaviors) {
+            behavior.onAttachViewHolder(adapter, viewHolder);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onDetachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
         final int size = mBehaviors.size();
         for (int i = size - 1; i >= 0; i--) {
-            final ViewHolderBehavior behavior = mBehaviors.get(i);
-            behavior.onDetachViewHolder(viewHolder);
+            final ViewHolderBehavior<A, VH> behavior = mBehaviors.get(i);
+            behavior.onDetachViewHolder(adapter, viewHolder);
         }
     }
-
+    
 }

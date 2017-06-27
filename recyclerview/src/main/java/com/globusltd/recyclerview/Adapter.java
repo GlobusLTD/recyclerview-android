@@ -16,6 +16,7 @@
 package com.globusltd.recyclerview;
 
 import android.support.annotation.CallSuper;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
@@ -27,15 +28,14 @@ import android.view.ViewGroup;
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.view.ClickableViews;
-import com.globusltd.recyclerview.view.ItemClickBehavior;
-import com.globusltd.recyclerview.view.OnItemClickListener;
-import com.globusltd.recyclerview.view.OnItemLongClickListener;
+import com.globusltd.recyclerview.view.ViewHolderBehaviorComposite;
 
 import java.util.List;
 import java.util.Set;
 
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E> {
+        extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E>,
+        ClickableAdapter<E> {
     
     @NonNull
     private final DatasourceProxy<E> mDatasource;
@@ -44,7 +44,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     private final DatasourceObserver mDatasourceObserver;
     
     @NonNull
-    private final ItemClickBehavior<E> mItemClickBehavior;
+    private final ViewHolderBehaviorComposite<Adapter<E, VH>, VH> mViewHolderBehaviorComposite;
     
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
@@ -62,7 +62,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         super();
         mDatasource = new DatasourceProxy<>(datasource, diffCallbackFactory);
         mDatasourceObserver = new AdapterDatasourceObserver(this);
-        mItemClickBehavior = new ItemClickBehavior<>(this);
+        mViewHolderBehaviorComposite = new ViewHolderBehaviorComposite<>();
         mAttachedRecyclerViews = new ArraySet<>();
     }
     
@@ -73,6 +73,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
      * @see #swap(Datasource)
      */
     @NonNull
+    @Override
     public Datasource<? extends E> getDatasource() {
         return mDatasource;
     }
@@ -94,49 +95,27 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         return mDatasource.size();
     }
     
-    /**
-     * Register a callback to be invoked when an item in this adapter has
-     * been clicked.
-     *
-     * @param onItemClickListener the callback that will be invoked.
-     */
-    public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
-        mItemClickBehavior.setOnItemClickListener(onItemClickListener);
+    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<Adapter<E, VH>, VH> viewHolderBehavior) {
+        mViewHolderBehaviorComposite.addViewHolderBehavior(viewHolderBehavior);
+    }
+    
+    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<Adapter<E, VH>, VH> viewHolderBehavior) {
+        mViewHolderBehaviorComposite.removeViewHolderBehavior(viewHolderBehavior);
     }
     
     /**
-     * Register a callback to be invoked when an item in this adapter has
-     * been long clicked.
-     *
-     * @param onItemLongClickListener the callback that will be invoked.
+     * {@inheritDoc}
      */
-    public void setOnLongItemClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
-        mItemClickBehavior.setOnLongItemClickListener(onItemLongClickListener);
-    }
-    
-    /**
-     * Returns true if the item at the specified position is clickable.
-     * <p/>
-     * The result is unspecified if position is invalid. An {@link IndexOutOfBoundsException}
-     * should be thrown in that case for fast failure.
-     *
-     * @param position an index of the item.
-     * @return {@code true} if item is enabled, {@code false} otherwise.
-     */
-    public boolean isEnabled(final int position) {
+    @Override
+    public boolean isEnabled(@IntRange(from = 0) final int position) {
         return true;
     }
     
     /**
-     * Returns information about all of the clickable views at specified position.
-     * Note that it's better to preallocate ClickableViews instance for each view type
-     * and enable/disable clicks by providing enabled flag via {@link #isEnabled(int)}.
-     *
-     * @param position an index of the item.
-     * @return A {@link ClickableViews} instance.
-     * @see #isEnabled(int)
+     * {@inheritDoc}
      */
     @NonNull
+    @Override
     public ClickableViews getClickableViews(final int position, final int viewType) {
         return ClickableViews.NONE;
     }
@@ -176,7 +155,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
-        mItemClickBehavior.onAttachViewHolder(holder);
+        mViewHolderBehaviorComposite.onAttachViewHolder(this, holder);
     }
     
     /**
@@ -205,7 +184,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                        final List<Object> payloads) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position, payloads);
-        mItemClickBehavior.onAttachViewHolder(holder);
+        mViewHolderBehaviorComposite.onAttachViewHolder(this, holder);
     }
     
     /**
@@ -248,7 +227,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public void onViewRecycled(final VH holder) {
-        mItemClickBehavior.onDetachViewHolder(holder);
+        mViewHolderBehaviorComposite.onDetachViewHolder(this, holder);
         super.onViewRecycled(holder);
     }
     
@@ -258,7 +237,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public boolean onFailedToRecycleView(final VH holder) {
-        mItemClickBehavior.onDetachViewHolder(holder);
+        mViewHolderBehaviorComposite.onDetachViewHolder(this, holder);
         return super.onFailedToRecycleView(holder);
     }
     
