@@ -33,7 +33,7 @@ public class AdapterDatasourceObserver extends DatasourceObserver {
         super();
         mAdapter = adapter;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -78,5 +78,5 @@ public class AdapterDatasourceObserver extends DatasourceObserver {
                             @IntRange(from = 0) final int toPosition) {
         mAdapter.notifyItemMoved(fromPosition, toPosition);
     }
-
+    
 }

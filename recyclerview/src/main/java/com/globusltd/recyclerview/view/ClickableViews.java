@@ -67,7 +67,7 @@ public class ClickableViews {
      * @return An identifier of view, or {@link #ITEM_VIEW_ID} or {@link View#NO_ID}.
      */
     @IdRes
-    public int getDefaultViewId() {
+    int getDefaultViewId() {
         return mDefaultViewId;
     }
     
@@ -78,7 +78,7 @@ public class ClickableViews {
      */
     @IdRes
     @NonNull
-    public int[] getClickableViewIds() {
+    int[] getClickableViewIds() {
         return mClickableViewIds;
     }
     

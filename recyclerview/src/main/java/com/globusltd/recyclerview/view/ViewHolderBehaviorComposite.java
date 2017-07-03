@@ -24,24 +24,39 @@ import com.globusltd.recyclerview.ViewHolderBehavior;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link ViewHolderBehaviorComposite} provides view holder attach/detach events to
+ * the registered {@link ViewHolderBehavior} objects.
+ */
 @MainThread
-public class ViewHolderBehaviorComposite<A extends RecyclerView.Adapter<VH>, VH extends RecyclerView.ViewHolder>
-        implements ViewHolderBehavior<A, VH> {
+public class ViewHolderBehaviorComposite<VH extends RecyclerView.ViewHolder>
+        implements ViewHolderBehavior<VH> {
     
     @NonNull
-    private final List<ViewHolderBehavior<A, VH>> mBehaviors;
+    private final List<ViewHolderBehavior<VH>> mBehaviors;
     
     public ViewHolderBehaviorComposite() {
         mBehaviors = new ArrayList<>();
     }
     
-    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<A, VH> viewHolderBehavior) {
+    /**
+     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderBehaviorComposite},
+     * which will be called at the same times as the attach/detach methods of
+     * adapter are called.
+     *
+     * @param viewHolderBehavior The interface to call.
+     */
+    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         if (!mBehaviors.contains(viewHolderBehavior)) {
             mBehaviors.add(viewHolderBehavior);
         }
     }
     
-    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<A, VH> viewHolderBehavior) {
+    /**
+     * Remove a {@link ViewHolderBehavior} object that was previously registered
+     * with {@link #addViewHolderBehavior(ViewHolderBehavior)}.
+     */
+    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         mBehaviors.remove(viewHolderBehavior);
     }
     
@@ -49,9 +64,9 @@ public class ViewHolderBehaviorComposite<A extends RecyclerView.Adapter<VH>, VH 
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
-        for (final ViewHolderBehavior<A, VH> behavior : mBehaviors) {
-            behavior.onAttachViewHolder(adapter, viewHolder);
+    public void onAttachViewHolder(@NonNull final VH viewHolder) {
+        for (final ViewHolderBehavior<VH> behavior : mBehaviors) {
+            behavior.onAttachViewHolder(viewHolder);
         }
     }
     
@@ -59,11 +74,11 @@ public class ViewHolderBehaviorComposite<A extends RecyclerView.Adapter<VH>, VH 
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final VH viewHolder) {
         final int size = mBehaviors.size();
         for (int i = size - 1; i >= 0; i--) {
-            final ViewHolderBehavior<A, VH> behavior = mBehaviors.get(i);
-            behavior.onDetachViewHolder(adapter, viewHolder);
+            final ViewHolderBehavior<VH> behavior = mBehaviors.get(i);
+            behavior.onDetachViewHolder(viewHolder);
         }
     }
     

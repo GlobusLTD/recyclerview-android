@@ -33,7 +33,8 @@ public interface OnItemClickListener<E> {
      * @param view     the view that was clicked (this will be a view provided by the adapter).
      * @param item     the data entity that was clicked.
      * @param position the position of the data entity in the adapter.
+     * @return true if the callback consumed the click, false otherwise.
      */
-    void onItemClick(@NonNull final View view, final E item, final int position);
+    boolean onItemClick(@NonNull final View view, final E item, final int position);
 
 }

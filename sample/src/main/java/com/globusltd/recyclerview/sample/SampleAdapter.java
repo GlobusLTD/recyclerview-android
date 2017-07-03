@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.globusltd.recyclerview.Adapter;
+import com.globusltd.recyclerview.ClickableAdapter;
 import com.globusltd.recyclerview.Datasource;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
@@ -34,7 +35,8 @@ import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 import com.globusltd.recyclerview.view.ClickableViews;
 import com.globusltd.recyclerview.view.LifecycleCallbacks;
 
-class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder> {
+class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SampleViewHolder>
+        implements ClickableAdapter<CharSequence> {
     
     SampleAdapter(@NonNull final Datasource<? extends CharSequence> datasource) {
         super(datasource, new CharSequenceDiffCallbackFactory());

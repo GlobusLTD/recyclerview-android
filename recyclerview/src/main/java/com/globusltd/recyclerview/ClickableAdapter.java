@@ -20,15 +20,10 @@ import android.support.annotation.NonNull;
 
 import com.globusltd.recyclerview.view.ClickableViews;
 
-public interface ClickableAdapter<E> {
-    
-    /**
-     * Returns an {@link Datasource} instance.
-     *
-     * @return An {@link Datasource} instance.
-     */
-    @NonNull
-    Datasource<? extends E> getDatasource();
+/**
+ * Interface declares methods for an adapter that supports clicks on items.
+ */
+public interface ClickableAdapter<E> extends DatasourceAdapter<E> {
     
     /**
      * Returns true if the item at the specified position is clickable.
@@ -51,6 +46,6 @@ public interface ClickableAdapter<E> {
      * @see #isEnabled(int)
      */
     @NonNull
-    ClickableViews getClickableViews(final int position, final int viewType);
+    ClickableViews getClickableViews(@IntRange(from = 0) final int position, final int viewType);
     
 }

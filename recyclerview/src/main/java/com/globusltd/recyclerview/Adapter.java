@@ -16,10 +16,8 @@
 package com.globusltd.recyclerview;
 
 import android.support.annotation.CallSuper;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,27 +25,25 @@ import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-import com.globusltd.recyclerview.view.ClickableViews;
 import com.globusltd.recyclerview.view.ViewHolderBehaviorComposite;
 
 import java.util.List;
-import java.util.Set;
 
-public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements DatasourceSwappable<E>,
-        ClickableAdapter<E> {
+/**
+ * Base {@link RecyclerView.Adapter} that holds a reference to the {@link Datasource} object
+ * and provides simple bindings.
+ */
+public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
+        implements DatasourceSwappable<E>, DatasourceAdapter<E> {
     
     @NonNull
     private final DatasourceProxy<E> mDatasource;
     
     @NonNull
-    private final DatasourceObserver mDatasourceObserver;
+    private final RecyclerViewBehavior mDatasourceAdapterBehavior;
     
     @NonNull
-    private final ViewHolderBehaviorComposite<Adapter<E, VH>, VH> mViewHolderBehaviorComposite;
-    
-    @NonNull
-    private final Set<RecyclerView> mAttachedRecyclerViews;
+    private final ViewHolderBehaviorComposite<VH> mViewHolderBehaviorComposite;
     
     public Adapter() {
         this(Datasources.<E>empty());
@@ -61,9 +57,11 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
         mDatasource = new DatasourceProxy<>(datasource, diffCallbackFactory);
-        mDatasourceObserver = new AdapterDatasourceObserver(this);
+        
+        final DatasourceObserver datasourceObserver = new AdapterDatasourceObserver(this);
+        mDatasourceAdapterBehavior = new DatasourceAdapterBehavior(mDatasource, datasourceObserver);
+        
         mViewHolderBehaviorComposite = new ViewHolderBehaviorComposite<>();
-        mAttachedRecyclerViews = new ArraySet<>();
     }
     
     /**
@@ -95,29 +93,23 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         return mDatasource.size();
     }
     
-    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<Adapter<E, VH>, VH> viewHolderBehavior) {
+    /**
+     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderBehaviorComposite},
+     * which will be called at the same times as the attach/detach methods of the
+     * adapter are called.
+     *
+     * @param viewHolderBehavior The interface to call.
+     */
+    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         mViewHolderBehaviorComposite.addViewHolderBehavior(viewHolderBehavior);
     }
     
-    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<Adapter<E, VH>, VH> viewHolderBehavior) {
+    /**
+     * Remove a {@link ViewHolderBehavior} object that was previously registered
+     * with {@link #addViewHolderBehavior(ViewHolderBehavior)}.
+     */
+    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         mViewHolderBehaviorComposite.removeViewHolderBehavior(viewHolderBehavior);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isEnabled(@IntRange(from = 0) final int position) {
-        return true;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    @Override
-    public ClickableViews getClickableViews(final int position, final int viewType) {
-        return ClickableViews.NONE;
     }
     
     @Override
@@ -155,7 +147,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position);
-        mViewHolderBehaviorComposite.onAttachViewHolder(this, holder);
+        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
     }
     
     /**
@@ -184,7 +176,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                        final List<Object> payloads) {
         final E item = mDatasource.get(position);
         onBindViewHolder(holder, item, position, payloads);
-        mViewHolderBehaviorComposite.onAttachViewHolder(this, holder);
+        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
     }
     
     /**
@@ -227,7 +219,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public void onViewRecycled(final VH holder) {
-        mViewHolderBehaviorComposite.onDetachViewHolder(this, holder);
+        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
         super.onViewRecycled(holder);
     }
     
@@ -237,7 +229,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public boolean onFailedToRecycleView(final VH holder) {
-        mViewHolderBehaviorComposite.onDetachViewHolder(this, holder);
+        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
         return super.onFailedToRecycleView(holder);
     }
     
@@ -248,9 +240,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
-            mDatasource.registerDatasourceObserver(mDatasourceObserver);
-        }
+        mDatasourceAdapterBehavior.onAttachedToRecyclerView(recyclerView);
     }
     
     /**
@@ -259,10 +249,8 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     @CallSuper
     @Override
     public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
+        mDatasourceAdapterBehavior.onDetachedFromRecyclerView(recyclerView);
         super.onDetachedFromRecyclerView(recyclerView);
-        if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
-            mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
-        }
     }
     
 }

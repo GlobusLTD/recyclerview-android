@@ -22,9 +22,8 @@ import android.support.v7.widget.RecyclerView;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class LifecycleBehavior<A extends RecyclerView.Adapter<VH>,
-        VH extends RecyclerView.ViewHolder & LifecycleCallbacks>
-        implements ViewHolderBehavior<A, VH> {
+public class LifecycleBehavior<VH extends RecyclerView.ViewHolder & LifecycleCallbacks>
+        implements ViewHolderBehavior<VH> {
     
     @NonNull
     private final LifecycleComposite mLifecycleComposite;
@@ -37,7 +36,7 @@ public class LifecycleBehavior<A extends RecyclerView.Adapter<VH>,
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
+    public void onAttachViewHolder(@NonNull final VH viewHolder) {
         mLifecycleComposite.registerLifecycleCallbacks(viewHolder);
     }
     
@@ -45,7 +44,7 @@ public class LifecycleBehavior<A extends RecyclerView.Adapter<VH>,
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final A adapter, @NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final VH viewHolder) {
         mLifecycleComposite.unregisterLifecycleCallbacks(viewHolder);
     }
     

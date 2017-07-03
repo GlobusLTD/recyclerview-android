@@ -16,31 +16,27 @@
 package com.globusltd.recyclerview;
 
 import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-/**
- * Interface describes {@link RecyclerView.ViewHolder} attachable behavior.
- */
 @MainThread
-public interface ViewHolderBehavior<VH extends RecyclerView.ViewHolder> {
+public interface RecyclerViewBehavior {
     
     /**
-     * Called when a view created by adapter has been attached to a data.
+     * Called by RecyclerView when it starts observing this behavior.
      * <p>
-     * Keep in mind that same data may be attached to the same ViewHolder multiple times.
+     * Keep in mind that same behavior may be observed by multiple RecyclerViews.
      *
-     * @param viewHolder Holder of the view being attached.
-     * @see #onDetachViewHolder(VH)
+     * @param recyclerView The RecyclerView instance which started observing this behavior.
+     * @see #onDetachedFromRecyclerView(RecyclerView)
      */
-    void onAttachViewHolder(@NonNull final VH viewHolder);
+    void onAttachedToRecyclerView(final RecyclerView recyclerView);
     
     /**
-     * Called when a view created by adapter has been detached from its data.
+     * Called by RecyclerView when it stops observing this behavior.
      *
-     * @param viewHolder Holder of the view being detached.
-     * @see #onAttachViewHolder(VH)
+     * @param recyclerView The RecyclerView instance which stopped observing this behavior.
+     * @see #onAttachedToRecyclerView(RecyclerView)
      */
-    void onDetachViewHolder(@NonNull final VH viewHolder);
+    void onDetachedFromRecyclerView(final RecyclerView recyclerView);
     
 }

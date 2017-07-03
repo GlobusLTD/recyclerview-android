@@ -56,8 +56,14 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         }
         
         final SampleAdapter adapter = new SampleAdapter(datasource);
-        adapter.addViewHolderBehavior(new ItemClickBehavior<>(this, this));
-        adapter.addViewHolderBehavior(new EnableBehavior<>());
+        
+        final ItemClickBehavior<CharSequence, SampleAdapter.SampleViewHolder> itemClickBehavior =
+                new ItemClickBehavior<>(adapter);
+        itemClickBehavior.setOnItemClickListener(this);
+        itemClickBehavior.setOnItemLongClickListener(this);
+        adapter.addViewHolderBehavior(itemClickBehavior);
+        
+        adapter.addViewHolderBehavior(new EnableBehavior<>(adapter));
         adapter.addViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
         
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
@@ -87,8 +93,9 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     }
     
     @Override
-    public void onItemClick(@NonNull final View view, final CharSequence item, final int position) {
+    public boolean onItemClick(@NonNull final View view, final CharSequence item, final int position) {
         Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show();
+        return true;
     }
     
     @Override
