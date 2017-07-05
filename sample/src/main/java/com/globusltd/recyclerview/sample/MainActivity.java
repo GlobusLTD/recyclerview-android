@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.globusltd.recyclerview.datasource.ListDatasource;
 import com.globusltd.recyclerview.view.LifecycleComposite;
 import com.globusltd.recyclerview.view.EnableBehavior;
-import com.globusltd.recyclerview.view.ItemClickBehavior;
 import com.globusltd.recyclerview.view.LifecycleBehavior;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
@@ -56,15 +55,10 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         }
         
         final SampleAdapter adapter = new SampleAdapter(datasource);
-        
-        final ItemClickBehavior<CharSequence, SampleAdapter.SampleViewHolder> itemClickBehavior =
-                new ItemClickBehavior<>(adapter);
-        itemClickBehavior.setOnItemClickListener(this);
-        itemClickBehavior.setOnItemLongClickListener(this);
-        adapter.addViewHolderBehavior(itemClickBehavior);
-        
-        adapter.addViewHolderBehavior(new EnableBehavior<>(adapter));
-        adapter.addViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
+        adapter.setOnItemClickListener(this);
+        adapter.setOnItemLongClickListener(this);
+        adapter.registerViewHolderBehavior(new EnableBehavior<>(adapter));
+        adapter.registerViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
         
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -15,7 +15,8 @@
  */
 package com.globusltd.recyclerview;
 
-import android.support.annotation.CallSuper;
+import android.support.annotation.IntRange;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -25,25 +26,26 @@ import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-import com.globusltd.recyclerview.view.ViewHolderBehaviorComposite;
+import com.globusltd.recyclerview.view.ClickableViews;
+import com.globusltd.recyclerview.view.ItemClickBehavior;
+import com.globusltd.recyclerview.view.OnItemClickListener;
+import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
 import java.util.List;
 
 /**
- * Base {@link RecyclerView.Adapter} that holds a reference to the {@link Datasource} object
- * and provides simple bindings.
+ * Base {@link RecyclerView.Adapter} that holds a reference to the {@link Datasource} object,
+ * handles clicks and etc.
  */
-public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
-        implements DatasourceSwappable<E>, DatasourceAdapter<E> {
+@MainThread
+public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends BindableAdapter<VH>
+        implements DatasourceSwappable<E> {
     
     @NonNull
-    private final DatasourceProxy<E> mDatasource;
+    private final DatasourceOwner<E> mDatasourceOwner;
     
     @NonNull
-    private final RecyclerViewBehavior mDatasourceAdapterBehavior;
-    
-    @NonNull
-    private final ViewHolderBehaviorComposite<VH> mViewHolderBehaviorComposite;
+    private final ItemClickBehavior<E, VH> mItemClickBehavior;
     
     public Adapter() {
         this(Datasources.<E>empty());
@@ -56,12 +58,32 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super();
-        mDatasource = new DatasourceProxy<>(datasource, diffCallbackFactory);
         
+        final DatasourceProxy<E> datasourceProxy = new DatasourceProxy<>(datasource, diffCallbackFactory);
         final DatasourceObserver datasourceObserver = new AdapterDatasourceObserver(this);
-        mDatasourceAdapterBehavior = new DatasourceAdapterBehavior(mDatasource, datasourceObserver);
+        mDatasourceOwner = new DatasourceOwner<>(datasourceProxy, datasourceObserver);
+        registerRecyclerViewBehavior(mDatasourceOwner);
         
-        mViewHolderBehaviorComposite = new ViewHolderBehaviorComposite<>();
+        mItemClickBehavior = new ItemClickBehavior<>(this);
+        registerViewHolderBehavior(mItemClickBehavior);
+    }
+    
+    /**
+     * Register a callback to be invoked when view is clicked.
+     *
+     * @param onItemClickListener The callback that will run
+     */
+    public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
+        mItemClickBehavior.setOnItemClickListener(onItemClickListener);
+    }
+    
+    /**
+     * Register a callback to be invoked when view is long clicked.
+     *
+     * @param itemLongClickListener The callback that will run
+     */
+    public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> itemLongClickListener) {
+        mItemClickBehavior.setOnItemLongClickListener(itemLongClickListener);
     }
     
     /**
@@ -71,9 +93,8 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
      * @see #swap(Datasource)
      */
     @NonNull
-    @Override
-    public Datasource<? extends E> getDatasource() {
-        return mDatasource;
+    public final Datasource<? extends E> getDatasource() {
+        return mDatasourceOwner.getDatasource();
     }
     
     /**
@@ -81,8 +102,8 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
      */
     @Nullable
     @Override
-    public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
-        return mDatasource.swap(datasource);
+    public final Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
+        return mDatasourceOwner.swap(datasource);
     }
     
     /**
@@ -90,26 +111,34 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
      */
     @Override
     public int getItemCount() {
-        return mDatasource.size();
+        return getDatasource().size();
     }
     
     /**
-     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderBehaviorComposite},
-     * which will be called at the same times as the attach/detach methods of the
-     * adapter are called.
+     * Returns true if the item at the specified position is clickable.
+     * <p/>
+     * The result is unspecified if position is invalid. An {@link IndexOutOfBoundsException}
+     * should be thrown in that case for fast failure.
      *
-     * @param viewHolderBehavior The interface to call.
+     * @param position an index of the item.
+     * @return {@code true} if item is enabled, {@code false} otherwise.
      */
-    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
-        mViewHolderBehaviorComposite.addViewHolderBehavior(viewHolderBehavior);
+    public boolean isEnabled(@IntRange(from = 0) final int position) {
+        return true;
     }
     
     /**
-     * Remove a {@link ViewHolderBehavior} object that was previously registered
-     * with {@link #addViewHolderBehavior(ViewHolderBehavior)}.
+     * Returns information about all of the clickable views at specified position.
+     * Note that it's better to preallocate ClickableViews instance for each view type
+     * and enable/disable clicks by providing enabled flag via {@link #isEnabled(int)}.
+     *
+     * @param position an index of the item.
+     * @return A {@link ClickableViews} instance.
+     * @see #isEnabled(int)
      */
-    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
-        mViewHolderBehaviorComposite.removeViewHolderBehavior(viewHolderBehavior);
+    @NonNull
+    public ClickableViews getClickableViews(@IntRange(from = 0) final int position, final int viewType) {
+        return ClickableViews.NONE;
     }
     
     @Override
@@ -145,9 +174,9 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
     
     @Override
     public final void onBindViewHolder(final VH holder, final int position) {
-        final E item = mDatasource.get(position);
+        final E item = mDatasourceOwner.getDatasource().get(position);
         onBindViewHolder(holder, item, position);
-        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
+        super.onBindViewHolder(holder, position);
     }
     
     /**
@@ -174,9 +203,9 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
     @Override
     public final void onBindViewHolder(final VH holder, final int position,
                                        final List<Object> payloads) {
-        final E item = mDatasource.get(position);
+        final E item = mDatasourceOwner.getDatasource().get(position);
         onBindViewHolder(holder, item, position, payloads);
-        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
+        super.onBindViewHolder(holder, position, payloads);
     }
     
     /**
@@ -211,46 +240,6 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder> extends Rec
     public void onBindViewHolder(@NonNull final VH holder, @NonNull final E item,
                                  final int position, final List<Object> payloads) {
         onBindViewHolder(holder, item, position);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public void onViewRecycled(final VH holder) {
-        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
-        super.onViewRecycled(holder);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public boolean onFailedToRecycleView(final VH holder) {
-        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
-        return super.onFailedToRecycleView(holder);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        mDatasourceAdapterBehavior.onAttachedToRecyclerView(recyclerView);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
-        mDatasourceAdapterBehavior.onDetachedFromRecyclerView(recyclerView);
-        super.onDetachedFromRecyclerView(recyclerView);
     }
     
 }

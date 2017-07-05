@@ -46,7 +46,7 @@ public class ViewHolderBehaviorComposite<VH extends RecyclerView.ViewHolder>
      *
      * @param viewHolderBehavior The interface to call.
      */
-    public void addViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
+    public void registerViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         if (!mBehaviors.contains(viewHolderBehavior)) {
             mBehaviors.add(viewHolderBehavior);
         }
@@ -54,9 +54,9 @@ public class ViewHolderBehaviorComposite<VH extends RecyclerView.ViewHolder>
     
     /**
      * Remove a {@link ViewHolderBehavior} object that was previously registered
-     * with {@link #addViewHolderBehavior(ViewHolderBehavior)}.
+     * with {@link #registerViewHolderBehavior(ViewHolderBehavior)}.
      */
-    public void removeViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
+    public void unregisterViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
         mBehaviors.remove(viewHolderBehavior);
     }
     

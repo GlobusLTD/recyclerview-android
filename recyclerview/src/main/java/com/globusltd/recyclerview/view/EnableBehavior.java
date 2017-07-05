@@ -19,16 +19,16 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.globusltd.recyclerview.ClickableAdapter;
+import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
 public class EnableBehavior<VH extends RecyclerView.ViewHolder> implements ViewHolderBehavior<VH> {
     
     @NonNull
-    private final ClickableAdapter<?> mAdapter;
+    private final Adapter<?, ?> mAdapter;
     
-    public EnableBehavior(@NonNull final ClickableAdapter<?> adapter) {
+    public EnableBehavior(@NonNull final Adapter<?, ?> adapter) {
         mAdapter = adapter;
     }
     

@@ -51,7 +51,7 @@ class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
         mDiffCallbackFactory = diffCallbackFactory;
 
         mDatasourceObservable = new DatasourceObservable();
-        mDatasourceObserver = new DatasourceObserverImpl();
+        mDatasourceObserver = new DatasourceObserverProxy();
         mListUpdateCallback = new DatasourceListUpdateCallback();
 
         mDatasource.registerDatasourceObserver(mDatasourceObserver);
@@ -107,7 +107,7 @@ class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
         mDatasourceObservable.unregisterObserver(observer);
     }
 
-    private class DatasourceObserverImpl extends DatasourceObserver {
+    private class DatasourceObserverProxy extends DatasourceObserver {
 
         @Override
         public void onChanged() {

@@ -17,16 +17,19 @@ package com.globusltd.recyclerview;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.Set;
 
 @MainThread
-public class DatasourceAdapterBehavior implements RecyclerViewBehavior {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior {
     
     @NonNull
-    private final Datasource<?> mDatasource;
+    private final DatasourceProxy<E> mDatasource;
     
     @NonNull
     private final DatasourceObserver mDatasourceObserver;
@@ -34,11 +37,22 @@ public class DatasourceAdapterBehavior implements RecyclerViewBehavior {
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
     
-    public DatasourceAdapterBehavior(@NonNull final Datasource<?> datasource,
-                                     @NonNull final DatasourceObserver datasourceObserver) {
+    DatasourceOwner(@NonNull final DatasourceProxy<E> datasource,
+                    @NonNull final DatasourceObserver datasourceObserver) {
         mDatasource = datasource;
         mDatasourceObserver = datasourceObserver;
         mAttachedRecyclerViews = new ArraySet<>();
+    }
+    
+    @NonNull
+    DatasourceProxy<? extends E> getDatasource() {
+        return mDatasource;
+    }
+    
+    @Nullable
+    @Override
+    public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
+        return mDatasource.swap(datasource);
     }
     
     /**

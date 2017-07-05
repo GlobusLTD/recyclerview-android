@@ -24,7 +24,7 @@ import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.globusltd.recyclerview.ClickableAdapter;
+import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 import com.globusltd.recyclerview.util.ArrayPool;
 import com.globusltd.recyclerview.util.Pool;
@@ -42,7 +42,7 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
         implements ViewHolderBehavior<VH> {
     
     @NonNull
-    private final ClickableAdapter<E> mAdapter;
+    private final Adapter<E, VH> mAdapter;
     
     @NonNull
     private final Pool<ViewHolderClickListener> mPool;
@@ -56,16 +56,26 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
     @Nullable
     private OnItemLongClickListener<E> mOnItemLongClickListener;
     
-    public ItemClickBehavior(@NonNull final ClickableAdapter<E> adapter) {
+    public ItemClickBehavior(@NonNull final Adapter<E, VH> adapter) {
         mAdapter = adapter;
         mPool = new ArrayPool<>(new ViewHolderClickListenerFactory());
         mActiveViewHolders = new ArrayMap<>();
     }
     
+    /**
+     * Register a callback to be invoked when view is clicked.
+     *
+     * @param onItemClickListener The callback that will run
+     */
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
     
+    /**
+     * Register a callback to be invoked when view is long clicked.
+     *
+     * @param itemLongClickListener The callback that will run
+     */
     public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> itemLongClickListener) {
         mOnItemLongClickListener = itemLongClickListener;
     }
