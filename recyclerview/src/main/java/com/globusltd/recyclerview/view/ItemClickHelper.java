@@ -24,7 +24,7 @@ import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.globusltd.recyclerview.Adapter;
+import com.globusltd.recyclerview.ClickableAdapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 import com.globusltd.recyclerview.util.ArrayPool;
 import com.globusltd.recyclerview.util.Pool;
@@ -38,11 +38,11 @@ import java.util.Map;
  * @param <E> Type of elements handled by click listeners.
  */
 @MainThread
-public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
+public class ItemClickHelper<E, VH extends RecyclerView.ViewHolder>
         implements ViewHolderBehavior<VH> {
     
     @NonNull
-    private final Adapter<E, VH> mAdapter;
+    private final ClickableAdapter<E> mAdapter;
     
     @NonNull
     private final Pool<ViewHolderClickListener> mPool;
@@ -56,7 +56,7 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
     @Nullable
     private OnItemLongClickListener<E> mOnItemLongClickListener;
     
-    public ItemClickBehavior(@NonNull final Adapter<E, VH> adapter) {
+    public ItemClickHelper(@NonNull final ClickableAdapter<E> adapter) {
         mAdapter = adapter;
         mPool = new ArrayPool<>(new ViewHolderClickListenerFactory());
         mActiveViewHolders = new ArrayMap<>();
@@ -90,8 +90,8 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
             final ViewHolderClickListener listener = mActiveViewHolders.containsKey(holder) ?
                     mActiveViewHolders.get(holder) : mPool.obtain();
             mActiveViewHolders.put(holder, listener);
-            
-            final int viewType = mAdapter.getItemViewType(position);
+
+            final int viewType = holder.getItemViewType();
             listener.position = position;
             listener.viewType = viewType;
             
@@ -141,7 +141,7 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
     
     private void setLongClickable(@NonNull final View itemView, @IdRes final int viewId,
                                   @Nullable final View.OnLongClickListener listener) {
-        final View view = (findViewById(itemView, viewId));
+        final View view = findViewById(itemView, viewId);
         if (view != null) {
             view.setOnLongClickListener(listener);
             view.setLongClickable(listener != null);
@@ -178,8 +178,8 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
     
     private class ViewHolderClickListener implements View.OnClickListener, View.OnLongClickListener {
         
-        //@IntRange(from = RecyclerView.NO_POSITION)
-        int position;// = RecyclerView.NO_POSITION;
+        // @IntRange(from = RecyclerView.NO_POSITION)
+        int position; // = RecyclerView.NO_POSITION;
         
         @IntRange(from = RecyclerView.INVALID_TYPE)
         int viewType = RecyclerView.INVALID_TYPE;
@@ -190,7 +190,7 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
             // ViewHolder.getAdapterPosition to return NO_POSITION for a visible item.
             if (isPositionAvailable(position)) {
                 if (mOnItemClickListener != null) {
-                    final E item = mAdapter.getDatasource().get(position);
+                    final E item = mAdapter.get(position);
                     mOnItemClickListener.onItemClick(view, item, position);
                 }
             }
@@ -202,7 +202,7 @@ public class ItemClickBehavior<E, VH extends RecyclerView.ViewHolder>
             // ViewHolder.getAdapterPosition to return NO_POSITION for a visible item.
             if (isPositionAvailable(position)) {
                 if (mOnItemLongClickListener != null) {
-                    final E item = mAdapter.getDatasource().get(position);
+                    final E item = mAdapter.get(position);
                     return mOnItemLongClickListener.onItemLongClick(view, item, position);
                 }
             }

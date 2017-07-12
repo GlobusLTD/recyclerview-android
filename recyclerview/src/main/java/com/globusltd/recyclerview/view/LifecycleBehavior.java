@@ -18,34 +18,57 @@ package com.globusltd.recyclerview.view;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class LifecycleBehavior<VH extends RecyclerView.ViewHolder & LifecycleCallbacks>
+public class LifecycleBehavior<VH extends RecyclerView.ViewHolder>
         implements ViewHolderBehavior<VH> {
-    
+
     @NonNull
     private final LifecycleComposite mLifecycleComposite;
-    
+
+    @NonNull
+    private final SparseBooleanArray mLifecycleCallbacksTypes;
+
     public LifecycleBehavior(@NonNull final LifecycleComposite lifecycleComposite) {
         mLifecycleComposite = lifecycleComposite;
+        mLifecycleCallbacksTypes = new SparseBooleanArray();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onAttachViewHolder(@NonNull final VH viewHolder) {
-        mLifecycleComposite.registerLifecycleCallbacks(viewHolder);
+        if (isLifecycleCallbacks(viewHolder)) {
+            final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
+            mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onDetachViewHolder(@NonNull final VH viewHolder) {
-        mLifecycleComposite.unregisterLifecycleCallbacks(viewHolder);
+        if (isLifecycleCallbacks(viewHolder)) {
+            final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
+            mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);
+        }
     }
-    
+
+    private boolean isLifecycleCallbacks(@NonNull final VH viewHolder) {
+        final int viewType = viewHolder.getItemViewType();
+        if (mLifecycleCallbacksTypes.indexOfKey(viewType) >= 0) {
+            return mLifecycleCallbacksTypes.get(viewType);
+
+        } else {
+            final boolean isLifecycleCallbacks = LifecycleCallbacks.class.isInstance(viewHolder);
+            mLifecycleCallbacksTypes.put(viewType, isLifecycleCallbacks);
+            return isLifecycleCallbacks;
+        }
+    }
+
 }

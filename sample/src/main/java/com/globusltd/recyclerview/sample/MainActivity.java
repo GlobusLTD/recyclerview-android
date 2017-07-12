@@ -37,83 +37,83 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnItemClickListener<CharSequence>,
         OnItemLongClickListener<CharSequence> {
-    
+
     private RecyclerView mRecyclerView;
-    
+
     private LifecycleComposite mLifecycleComposite;
-    
+
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         mLifecycleComposite = new LifecycleComposite();
-        
+
         final ListDatasource<String> datasource = new ListDatasource<>();
         for (int i = 1; i < 101; i++) {
             datasource.add(String.format(Locale.getDefault(), "Test%1$s String", i));
         }
-        
+
         final SampleAdapter adapter = new SampleAdapter(datasource);
         adapter.setOnItemClickListener(this);
         adapter.setOnItemLongClickListener(this);
         adapter.registerViewHolderBehavior(new EnableBehavior<>(adapter));
         adapter.registerViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
-        
+
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
-        
+
         findViewById(R.id.pause).setOnClickListener(v -> pauseActivity());
     }
-    
+
     private void pauseActivity() {
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         startActivity(Intent.createChooser(intent, getString(R.string.app_name)));
     }
-    
+
     @Override
     protected void onStart() {
         super.onStart();
         mLifecycleComposite.onStart();
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
         mLifecycleComposite.onResume();
     }
-    
+
     @Override
     public boolean onItemClick(@NonNull final View view, final CharSequence item, final int position) {
         Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show();
         return true;
     }
-    
+
     @Override
     public boolean onItemLongClick(@NonNull final View view, final CharSequence item, final int position) {
         Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
         return true;
     }
-    
+
     @Override
     protected void onPause() {
         mLifecycleComposite.onPause();
         super.onPause();
     }
-    
+
     @Override
     protected void onStop() {
         mLifecycleComposite.onStop();
         super.onStop();
     }
-    
+
     @Override
     protected void onDestroy() {
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }
-    
+
 }

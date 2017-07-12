@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.datasource;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
@@ -23,12 +23,16 @@ import android.support.annotation.RestrictTo;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 
+import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.DatasourceObservable;
+import com.globusltd.recyclerview.DatasourceObserver;
+import com.globusltd.recyclerview.DatasourceSwappable;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
+public class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
 
     @Nullable
     private final DiffCallbackFactory<E> mDiffCallbackFactory;
@@ -45,8 +49,8 @@ class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
     @NonNull
     private Datasource<? extends E> mDatasource;
 
-    DatasourceProxy(@NonNull final Datasource<? extends E> datasource,
-                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
+    public DatasourceProxy(@NonNull final Datasource<? extends E> datasource,
+                           @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         mDatasource = datasource;
         mDiffCallbackFactory = diffCallbackFactory;
 
@@ -132,7 +136,7 @@ class DatasourceProxy<E> implements Datasource<E>, DatasourceSwappable<E> {
                                        @IntRange(from = 0) final int itemCount) {
             mDatasourceObservable.notifyItemRangeRemoved(positionStart, itemCount);
         }
-        
+
         @Override
         public void onItemMoved(@IntRange(from = 0) final int fromPosition,
                                 @IntRange(from = 0) final int toPosition) {

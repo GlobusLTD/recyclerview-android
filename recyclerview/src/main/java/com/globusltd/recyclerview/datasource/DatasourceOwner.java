@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.datasource;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -22,39 +22,44 @@ import android.support.annotation.RestrictTo;
 import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 
+import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.DatasourceObserver;
+import com.globusltd.recyclerview.DatasourceSwappable;
+import com.globusltd.recyclerview.RecyclerViewBehavior;
+
 import java.util.Set;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior {
-    
+public class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior {
+
     @NonNull
     private final DatasourceProxy<E> mDatasource;
-    
+
     @NonNull
     private final DatasourceObserver mDatasourceObserver;
-    
+
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
-    
-    DatasourceOwner(@NonNull final DatasourceProxy<E> datasource,
-                    @NonNull final DatasourceObserver datasourceObserver) {
+
+    public DatasourceOwner(@NonNull final DatasourceProxy<E> datasource,
+                           @NonNull final DatasourceObserver datasourceObserver) {
         mDatasource = datasource;
         mDatasourceObserver = datasourceObserver;
         mAttachedRecyclerViews = new ArraySet<>();
     }
-    
+
     @NonNull
-    DatasourceProxy<? extends E> getDatasource() {
+    public Datasource<? extends E> getDatasource() {
         return mDatasource;
     }
-    
+
     @Nullable
     @Override
     public Datasource<? extends E> swap(@NonNull final Datasource<? extends E> datasource) {
         return mDatasource.swap(datasource);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -66,7 +71,7 @@ class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior
             mAttachedRecyclerViews.add(recyclerView);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -76,5 +81,5 @@ class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior
             mDatasource.unregisterDatasourceObserver(mDatasourceObserver);
         }
     }
-    
+
 }
