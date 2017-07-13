@@ -17,6 +17,7 @@ package com.globusltd.recyclerview.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -87,13 +88,15 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     }
 
     @Override
-    public boolean onItemClick(@NonNull final View view, final CharSequence item, final int position) {
+    public boolean onItemClick(@NonNull final View view, @NonNull final CharSequence item,
+                               @IntRange(from = 0) final int position) {
         Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show();
         return true;
     }
 
     @Override
-    public boolean onItemLongClick(@NonNull final View view, final CharSequence item, final int position) {
+    public boolean onItemLongClick(@NonNull final View view, @NonNull final CharSequence item,
+                                   @IntRange(from = 0) final int position) {
         Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
         return true;
     }

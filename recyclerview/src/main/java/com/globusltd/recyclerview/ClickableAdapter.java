@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.globusltd.recyclerview.view.ClickableViews;
 
-public interface ClickableAdapter<E> extends DataAdapter<E> {
+public interface ClickableAdapter<E> extends ParameterizedAdapter<E> {
 
     /**
      * Returns true if the item at the specified position is clickable.

@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
+import com.globusltd.recyclerview.choice.ChoiceMode;
+import com.globusltd.recyclerview.choice.ChoiceModeOwner;
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.view.ClickableViews;
@@ -29,7 +31,7 @@ import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
 /**
- * Base {@link RecyclerView.Adapter} that handles clicks and action mode.
+ * Base {@link RecyclerView.Adapter} that handles clicks and choice mode.
  * <p>
  * Notice that you should always detach adapter from RecyclerView when view is destroyed
  * to avoid possible memory leaks. Detaching the adapter from RecyclerView guarantees that
@@ -49,7 +51,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         extends DatasourceAdapter<E, VH> implements ClickableAdapter<E> {
 
     @NonNull
-    private final ItemClickHelper<E, VH> mItemClickHelper;
+    private final ChoiceModeOwner<E> mChoiceModeOwner;
 
     public Adapter() {
         this(Datasources.<E>empty());
@@ -62,27 +64,41 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         super(datasource, diffCallbackFactory);
-
-        mItemClickHelper = new ItemClickHelper<>(this);
-        registerViewHolderBehavior(mItemClickHelper);
+    
+        mChoiceModeOwner = new ChoiceModeOwner<>();
+        registerRecyclerViewBehavior(mChoiceModeOwner);
+        
+        final ItemClickHelper<E, VH> itemClickHelper = new ItemClickHelper<>(this);
+        itemClickHelper.setOnItemClickListener(mChoiceModeOwner);
+        itemClickHelper.setOnItemLongClickListener(mChoiceModeOwner);
+        registerViewHolderBehavior(itemClickHelper);
     }
 
     /**
      * Register a callback to be invoked when view is clicked.
      *
-     * @param onItemClickListener The callback that will run
+     * @param onItemClickListener The callback that will run.
      */
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
-        mItemClickHelper.setOnItemClickListener(onItemClickListener);
+        mChoiceModeOwner.setOnItemClickListener(onItemClickListener);
     }
 
     /**
      * Register a callback to be invoked when view is long clicked.
      *
-     * @param itemLongClickListener The callback that will run
+     * @param onItemLongClickListener The callback that will run.
      */
-    public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> itemLongClickListener) {
-        mItemClickHelper.setOnItemLongClickListener(itemLongClickListener);
+    public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
+        mChoiceModeOwner.setOnItemLongClickListener(onItemLongClickListener);
+    }
+    
+    /**
+     * Sets a {@link ChoiceMode} implementation to handle selected items.
+     *
+     * @param choiceMode {@link ChoiceMode} implementation.
+     */
+    public void setChoiceMode(@NonNull final ChoiceMode choiceMode) {
+        mChoiceModeOwner.setChoiceMode(choiceMode);
     }
 
     /**

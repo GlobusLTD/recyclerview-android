@@ -36,7 +36,7 @@ import java.util.List;
  */
 @MainThread
 public abstract class DatasourceAdapter<E, VH extends RecyclerView.ViewHolder>
-        extends BindableAdapter<VH> implements DataAdapter<E>, DatasourceSwappable<E> {
+        extends BindableAdapter<VH> implements ParameterizedAdapter<E>, DatasourceSwappable<E> {
 
     @NonNull
     private final DatasourceOwner<E> mDatasourceOwner;

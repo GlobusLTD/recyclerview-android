@@ -18,7 +18,7 @@ package com.globusltd.recyclerview;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
-public interface DataAdapter<E> {
+public interface ParameterizedAdapter<E> {
 
     /**
      * Returns the element at the specified position.

@@ -19,9 +19,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.globusltd.recyclerview.view.RecyclerViewBehaviorComposite;
-import com.globusltd.recyclerview.view.ViewHolderBehaviorComposite;
-
 import java.util.List;
 
 /**

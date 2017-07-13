@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.view;
+package com.globusltd.recyclerview;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-
-import com.globusltd.recyclerview.RecyclerViewBehavior;
 
 import java.util.ArrayList;
 import java.util.List;

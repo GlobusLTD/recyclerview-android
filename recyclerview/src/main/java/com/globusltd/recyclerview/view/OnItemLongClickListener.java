@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview.view;
 
+import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -35,6 +36,7 @@ public interface OnItemLongClickListener<E> {
      * @param position the position of the data entity in the adapter.
      * @return true if the callback consumed the long click, false otherwise.
      */
-    boolean onItemLongClick(@NonNull final View view, final E item, final int position);
+    boolean onItemLongClick(@NonNull final View view, @NonNull final E item,
+                            @IntRange(from = 0) final int position);
 
 }
