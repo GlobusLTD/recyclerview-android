@@ -19,10 +19,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
-import com.globusltd.recyclerview.Datasource;
-import com.globusltd.recyclerview.DatasourceObservable;
-import com.globusltd.recyclerview.DatasourceObserver;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

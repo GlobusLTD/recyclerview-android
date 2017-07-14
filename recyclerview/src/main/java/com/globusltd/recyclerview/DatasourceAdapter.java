@@ -24,6 +24,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.globusltd.recyclerview.datasource.Datasource;
+import com.globusltd.recyclerview.datasource.DatasourceObserver;
 import com.globusltd.recyclerview.datasource.DatasourceOwner;
 import com.globusltd.recyclerview.datasource.DatasourceProxy;
 import com.globusltd.recyclerview.datasource.Datasources;

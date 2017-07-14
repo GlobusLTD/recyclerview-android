@@ -22,7 +22,7 @@ import android.support.v7.widget.RecyclerView;
 /**
  * {@link ChoiceMode} that allows up to one choice.
  */
-public class SingleChoiceMode implements ChoiceMode {
+public class SingleChoiceMode extends ObservableChoiceMode {
     
     /**
      * Single choice mode callback.
@@ -76,6 +76,11 @@ public class SingleChoiceMode implements ChoiceMode {
      */
     @Override
     public void setItemChecked(final long itemId, final boolean checked) {
+        setItemCheckedInternal(itemId, checked, false);
+    }
+    
+    private void setItemCheckedInternal(final long itemId, final boolean checked,
+                                        final boolean fromUser) {
         final long checkedId = mCheckedId;
         mCheckedId = (checked ? itemId : RecyclerView.NO_ID);
     
@@ -83,8 +88,8 @@ public class SingleChoiceMode implements ChoiceMode {
             mChoiceModeListener.onItemCheckedStateChanged(itemId, checked);
         }
     
-        // TODO: notifyItemCheckedChanged(checkedId);
-        // TODO: notifyItemCheckedChanged(mCheckedId);
+        notifyItemCheckedChanged(checkedId, fromUser);
+        notifyItemCheckedChanged(mCheckedId, fromUser);
     }
     
     /**
@@ -102,7 +107,7 @@ public class SingleChoiceMode implements ChoiceMode {
     public void clearChoices() {
         final long itemId = mCheckedId;
         mCheckedId = RecyclerView.NO_ID;
-        // TODO: notifyItemCheckedChanged(itemId);
+        notifyItemCheckedChanged(itemId, false);
     }
     
     /**
@@ -111,7 +116,7 @@ public class SingleChoiceMode implements ChoiceMode {
     @Override
     public boolean onClick(final long itemId) {
         if (!isItemChecked(itemId)) {
-            setItemChecked(itemId, true);
+            setItemCheckedInternal(itemId, true, true);
         }
         return true;
     }

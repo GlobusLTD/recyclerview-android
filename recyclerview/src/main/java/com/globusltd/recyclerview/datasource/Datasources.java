@@ -18,9 +18,6 @@ package com.globusltd.recyclerview.datasource;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
-import com.globusltd.recyclerview.Datasource;
-import com.globusltd.recyclerview.DatasourceObserver;
-
 public class Datasources {
 
     private static final Datasource EMPTY_DATASOURCE = new EmptyDatasource<>();

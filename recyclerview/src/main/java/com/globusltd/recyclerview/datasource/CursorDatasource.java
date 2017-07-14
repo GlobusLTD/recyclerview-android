@@ -24,9 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import com.globusltd.recyclerview.Datasource;
-import com.globusltd.recyclerview.DatasourceObserver;
-
 import java.io.Closeable;
 
 /**

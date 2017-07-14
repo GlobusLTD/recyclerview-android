@@ -23,6 +23,8 @@ import android.support.v7.widget.RecyclerView;
 
 import com.globusltd.recyclerview.choice.ChoiceMode;
 import com.globusltd.recyclerview.choice.ChoiceModeOwner;
+import com.globusltd.recyclerview.choice.NoneChoiceMode;
+import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.datasource.Datasources;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.view.ClickableViews;
@@ -49,24 +51,28 @@ import com.globusltd.recyclerview.view.OnItemLongClickListener;
 @MainThread
 public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         extends DatasourceAdapter<E, VH> implements ClickableAdapter<E> {
+    
+    private static final ChoiceMode DEFAULT_CHOICE_MODE = new NoneChoiceMode();
 
     @NonNull
-    private final ChoiceModeOwner<E> mChoiceModeOwner;
+    private final ChoiceModeOwner<E, VH> mChoiceModeOwner;
 
     public Adapter() {
         this(Datasources.<E>empty());
     }
 
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
-        this(datasource, null);
+        this(datasource, null, DEFAULT_CHOICE_MODE);
     }
 
     public Adapter(@NonNull final Datasource<? extends E> datasource,
-                   @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
+                   @Nullable final DiffCallbackFactory<E> diffCallbackFactory,
+                   @NonNull final ChoiceMode choiceMode) {
         super(datasource, diffCallbackFactory);
     
-        mChoiceModeOwner = new ChoiceModeOwner<>();
+        mChoiceModeOwner = new ChoiceModeOwner<>(choiceMode);
         registerRecyclerViewBehavior(mChoiceModeOwner);
+        registerViewHolderBehavior(mChoiceModeOwner);
         
         final ItemClickHelper<E, VH> itemClickHelper = new ItemClickHelper<>(this);
         itemClickHelper.setOnItemClickListener(mChoiceModeOwner);

@@ -20,6 +20,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
+import com.globusltd.recyclerview.datasource.Datasource;
+import com.globusltd.recyclerview.datasource.DatasourceObserver;
+
 /**
  * Observer class for watching changes to a {@link Datasource} and
  * dispatching them to the {@link RecyclerView.Adapter}.

@@ -17,7 +17,7 @@ package com.globusltd.recyclerview.diff;
 
 import android.support.annotation.NonNull;
 
-import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.datasource.Datasource;
 
 /**
  * Factory that allows to create {@link DiffCallback} for two {@link Datasource}s.

@@ -23,9 +23,6 @@ import android.support.annotation.RestrictTo;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 
-import com.globusltd.recyclerview.Datasource;
-import com.globusltd.recyclerview.DatasourceObservable;
-import com.globusltd.recyclerview.DatasourceObserver;
 import com.globusltd.recyclerview.DatasourceSwappable;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;

@@ -22,8 +22,6 @@ import android.support.annotation.RestrictTo;
 import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 
-import com.globusltd.recyclerview.Datasource;
-import com.globusltd.recyclerview.DatasourceObserver;
 import com.globusltd.recyclerview.DatasourceSwappable;
 import com.globusltd.recyclerview.RecyclerViewBehavior;
 

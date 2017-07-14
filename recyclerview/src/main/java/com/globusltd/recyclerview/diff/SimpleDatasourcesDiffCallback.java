@@ -18,7 +18,7 @@ package com.globusltd.recyclerview.diff;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.datasource.Datasource;
 
 /**
  * A callback class used by DiffUtil while calculating the diff between two {@link Datasource}s.

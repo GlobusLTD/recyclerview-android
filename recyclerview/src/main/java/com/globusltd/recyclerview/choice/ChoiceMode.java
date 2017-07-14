@@ -16,11 +16,13 @@
 package com.globusltd.recyclerview.choice;
 
 import android.support.annotation.IntRange;
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 
 /**
- * Base class for any choice mode that can be used with {@link com.globusltd.recyclerview.Adapter}.
+ * Interface describes choice mode that can be used with {@link com.globusltd.recyclerview.Adapter}.
  */
-
+@MainThread
 public interface ChoiceMode {
     
     /**
@@ -75,5 +77,30 @@ public interface ChoiceMode {
      * @return true if click is handled by choice mode.
      */
     boolean onLongClick(final long itemId);
+    
+    /**
+     * Register a new observer to listen for selection changes.
+     * <p>
+     * <p>The choice mode may publish a variety of events describing selection changes.
+     * <p>
+     * <p>Components registering observers with a choice mode are responsible for
+     * {@link #unregisterChoiceModeObserver(ChoiceModeObserver)}
+     * unregistering} those observers when finished.</p>
+     *
+     * @param observer Observer to register.
+     * @see #unregisterChoiceModeObserver(ChoiceModeObserver)
+     */
+    void registerChoiceModeObserver(@NonNull final ChoiceModeObserver observer);
+    
+    /**
+     * Unregister an observer currently listening for selection changes.
+     * <p>
+     * <p>The unregistered observer will no longer receive events about changes
+     * to the choice mode.</p>
+     *
+     * @param observer Observer to unregister.
+     * @see #registerChoiceModeObserver(ChoiceModeObserver)
+     */
+    void unregisterChoiceModeObserver(@NonNull final ChoiceModeObserver observer);
     
 }

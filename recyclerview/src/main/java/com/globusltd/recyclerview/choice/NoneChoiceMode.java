@@ -16,6 +16,7 @@
 package com.globusltd.recyclerview.choice;
 
 import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 
 /**
  * {@link ChoiceMode} that does not have any choice behavior.
@@ -80,6 +81,20 @@ public final class NoneChoiceMode implements ChoiceMode {
     @Override
     public boolean onLongClick(final long itemId) {
         return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerChoiceModeObserver(@NonNull final ChoiceModeObserver observer) {
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unregisterChoiceModeObserver(@NonNull final ChoiceModeObserver observer) {
     }
     
 }

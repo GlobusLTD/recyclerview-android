@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.globusltd.recyclerview.Adapter;
-import com.globusltd.recyclerview.Datasource;
+import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;

@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
-
-import android.support.annotation.MainThread;
-
-import com.globusltd.recyclerview.datasource.Datasource;
+package com.globusltd.recyclerview.choice;
 
 /**
- * Interface describes component that supports replacing internal {@link Datasource}
- * without interruption to the system.
- *
- * @param <E> Type of elements handled by datasource.
+ * Defines an extension for view holders that make them able to handle choice mode.
  */
-@MainThread
-public interface DatasourceSwappable<E> extends Swappable<Datasource<? extends E>> {
+public interface ChoiceModeCheckable {
+    
+    void setInChoiceMode(final boolean isInChoiceMode);
+    
+    /**
+     * Change the checked state of the view holder
+     *
+     * @param checked  The new checked state.
+     * @param fromUser True if the checked state change was initiated by the user.
+     */
+    void setChecked(final boolean checked, final boolean fromUser);
+    
 }

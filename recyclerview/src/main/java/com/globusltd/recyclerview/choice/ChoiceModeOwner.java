@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewParent;
 
 import com.globusltd.recyclerview.RecyclerViewBehavior;
+import com.globusltd.recyclerview.ViewHolderBehavior;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
@@ -33,13 +34,12 @@ import java.util.Set;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongClickListener<E>,
-        RecyclerViewBehavior {
-    
-    private static final ChoiceMode DEFAULT_CHOICE_MODE = new NoneChoiceMode();
+public class ChoiceModeOwner<E, VH extends RecyclerView.ViewHolder>
+        implements OnItemClickListener<E>, OnItemLongClickListener<E>,
+        RecyclerViewBehavior, ViewHolderBehavior<VH> {
     
     @NonNull
-    private ChoiceMode mChoiceMode = DEFAULT_CHOICE_MODE;
+    private ChoiceMode mChoiceMode;
     
     @Nullable
     private OnItemClickListener<E> mOnItemClickListener;
@@ -50,8 +50,13 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
     @NonNull
     private final Set<RecyclerView> mAttachedRecyclerViews;
     
-    public ChoiceModeOwner() {
+    @NonNull
+    private final ChoiceModeObserver mChoiceModeObserver;
+    
+    public ChoiceModeOwner(@NonNull final ChoiceMode choiceMode) {
+        mChoiceMode = choiceMode;
         mAttachedRecyclerViews = new ArraySet<>();
+        mChoiceModeObserver = new Observer();
     }
     
     /**
@@ -60,8 +65,12 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
      * @param choiceMode {@link ChoiceMode} implementation.
      */
     public void setChoiceMode(@NonNull final ChoiceMode choiceMode) {
+        mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
         mChoiceMode = choiceMode;
-        // TODO: attach/detach
+        if (!mAttachedRecyclerViews.isEmpty()) {
+            mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
+            // TODO: invalidate visible view holders
+        }
     }
     
     /**
@@ -109,7 +118,21 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
      */
     @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
-        mAttachedRecyclerViews.add(recyclerView);
+        if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
+            mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
+        } else {
+            mAttachedRecyclerViews.add(recyclerView);
+        }
+    }
+    
+    @Override
+    public void onAttachViewHolder(@NonNull final VH viewHolder) {
+        // TODO: set view holder checked
+    }
+    
+    @Override
+    public void onDetachViewHolder(@NonNull final VH viewHolder) {
+        // TODO: reset view holder checked
     }
     
     /**
@@ -117,7 +140,9 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
      */
     @Override
     public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
-        mAttachedRecyclerViews.remove(recyclerView);
+        if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
+            mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
+        }
     }
     
     @Nullable
@@ -131,6 +156,15 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
             }
         }
         return null;
+    }
+    
+    private class Observer extends ChoiceModeObserver {
+        
+        @Override
+        public void onItemCheckedChanged(final long itemId, final boolean fromUser) {
+            // TODO: handle item checked changed
+        }
+        
     }
     
 }

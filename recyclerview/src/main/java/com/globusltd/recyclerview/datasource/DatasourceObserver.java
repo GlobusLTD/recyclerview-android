@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.datasource;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;

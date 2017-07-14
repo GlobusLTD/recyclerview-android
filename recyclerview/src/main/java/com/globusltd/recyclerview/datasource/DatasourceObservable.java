@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview;
+package com.globusltd.recyclerview.datasource;
 
-import android.database.Observable;
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
+
+import com.globusltd.recyclerview.util.Observable;
 
 /**
  * {@link DatasourceObservable} provides methods for registering, unregistering
@@ -29,15 +30,6 @@ public class DatasourceObservable extends Observable<DatasourceObserver> {
     
     public DatasourceObservable() {
         super();
-    }
-    
-    /**
-     * Checks if this observable has any registered observers.
-     *
-     * @return true if this observable has any registered observers, false otherwise.
-     */
-    public boolean hasObservers() {
-        return !mObservers.isEmpty();
     }
     
     /**
