@@ -64,6 +64,15 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
         this(datasource, null, DEFAULT_CHOICE_MODE);
     }
+    
+    public Adapter(@Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
+        this(Datasources.<E>empty(), diffCallbackFactory);
+    }
+    
+    public Adapter(@NonNull final Datasource<? extends E> datasource,
+                   @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
+        this(datasource, diffCallbackFactory, DEFAULT_CHOICE_MODE);
+    }
 
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory,
