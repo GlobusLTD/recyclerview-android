@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
+import com.globusltd.recyclerview.view.ItemClickHelper2;
 
 public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
     
@@ -46,33 +47,20 @@ public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
         mViewModel = ViewModelProviders.of(this).get(SimpleListDatasourceExampleViewModel.class);
         
         final Datasource<Person> datasource = mViewModel.getDatasource();
-        
         final PersonsAdapter adapter = new PersonsAdapter(datasource);
         adapter.setOnItemClickListener(this::onItemClick);
         adapter.setOnItemLongClickListener(this::onItemLongClick);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-    
-            @Override
-            public boolean getSupportsChangeAnimations() {
-                return false; //super.getSupportsChangeAnimations();
-            }
-    
-            @Override
-            public void onAnimationStarted(final RecyclerView.ViewHolder viewHolder) {
-                super.onAnimationStarted(viewHolder);
-                Log.i("1111", "Animation started for position " + viewHolder.getAdapterPosition());
-            }
-    
-            @Override
-            public void onAnimationFinished(final RecyclerView.ViewHolder viewHolder) {
-                super.onAnimationFinished(viewHolder);
-                Log.i("1111", "Animation finished for position " + viewHolder.getAdapterPosition());
-            }
-        });
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
+
+        //ItemTouchHelper
+        final ItemClickHelper2<Person> itemClickHelper = new ItemClickHelper2<>(/*adapter*/);
+        itemClickHelper.setOnItemClickListener(this::onItemClick);
+        itemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
+        itemClickHelper.attachToRecyclerView(mRecyclerView);
         
         findViewById(R.id.action_add).setOnClickListener(v -> mViewModel.addSingleItem());
         findViewById(R.id.action_add_multiple).setOnClickListener(v -> mViewModel.addMultipleItems());

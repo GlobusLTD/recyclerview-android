@@ -32,8 +32,6 @@ public class SimpleListDatasourceExampleViewModel extends ViewModel {
     @NonNull
     private final PersonGenerator mPersonGenerator;
     
-    private int mCounter = 0;
-    
     public SimpleListDatasourceExampleViewModel() {
         mDatasource = new ListDatasource<>();
         mPersonGenerator = new PersonGenerator();
