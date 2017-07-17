@@ -19,8 +19,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.List;
-
 /**
  * Base {@link RecyclerView.Adapter} that provides simple bindings.
  */
@@ -82,7 +80,8 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
      */
     @CallSuper
     @Override
-    public void onBindViewHolder(final VH holder, final int position) {
+    public void onViewAttachedToWindow(final VH holder) {
+        super.onViewAttachedToWindow(holder);
         mViewHolderBehaviorComposite.onAttachViewHolder(holder);
     }
     
@@ -91,28 +90,9 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
      */
     @CallSuper
     @Override
-    public void onBindViewHolder(final VH holder, final int position, final List<Object> payloads) {
-        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public void onViewRecycled(final VH holder) {
+    public void onViewDetachedFromWindow(final VH holder) {
+        super.onViewDetachedFromWindow(holder);
         mViewHolderBehaviorComposite.onDetachViewHolder(holder);
-        super.onViewRecycled(holder);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @CallSuper
-    @Override
-    public boolean onFailedToRecycleView(final VH holder) {
-        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
-        return super.onFailedToRecycleView(holder);
     }
     
     /**

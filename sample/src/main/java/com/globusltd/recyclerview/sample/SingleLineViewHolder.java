@@ -16,16 +16,25 @@
 package com.globusltd.recyclerview.sample;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ObservableViewHolder;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SingleLineViewHolder extends RecyclerView.ViewHolder {
+public class SingleLineViewHolder extends ObservableViewHolder {
+    
+    @NonNull
+    public static SingleLineViewHolder inflate(@NonNull final LayoutInflater inflater,
+                                               @NonNull final ViewGroup parent) {
+        final View itemView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        return new SingleLineViewHolder(itemView);
+    }
     
     @NonNull
     private final TextView mTextView1;
     
-    public SingleLineViewHolder(@NonNull final View itemView) {
+    private SingleLineViewHolder(@NonNull final View itemView) {
         super(itemView);
         mTextView1 = (TextView) itemView.findViewById(android.R.id.text1);
     }

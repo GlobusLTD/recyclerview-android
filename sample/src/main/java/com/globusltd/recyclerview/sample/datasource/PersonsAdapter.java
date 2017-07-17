@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.Adapter;
@@ -37,6 +36,12 @@ class PersonsAdapter extends Adapter<Person, SingleLineViewHolder> {
     
     PersonsAdapter(@NonNull final Datasource<Person> datasource) {
         super(datasource, new PersonDiffCallbackFactory());
+        setHasStableIds(true);
+    }
+    
+    @Override
+    public long getItemId(final int position) {
+        return get(position).getId();
     }
     
     @NonNull
@@ -51,8 +56,7 @@ class PersonsAdapter extends Adapter<Person, SingleLineViewHolder> {
     public SingleLineViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                                    @NonNull final ViewGroup parent,
                                                    final int viewType) {
-        final View itemView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-        final SingleLineViewHolder viewHolder = new SingleLineViewHolder(itemView);
+        final SingleLineViewHolder viewHolder = SingleLineViewHolder.inflate(inflater, parent);
         
         // Typically you should specify ?attr/selectableItemBackground as background in layout file,
         // but for platform views you can specify it programmatically

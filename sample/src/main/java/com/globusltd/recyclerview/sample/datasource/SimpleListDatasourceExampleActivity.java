@@ -24,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -51,7 +53,25 @@ public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
+    
+            @Override
+            public boolean getSupportsChangeAnimations() {
+                return false; //super.getSupportsChangeAnimations();
+            }
+    
+            @Override
+            public void onAnimationStarted(final RecyclerView.ViewHolder viewHolder) {
+                super.onAnimationStarted(viewHolder);
+                Log.i("1111", "Animation started for position " + viewHolder.getAdapterPosition());
+            }
+    
+            @Override
+            public void onAnimationFinished(final RecyclerView.ViewHolder viewHolder) {
+                super.onAnimationFinished(viewHolder);
+                Log.i("1111", "Animation finished for position " + viewHolder.getAdapterPosition());
+            }
+        });
         mRecyclerView.setAdapter(adapter);
         
         findViewById(R.id.action_add).setOnClickListener(v -> mViewModel.addSingleItem());

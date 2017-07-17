@@ -36,6 +36,14 @@ public interface ViewHolderBehavior<VH extends RecyclerView.ViewHolder> {
     void onAttachViewHolder(@NonNull final VH viewHolder);
     
     /**
+     * Called when a view holder position has been changed,
+     * but data item associated with this view holder has not been changed.
+     *
+     * @param viewHolder A view holder whose position has been changed.
+     */
+    void onPositionChanged(@NonNull final VH viewHolder);
+    
+    /**
      * Called when a view created by adapter has been detached from its data.
      *
      * @param viewHolder Holder of the view being detached.

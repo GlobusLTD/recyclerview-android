@@ -42,6 +42,11 @@ public class ChoiceModeBehavior<VH extends RecyclerView.ViewHolder>
     
     @Override
     public void onAttachViewHolder(@NonNull final VH viewHolder) {
+        onPositionChanged(viewHolder);
+    }
+    
+    @Override
+    public void onPositionChanged(@NonNull final VH viewHolder) {
         setViewChecked(viewHolder, false); // TODO: isChecked from choice mode;
     }
     

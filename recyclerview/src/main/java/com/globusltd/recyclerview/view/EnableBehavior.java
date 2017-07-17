@@ -37,6 +37,14 @@ public class EnableBehavior<VH extends RecyclerView.ViewHolder> implements ViewH
      */
     @Override
     public void onAttachViewHolder(@NonNull final VH viewHolder) {
+        onPositionChanged(viewHolder);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPositionChanged(@NonNull final VH viewHolder) {
         final int position = viewHolder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount()) {
             final boolean isEnabled = mAdapter.isEnabled(position);

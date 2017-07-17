@@ -47,7 +47,15 @@ public class LifecycleBehavior<VH extends RecyclerView.ViewHolder>
             mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPositionChanged(@NonNull final VH viewHolder) {
+        // Do nothing
+    }
+    
     /**
      * {@inheritDoc}
      */

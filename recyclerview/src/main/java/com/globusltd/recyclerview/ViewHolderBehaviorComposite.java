@@ -72,6 +72,16 @@ public class ViewHolderBehaviorComposite<VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
+    public void onPositionChanged(@NonNull final VH viewHolder) {
+        for (final ViewHolderBehavior<VH> behavior : mBehaviors) {
+            behavior.onPositionChanged(viewHolder);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onDetachViewHolder(@NonNull final VH viewHolder) {
         final int size = mBehaviors.size();
         for (int i = size - 1; i >= 0; i--) {

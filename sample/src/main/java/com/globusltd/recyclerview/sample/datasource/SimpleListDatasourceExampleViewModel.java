@@ -58,7 +58,7 @@ public class SimpleListDatasourceExampleViewModel extends ViewModel {
     }
     
     void removeItemAtPosition(@IntRange(from = 0) final int position) {
-        mDatasource.remove(position);
+        mDatasource.move(position, position - 1);
     }
     
 }

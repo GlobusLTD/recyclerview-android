@@ -131,6 +131,11 @@ public class ChoiceModeOwner<E, VH extends RecyclerView.ViewHolder>
     }
     
     @Override
+    public void onPositionChanged(@NonNull final VH viewHolder) {
+        
+    }
+    
+    @Override
     public void onDetachViewHolder(@NonNull final VH viewHolder) {
         // TODO: reset view holder checked
     }

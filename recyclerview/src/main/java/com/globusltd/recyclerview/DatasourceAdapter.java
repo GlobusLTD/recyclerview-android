@@ -127,7 +127,6 @@ public abstract class DatasourceAdapter<E, VH extends RecyclerView.ViewHolder>
     public final void onBindViewHolder(final VH holder, final int position) {
         final E item = getDatasource().get(position);
         onBindViewHolder(holder, item, position);
-        super.onBindViewHolder(holder, position);
     }
 
     /**
