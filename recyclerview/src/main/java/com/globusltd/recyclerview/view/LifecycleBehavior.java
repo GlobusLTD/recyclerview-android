@@ -23,25 +23,24 @@ import android.util.SparseBooleanArray;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class LifecycleBehavior<VH extends RecyclerView.ViewHolder>
-        implements ViewHolderBehavior<VH> {
-
+public class LifecycleBehavior implements ViewHolderBehavior {
+    
     @NonNull
     private final LifecycleComposite mLifecycleComposite;
-
+    
     @NonNull
     private final SparseBooleanArray mLifecycleCallbacksTypes;
-
+    
     public LifecycleBehavior(@NonNull final LifecycleComposite lifecycleComposite) {
         mLifecycleComposite = lifecycleComposite;
         mLifecycleCallbacksTypes = new SparseBooleanArray();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final VH viewHolder) {
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
@@ -52,7 +51,7 @@ public class LifecycleBehavior<VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public void onPositionChanged(@NonNull final VH viewHolder) {
+    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         // Do nothing
     }
     
@@ -60,23 +59,23 @@ public class LifecycleBehavior<VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);
         }
     }
-
-    private boolean isLifecycleCallbacks(@NonNull final VH viewHolder) {
+    
+    private boolean isLifecycleCallbacks(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int viewType = viewHolder.getItemViewType();
         if (mLifecycleCallbacksTypes.indexOfKey(viewType) >= 0) {
             return mLifecycleCallbacksTypes.get(viewType);
-
+            
         } else {
             final boolean isLifecycleCallbacks = LifecycleCallbacks.class.isInstance(viewHolder);
             mLifecycleCallbacksTypes.put(viewType, isLifecycleCallbacks);
             return isLifecycleCallbacks;
         }
     }
-
+    
 }

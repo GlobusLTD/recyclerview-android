@@ -34,9 +34,8 @@ import java.util.Set;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ChoiceModeOwner<E, VH extends RecyclerView.ViewHolder>
-        implements OnItemClickListener<E>, OnItemLongClickListener<E>,
-        RecyclerViewBehavior, ViewHolderBehavior<VH> {
+public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongClickListener<E>,
+        RecyclerViewBehavior, ViewHolderBehavior {
     
     @NonNull
     private ChoiceMode mChoiceMode;
@@ -126,17 +125,18 @@ public class ChoiceModeOwner<E, VH extends RecyclerView.ViewHolder>
     }
     
     @Override
-    public void onAttachViewHolder(@NonNull final VH viewHolder) {
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        onViewHolderPositionChanged(viewHolder);
         // TODO: set view holder checked
     }
     
     @Override
-    public void onPositionChanged(@NonNull final VH viewHolder) {
-        
+    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        // TODO: set view holder checked
     }
     
     @Override
-    public void onDetachViewHolder(@NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
         // TODO: reset view holder checked
     }
     

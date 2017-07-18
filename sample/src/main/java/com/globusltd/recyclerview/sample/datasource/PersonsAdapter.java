@@ -29,10 +29,10 @@ import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 import com.globusltd.recyclerview.sample.R;
-import com.globusltd.recyclerview.sample.SingleLineViewHolder;
+import com.globusltd.recyclerview.sample.TwoLinesViewHolder;
 import com.globusltd.recyclerview.view.ClickableViews;
 
-class PersonsAdapter extends Adapter<Person, SingleLineViewHolder> {
+class PersonsAdapter extends Adapter<Person, TwoLinesViewHolder> {
     
     PersonsAdapter(@NonNull final Datasource<Person> datasource) {
         super(datasource, new PersonDiffCallbackFactory());
@@ -53,10 +53,10 @@ class PersonsAdapter extends Adapter<Person, SingleLineViewHolder> {
     
     @NonNull
     @Override
-    public SingleLineViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
-                                                   @NonNull final ViewGroup parent,
-                                                   final int viewType) {
-        final SingleLineViewHolder viewHolder = SingleLineViewHolder.inflate(inflater, parent);
+    public TwoLinesViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
+                                                 @NonNull final ViewGroup parent,
+                                                 final int viewType) {
+        final TwoLinesViewHolder viewHolder = TwoLinesViewHolder.inflate(inflater, parent);
         
         // Typically you should specify ?attr/selectableItemBackground as background in layout file,
         // but for platform views you can specify it programmatically
@@ -70,9 +70,10 @@ class PersonsAdapter extends Adapter<Person, SingleLineViewHolder> {
     }
     
     @Override
-    public void onBindViewHolder(@NonNull final SingleLineViewHolder holder,
+    public void onBindViewHolder(@NonNull final TwoLinesViewHolder holder,
                                  @NonNull final Person person, final int position) {
-        holder.setText1(person.getFullName());
+        holder.setText1(person.getLastName());
+        holder.setText2(person.getFirstName());
     }
     
     private static class PersonDiffCallbackFactory implements DiffCallbackFactory<Person> {

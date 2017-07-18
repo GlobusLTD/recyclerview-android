@@ -53,14 +53,14 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
         extends DatasourceAdapter<E, VH> implements ClickableAdapter<E> {
     
     private static final ChoiceMode DEFAULT_CHOICE_MODE = new NoneChoiceMode();
-
+    
     @NonNull
-    private final ChoiceModeOwner<E, VH> mChoiceModeOwner;
-
+    private final ChoiceModeOwner<E> mChoiceModeOwner;
+    
     public Adapter() {
         this(Datasources.<E>empty());
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource) {
         this(datasource, null, DEFAULT_CHOICE_MODE);
     }
@@ -73,22 +73,22 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory) {
         this(datasource, diffCallbackFactory, DEFAULT_CHOICE_MODE);
     }
-
+    
     public Adapter(@NonNull final Datasource<? extends E> datasource,
                    @Nullable final DiffCallbackFactory<E> diffCallbackFactory,
                    @NonNull final ChoiceMode choiceMode) {
         super(datasource, diffCallbackFactory);
-    
+        
         mChoiceModeOwner = new ChoiceModeOwner<>(choiceMode);
         registerRecyclerViewBehavior(mChoiceModeOwner);
         registerViewHolderBehavior(mChoiceModeOwner);
         
-        final ItemClickHelper<E, VH> itemClickHelper = new ItemClickHelper<>(this);
+        final ItemClickHelper<E> itemClickHelper = new ItemClickHelper<>(this);
         itemClickHelper.setOnItemClickListener(mChoiceModeOwner);
         itemClickHelper.setOnItemLongClickListener(mChoiceModeOwner);
         registerViewHolderBehavior(itemClickHelper);
     }
-
+    
     /**
      * Register a callback to be invoked when view is clicked.
      *
@@ -97,7 +97,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
         mChoiceModeOwner.setOnItemClickListener(onItemClickListener);
     }
-
+    
     /**
      * Register a callback to be invoked when view is long clicked.
      *
@@ -115,7 +115,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public void setChoiceMode(@NonNull final ChoiceMode choiceMode) {
         mChoiceModeOwner.setChoiceMode(choiceMode);
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -123,7 +123,7 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public boolean isEnabled(@IntRange(from = 0) final int position) {
         return true;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -132,5 +132,5 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
     public ClickableViews getClickableViews(@IntRange(from = 0) final int position, final int viewType) {
         return ClickableViews.NONE;
     }
-
+    
 }

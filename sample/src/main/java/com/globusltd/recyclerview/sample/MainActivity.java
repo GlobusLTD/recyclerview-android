@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         final SampleAdapter adapter = new SampleAdapter(datasource);
         adapter.setOnItemClickListener(this);
         adapter.setOnItemLongClickListener(this);
-        adapter.registerViewHolderBehavior(new EnableBehavior<>(adapter));
-        adapter.registerViewHolderBehavior(new LifecycleBehavior<>(mLifecycleComposite));
+        adapter.registerViewHolderBehavior(new EnableBehavior(adapter));
+        adapter.registerViewHolderBehavior(new LifecycleBehavior(mLifecycleComposite));
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

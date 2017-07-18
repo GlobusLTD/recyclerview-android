@@ -29,12 +29,12 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
     private final RecyclerViewBehaviorComposite mRecyclerViewBehaviorComposite;
     
     @NonNull
-    private final ViewHolderBehaviorComposite<VH> mViewHolderBehaviorComposite;
+    private final ViewHolderTracker mViewHolderTracker;
     
     public BindableAdapter() {
         super();
         mRecyclerViewBehaviorComposite = new RecyclerViewBehaviorComposite();
-        mViewHolderBehaviorComposite = new ViewHolderBehaviorComposite<>();
+        mViewHolderTracker = new ViewHolderTracker();
     }
     
     /**
@@ -57,22 +57,22 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
     }
     
     /**
-     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderBehaviorComposite},
+     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderTracker},
      * which will be called at the same times as the attach/detach methods of the
      * adapter are called.
      *
      * @param viewHolderBehavior The interface to call.
      */
-    public void registerViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
-        mViewHolderBehaviorComposite.registerViewHolderBehavior(viewHolderBehavior);
+    public void registerViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+        mViewHolderTracker.registerViewHolderBehavior(viewHolderBehavior);
     }
     
     /**
      * Remove a {@link ViewHolderBehavior} object that was previously registered
      * with {@link #registerViewHolderBehavior(ViewHolderBehavior)}.
      */
-    public void unregisterViewHolderBehavior(@NonNull final ViewHolderBehavior<VH> viewHolderBehavior) {
-        mViewHolderBehaviorComposite.unregisterViewHolderBehavior(viewHolderBehavior);
+    public void unregisterViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
+        mViewHolderTracker.unregisterViewHolderBehavior(viewHolderBehavior);
     }
     
     /**
@@ -82,7 +82,7 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
     @Override
     public void onViewAttachedToWindow(final VH holder) {
         super.onViewAttachedToWindow(holder);
-        mViewHolderBehaviorComposite.onAttachViewHolder(holder);
+        mViewHolderTracker.onAttachViewHolder(holder);
     }
     
     /**
@@ -92,7 +92,7 @@ public abstract class BindableAdapter<VH extends RecyclerView.ViewHolder>
     @Override
     public void onViewDetachedFromWindow(final VH holder) {
         super.onViewDetachedFromWindow(holder);
-        mViewHolderBehaviorComposite.onDetachViewHolder(holder);
+        mViewHolderTracker.onDetachViewHolder(holder);
     }
     
     /**

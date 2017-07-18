@@ -23,7 +23,7 @@ import com.globusltd.recyclerview.ClickableAdapter;
 import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class EnableBehavior<VH extends RecyclerView.ViewHolder> implements ViewHolderBehavior<VH> {
+public class EnableBehavior implements ViewHolderBehavior {
     
     @NonNull
     private final ClickableAdapter<?> mAdapter;
@@ -36,15 +36,15 @@ public class EnableBehavior<VH extends RecyclerView.ViewHolder> implements ViewH
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final VH viewHolder) {
-        onPositionChanged(viewHolder);
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        onViewHolderPositionChanged(viewHolder);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onPositionChanged(@NonNull final VH viewHolder) {
+    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int position = viewHolder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount()) {
             final boolean isEnabled = mAdapter.isEnabled(position);
@@ -58,7 +58,7 @@ public class EnableBehavior<VH extends RecyclerView.ViewHolder> implements ViewH
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
         viewHolder.itemView.setEnabled(false);
     }
     

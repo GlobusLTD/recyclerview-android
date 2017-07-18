@@ -16,31 +16,31 @@
 package com.globusltd.recyclerview.sample;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SingleLineViewHolder extends RecyclerView.ViewHolder {
+public class TwoLinesViewHolder extends SingleLineViewHolder {
     
     @NonNull
-    public static SingleLineViewHolder inflate(@NonNull final LayoutInflater inflater,
+    public static TwoLinesViewHolder inflate(@NonNull final LayoutInflater inflater,
                                                @NonNull final ViewGroup parent) {
-        final View itemView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-        return new SingleLineViewHolder(itemView);
+        final View itemView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
+        return new TwoLinesViewHolder(itemView);
     }
     
     @NonNull
-    private final TextView mTextView1;
+    private final TextView mTextView2;
     
-    public SingleLineViewHolder(@NonNull final View itemView) {
+    public TwoLinesViewHolder(@NonNull final View itemView) {
         super(itemView);
-        mTextView1 = (TextView) itemView.findViewById(android.R.id.text1);
+        mTextView2 = (TextView) itemView.findViewById(android.R.id.text2);
     }
     
-    public void setText1(@NonNull final CharSequence text) {
-        mTextView1.setText(text);
+    public void setText2(@Nullable final CharSequence text) {
+        mTextView2.setText(text);
     }
     
 }

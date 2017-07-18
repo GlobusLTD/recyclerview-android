@@ -31,7 +31,7 @@ public interface ClickableAdapter<E> extends ParameterizedAdapter<E> {
      * @param position an index of the item.
      * @return {@code true} if item is enabled, {@code false} otherwise.
      */
-    boolean isEnabled(@IntRange(from = 0) final int position);
+    boolean isEnabled(/*@IntRange(from = 0) */ final int position);
 
     /**
      * Returns information about all of the clickable views at specified position.
@@ -43,6 +43,6 @@ public interface ClickableAdapter<E> extends ParameterizedAdapter<E> {
      * @see #isEnabled(int)
      */
     @NonNull
-    ClickableViews getClickableViews(@IntRange(from = 0) final int position, final int viewType);
+    ClickableViews getClickableViews(/*@IntRange(from = 0) */ final int position, final int viewType);
 
 }

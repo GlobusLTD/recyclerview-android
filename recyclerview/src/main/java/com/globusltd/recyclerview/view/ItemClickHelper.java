@@ -38,8 +38,7 @@ import java.util.Map;
  * @param <E> Type of elements handled by click listeners.
  */
 @MainThread
-public class ItemClickHelper<E, VH extends RecyclerView.ViewHolder>
-        implements ViewHolderBehavior<VH> {
+public class ItemClickHelper<E> implements ViewHolderBehavior {
     
     @NonNull
     private final ClickableAdapter<E> mAdapter;
@@ -48,7 +47,7 @@ public class ItemClickHelper<E, VH extends RecyclerView.ViewHolder>
     private final Pool<ViewHolderClickListener> mPool;
     
     @NonNull
-    private final Map<VH, ViewHolderClickListener> mActiveViewHolders;
+    private final Map<RecyclerView.ViewHolder, ViewHolderClickListener> mActiveViewHolders;
     
     @Nullable
     private OnItemClickListener<E> mOnItemClickListener;
@@ -84,32 +83,32 @@ public class ItemClickHelper<E, VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final VH holder) {
-        onPositionChanged(holder);
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
+        onViewHolderPositionChanged(holder);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onPositionChanged(@NonNull final VH holder) {
+    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder holder) {
         final int position = holder.getAdapterPosition();
         if (isPositionAvailable(position)) {
             final ViewHolderClickListener listener = mActiveViewHolders.containsKey(holder) ?
                     mActiveViewHolders.get(holder) : mPool.obtain();
             mActiveViewHolders.put(holder, listener);
             listener.viewHolder = holder;
-        
+            
             final int viewType = holder.getItemViewType();
             final ClickableViews clickableViews = mAdapter.getClickableViews(position, viewType);
             final boolean isEnabled = mAdapter.isEnabled(position);
-        
+            
             final View.OnClickListener onClickListener = (isEnabled ? listener : null);
             setClickable(holder.itemView, clickableViews.getDefaultViewId(), onClickListener);
             for (final int viewId : clickableViews.getClickableViewIds()) {
                 setClickable(holder.itemView, viewId, onClickListener);
             }
-        
+            
             final View.OnLongClickListener onLongClickListener = (isEnabled ? listener : null);
             setLongClickable(holder.itemView, clickableViews.getDefaultViewId(), onLongClickListener);
         }
@@ -118,7 +117,7 @@ public class ItemClickHelper<E, VH extends RecyclerView.ViewHolder>
     /**
      * {@inheritDoc}
      */
-    public void onDetachViewHolder(@NonNull final VH holder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
         final ViewHolderClickListener listener = mActiveViewHolders.remove(holder);
         if (listener != null && isPositionAvailable(listener.getPosition())) {
             final ClickableViews clickableViews = mAdapter.getClickableViews(listener.getPosition(),

@@ -30,8 +30,7 @@ import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ChoiceModeBehavior<VH extends RecyclerView.ViewHolder>
-        implements ViewHolderBehavior<VH> {
+public class ChoiceModeBehavior implements ViewHolderBehavior {
     
     @NonNull
     private final SparseBooleanArray mCheckableViewTypes;
@@ -41,22 +40,22 @@ public class ChoiceModeBehavior<VH extends RecyclerView.ViewHolder>
     }
     
     @Override
-    public void onAttachViewHolder(@NonNull final VH viewHolder) {
-        onPositionChanged(viewHolder);
+    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        onViewHolderPositionChanged(viewHolder);
     }
     
     @Override
-    public void onPositionChanged(@NonNull final VH viewHolder) {
+    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         setViewChecked(viewHolder, false); // TODO: isChecked from choice mode;
     }
     
     @Override
-    public void onDetachViewHolder(@NonNull final VH viewHolder) {
+    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
         setViewChecked(viewHolder, false);
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setViewChecked(@NonNull final VH viewHolder, final boolean isChecked) {
+    private void setViewChecked(@NonNull final RecyclerView.ViewHolder viewHolder, final boolean isChecked) {
         final View itemView = viewHolder.itemView;
         if (isCheckableView(viewHolder)) {
             ((Checkable) itemView).setChecked(isChecked);
@@ -65,7 +64,7 @@ public class ChoiceModeBehavior<VH extends RecyclerView.ViewHolder>
         }
     }
     
-    private boolean isCheckableView(@NonNull final VH viewHolder) {
+    private boolean isCheckableView(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int viewType = viewHolder.getItemViewType();
         if (mCheckableViewTypes.indexOfKey(viewType) >= 0) {
             return mCheckableViewTypes.get(viewType);
@@ -77,7 +76,7 @@ public class ChoiceModeBehavior<VH extends RecyclerView.ViewHolder>
         }
     }
     
-    private boolean shouldUseActivated(@NonNull final VH viewHolder) {
+    private boolean shouldUseActivated(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final Context context = viewHolder.itemView.getContext();
         final int targetSdkVersion = context.getApplicationInfo().targetSdkVersion;
         return (targetSdkVersion >= Build.VERSION_CODES.HONEYCOMB);

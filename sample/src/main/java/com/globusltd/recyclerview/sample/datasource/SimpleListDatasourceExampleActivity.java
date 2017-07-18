@@ -24,14 +24,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.globusltd.recyclerview.ItemClickHelperV2;
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
-import com.globusltd.recyclerview.view.ItemClickHelper2;
 
 public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
     
@@ -48,16 +46,15 @@ public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
         
         final Datasource<Person> datasource = mViewModel.getDatasource();
         final PersonsAdapter adapter = new PersonsAdapter(datasource);
-        adapter.setOnItemClickListener(this::onItemClick);
-        adapter.setOnItemLongClickListener(this::onItemLongClick);
+        //adapter.setOnItemClickListener(this::onItemClick);
+        //adapter.setOnItemLongClickListener(this::onItemLongClick);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
-
-        //ItemTouchHelper
-        final ItemClickHelper2<Person> itemClickHelper = new ItemClickHelper2<>(/*adapter*/);
+    
+        final ItemClickHelperV2<Person> itemClickHelper = new ItemClickHelperV2<>(adapter);
         itemClickHelper.setOnItemClickListener(this::onItemClick);
         itemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
         itemClickHelper.attachToRecyclerView(mRecyclerView);

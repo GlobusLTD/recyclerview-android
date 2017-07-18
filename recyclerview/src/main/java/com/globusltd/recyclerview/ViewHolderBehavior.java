@@ -23,7 +23,7 @@ import android.support.v7.widget.RecyclerView;
  * Interface describes {@link RecyclerView.ViewHolder} attachable behavior.
  */
 @MainThread
-public interface ViewHolderBehavior<VH extends RecyclerView.ViewHolder> {
+public interface ViewHolderBehavior {
     
     /**
      * Called when a view created by adapter has been attached to a data.
@@ -31,9 +31,9 @@ public interface ViewHolderBehavior<VH extends RecyclerView.ViewHolder> {
      * Keep in mind that same data may be attached to the same ViewHolder multiple times.
      *
      * @param viewHolder Holder of the view being attached.
-     * @see #onDetachViewHolder(VH)
+     * @see #onDetachViewHolder(RecyclerView.ViewHolder)
      */
-    void onAttachViewHolder(@NonNull final VH viewHolder);
+    void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view holder position has been changed,
@@ -41,14 +41,14 @@ public interface ViewHolderBehavior<VH extends RecyclerView.ViewHolder> {
      *
      * @param viewHolder A view holder whose position has been changed.
      */
-    void onPositionChanged(@NonNull final VH viewHolder);
+    void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view created by adapter has been detached from its data.
      *
      * @param viewHolder Holder of the view being detached.
-     * @see #onAttachViewHolder(VH)
+     * @see #onAttachViewHolder(RecyclerView.ViewHolder)
      */
-    void onDetachViewHolder(@NonNull final VH viewHolder);
+    void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder);
     
 }

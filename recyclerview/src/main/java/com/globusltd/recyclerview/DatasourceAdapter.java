@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -58,7 +59,26 @@ public abstract class DatasourceAdapter<E, VH extends RecyclerView.ViewHolder>
         final DatasourceProxy<E> datasourceProxy = new DatasourceProxy<>(datasource, diffCallbackFactory);
         final DatasourceObserver datasourceObserver = new AdapterDatasourceObserver(this);
         mDatasourceOwner = new DatasourceOwner<>(datasourceProxy, datasourceObserver);
-        registerRecyclerViewBehavior(mDatasourceOwner);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @CallSuper
+    @Override
+    public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mDatasourceOwner.onAttachedToRecyclerView(recyclerView);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @CallSuper
+    @Override
+    public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
+        mDatasourceOwner.onDetachedFromRecyclerView(recyclerView);
+        super.onDetachedFromRecyclerView(recyclerView);
     }
 
     /**
@@ -191,5 +211,5 @@ public abstract class DatasourceAdapter<E, VH extends RecyclerView.ViewHolder>
                                  final int position, final List<Object> payloads) {
         onBindViewHolder(holder, item, position);
     }
-
+    
 }
