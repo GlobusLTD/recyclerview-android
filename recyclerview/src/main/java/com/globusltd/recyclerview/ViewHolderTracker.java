@@ -36,22 +36,22 @@ import java.util.Map;
  */
 @MainThread
 public class ViewHolderTracker implements ViewHolderBehavior {
-    
+
     @NonNull
     private final List<ViewHolderBehavior> mBehaviors;
-    
+
     @NonNull
     private final Pool<ViewHolderOnLayoutChangeListener> mPool;
-    
+
     @NonNull
     private final Map<RecyclerView.ViewHolder, ViewHolderOnLayoutChangeListener> mOnLayoutChangeListeners;
-    
+
     public ViewHolderTracker() {
         mBehaviors = new ArrayList<>();
         mPool = new ArrayPool<>(new ViewHolderOnLayoutChangeListenerFactory());
         mOnLayoutChangeListeners = new ArrayMap<>();
     }
-    
+
     /**
      * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderTracker},
      * which will be called at the same times as the attach/detach methods of
@@ -64,7 +64,7 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             mBehaviors.add(viewHolderBehavior);
         }
     }
-    
+
     /**
      * Remove a {@link ViewHolderBehavior} object that was previously registered
      * with {@link #registerViewHolderBehavior(ViewHolderBehavior)}.
@@ -72,7 +72,7 @@ public class ViewHolderTracker implements ViewHolderBehavior {
     public void unregisterViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
         mBehaviors.remove(viewHolderBehavior);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,12 +85,12 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             viewHolder.itemView.addOnLayoutChangeListener(listener);
             mOnLayoutChangeListeners.put(viewHolder, listener);
         }
-        
+
         for (final ViewHolderBehavior behavior : mBehaviors) {
             behavior.onAttachViewHolder(viewHolder);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -100,7 +100,7 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             behavior.onViewHolderPositionChanged(viewHolder);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -111,36 +111,36 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             final ViewHolderBehavior behavior = mBehaviors.get(i);
             behavior.onDetachViewHolder(viewHolder);
         }
-        
+
         final ViewHolderOnLayoutChangeListener listener = mOnLayoutChangeListeners.remove(viewHolder);
         if (listener != null) {
             viewHolder.itemView.removeOnLayoutChangeListener(listener);
-            
+
             listener.viewHolder = null;
             listener.position = RecyclerView.NO_POSITION;
             mPool.recycle(listener);
         }
     }
-    
+
     private class ViewHolderOnLayoutChangeListenerFactory implements
             Pool.Factory<ViewHolderOnLayoutChangeListener> {
-        
+
         @NonNull
         @Override
         public ViewHolderOnLayoutChangeListener create() {
             return new ViewHolderOnLayoutChangeListener();
         }
-        
+
     }
-    
+
     private class ViewHolderOnLayoutChangeListener implements View.OnLayoutChangeListener {
-        
+
         @Nullable
         RecyclerView.ViewHolder viewHolder;
-        
+
         @IntRange(from = RecyclerView.NO_POSITION)
         int position;
-        
+
         @Override
         public void onLayoutChange(final View v, final int left, final int top,
                                    final int right, final int bottom,
@@ -150,10 +150,14 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             final boolean isPositionChanged = (viewHolder != null && viewHolder.getAdapterPosition() != position);
             if (hasSameView && isPositionChanged) {
                 position = viewHolder.getAdapterPosition();
-                onViewHolderPositionChanged(viewHolder);
+                if (position == RecyclerView.NO_POSITION) {
+                    onDetachViewHolder(viewHolder);
+                } else {
+                    onViewHolderPositionChanged(viewHolder);
+                }
             }
         }
-        
+
     }
-    
+
 }

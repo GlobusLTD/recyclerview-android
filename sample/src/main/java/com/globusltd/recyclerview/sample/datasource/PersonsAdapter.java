@@ -15,12 +15,11 @@
  */
 package com.globusltd.recyclerview.sample.datasource;
 
-import android.content.res.Resources;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.Adapter;
@@ -32,72 +31,80 @@ import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.sample.TwoLinesViewHolder;
 import com.globusltd.recyclerview.view.ClickableViews;
 
-class PersonsAdapter extends Adapter<Person, TwoLinesViewHolder> {
-    
+class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonViewHolder> {
+
     PersonsAdapter(@NonNull final Datasource<Person> datasource) {
         super(datasource, new PersonDiffCallbackFactory());
         setHasStableIds(true);
     }
-    
+
     @Override
     public long getItemId(final int position) {
         return get(position).getId();
     }
-    
+
     @NonNull
     @Override
     public ClickableViews getClickableViews(@IntRange(from = 0) final int position,
                                             final int viewType) {
-        return ClickableViews.ITEM_VIEW;
+        return TwoLinesAndButtonViewHolder.CLICKABLE_VIEWS;
     }
-    
+
     @NonNull
     @Override
-    public TwoLinesViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
-                                                 @NonNull final ViewGroup parent,
-                                                 final int viewType) {
-        final TwoLinesViewHolder viewHolder = TwoLinesViewHolder.inflate(inflater, parent);
-        
-        // Typically you should specify ?attr/selectableItemBackground as background in layout file,
-        // but for platform views you can specify it programmatically
-        final Resources.Theme theme = parent.getContext().getTheme();
-        final TypedValue outValue = new TypedValue();
-        if (theme.resolveAttribute(R.attr.selectableItemBackground, outValue, true)) {
-            viewHolder.itemView.setBackgroundResource(outValue.resourceId);
-        }
-        
-        return viewHolder;
+    public TwoLinesAndButtonViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
+                                                          @NonNull final ViewGroup parent,
+                                                          final int viewType) {
+        return TwoLinesAndButtonViewHolder.inflate(inflater, parent);
     }
-    
+
     @Override
-    public void onBindViewHolder(@NonNull final TwoLinesViewHolder holder,
+    public void onBindViewHolder(@NonNull final TwoLinesAndButtonViewHolder holder,
                                  @NonNull final Person person, final int position) {
         holder.setText1(person.getLastName());
         holder.setText2(person.getFirstName());
     }
-    
+
+    static class TwoLinesAndButtonViewHolder extends TwoLinesViewHolder {
+
+        static final ClickableViews CLICKABLE_VIEWS = new ClickableViews(ClickableViews.ITEM_VIEW_ID,
+                R.id.action_delete);
+
+        @NonNull
+        public static TwoLinesAndButtonViewHolder inflate(@NonNull final LayoutInflater inflater,
+                                                          @NonNull final ViewGroup parent) {
+            final View itemView = inflater.inflate(R.layout.simple_list_item_2_and_button, parent, false);
+            return new TwoLinesAndButtonViewHolder(itemView);
+        }
+
+        TwoLinesAndButtonViewHolder(@NonNull final View itemView) {
+            super(itemView);
+        }
+
+    }
+
     private static class PersonDiffCallbackFactory implements DiffCallbackFactory<Person> {
-        
+
         @NonNull
         @Override
         public DiffCallback createDiffCallback(@NonNull final Datasource<? extends Person> oldDatasource,
                                                @NonNull final Datasource<? extends Person> newDatasource) {
             return new SimpleDatasourcesDiffCallback<Person>(oldDatasource, newDatasource) {
-                
+
                 @Override
                 public boolean areItemsTheSame(@NonNull final Person oldItem, @NonNull final Person newItem) {
                     return oldItem.getId() == newItem.getId();
                 }
-                
+
                 @Override
                 public boolean areContentsTheSame(@NonNull final Person oldItem, @NonNull final Person newItem) {
                     return TextUtils.equals(oldItem.getFirstName(), newItem.getLastName()) &&
                             TextUtils.equals(oldItem.getLastName(), newItem.getLastName());
                 }
-                
+
             };
         }
-        
+
     }
-    
+
 }

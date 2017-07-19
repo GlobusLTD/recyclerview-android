@@ -38,6 +38,7 @@ import java.util.Map;
  * @param <E> Type of elements handled by click listeners.
  */
 @MainThread
+@Deprecated
 public class ItemClickHelper<E> implements ViewHolderBehavior {
     
     @NonNull

@@ -23,54 +23,59 @@ import android.view.View;
  * Simple data class that keeps identifiers of clickable views.
  */
 public class ClickableViews {
-    
+
+    /**
+     * Used to mark a view that has no ID.
+     */
+    public static final int NO_ID = View.NO_ID;
+
     /**
      * Use this to describe {@link android.support.v7.widget.RecyclerView.ViewHolder#itemView}.
      */
     public static final int ITEM_VIEW_ID = Integer.MIN_VALUE;
-    
+
     private static final int[] EMPTY_ARRAY = new int[0];
-    
+
     /**
      * Default clickable views info that makes no view clickable.
      */
-    public static final ClickableViews NONE = new ClickableViews(View.NO_ID);
-    
+    public static final ClickableViews NONE = new ClickableViews(NO_ID);
+
     /**
      * Default clickable views info that makes clickable only
      * {@link android.support.v7.widget.RecyclerView.ViewHolder#itemView}.
      */
     public static final ClickableViews ITEM_VIEW = new ClickableViews(ITEM_VIEW_ID);
-    
+
     @IdRes
     private final int mDefaultViewId;
-    
+
     @IdRes
     @NonNull
     private final int[] mClickableViewIds;
-    
+
     public ClickableViews(@IdRes final int defaultViewId) {
         this(defaultViewId, EMPTY_ARRAY);
     }
-    
+
     public ClickableViews(@IdRes final int defaultViewId,
-                          @IdRes @NonNull final int[] clickableViewIds) {
+                          @IdRes @NonNull final int... clickableViewIds) {
         mDefaultViewId = defaultViewId;
         mClickableViewIds = clickableViewIds;
     }
-    
+
     /**
      * Returns identifier of default item view.
      * Use {@link #ITEM_VIEW_ID} to make root view clickable or
-     * {@link View#NO_ID} to make no view clickable.
+     * {@link #NO_ID} to make no view clickable.
      *
-     * @return An identifier of view, or {@link #ITEM_VIEW_ID} or {@link View#NO_ID}.
+     * @return An identifier of view, or {@link #ITEM_VIEW_ID} or {@link #NO_ID}.
      */
     @IdRes
-    public int getDefaultViewId() {
+    int getDefaultViewId() {
         return mDefaultViewId;
     }
-    
+
     /**
      * Returns array of clickable views ids at a given position.
      *
@@ -78,8 +83,8 @@ public class ClickableViews {
      */
     @IdRes
     @NonNull
-    public int[] getClickableViewIds() {
+    int[] getClickableViewIds() {
         return mClickableViewIds;
     }
-    
+
 }

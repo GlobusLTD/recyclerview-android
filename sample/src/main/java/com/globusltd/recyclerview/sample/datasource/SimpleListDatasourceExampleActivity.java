@@ -27,7 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.globusltd.recyclerview.ItemClickHelperV2;
+import com.globusltd.recyclerview.view.ItemClickHelperV2;
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
 
@@ -65,13 +65,20 @@ public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
 
     public boolean onItemClick(@NonNull final View view, @NonNull final Person person,
                                @IntRange(from = 0) final int position) {
-        Toast.makeText(this, "Clicked: " + person.getFullName(), Toast.LENGTH_SHORT).show();
-        return true;
+        switch (view.getId()) {
+            case R.id.action_delete:
+                mViewModel.removeItemAtPosition(position);
+                return true;
+
+            default:
+                Toast.makeText(this, "Clicked: " + person.getFullName(), Toast.LENGTH_SHORT).show();
+                return true;
+        }
     }
 
     public boolean onItemLongClick(@NonNull final View view, @NonNull final Person person,
                                    @IntRange(from = 0) final int position) {
-        mViewModel.removeItemAtPosition(position);
+        Toast.makeText(this, "Long clicked: " + person.getFullName(), Toast.LENGTH_SHORT).show();
         return true;
     }
 
