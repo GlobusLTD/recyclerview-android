@@ -23,6 +23,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import com.globusltd.recyclerview.ClickableAdapter;
 
@@ -40,7 +41,7 @@ class ClickableViewFinder {
     }
 
     /**
-     * Searches for view that actually has tapped by the user.
+     * Searches for a clickable view that has tapped by the user.
      *
      * @param x The x coordinate of the touch that caused the search.
      * @param y The y coordinate of the touch that caused the search.
@@ -50,56 +51,114 @@ class ClickableViewFinder {
     @Nullable
     Target findTarget(final float x, final float y) {
         final View itemView = mHostView.findChildViewUnder(x, y);
-        if (itemView != null) {
-            final RecyclerView.ViewHolder viewHolder = mHostView.getChildViewHolder(itemView);
-            final int position = viewHolder.getAdapterPosition();
-            final int viewType = viewHolder.getItemViewType();
-            if (position > RecyclerView.NO_POSITION && viewType > RecyclerView.INVALID_TYPE) {
-                final ClickableAdapter<?> adapter = (ClickableAdapter) mHostView.getAdapter();
-                if (!adapter.isEnabled(position)) {
-                    // Quick return when element is not enabled
-                    return null;
-                }
-
-                final ClickableViews clickableViews = adapter.getClickableViews(position, viewType);
-                final int defaultViewId = clickableViews.getDefaultViewId();
-                final int[] clickableViewIds = clickableViews.getClickableViewIds();
-                if (defaultViewId == ClickableViews.NO_ID && clickableViewIds.length == 0) {
-                    // Quick return when element is enabled but not clickable
-                    return null;
-
-                } else if (defaultViewId == ClickableViews.ITEM_VIEW_ID && clickableViewIds.length == 0) {
-                    // Quick return when element is enabled but only the whole item view is clickable
-                    return new Target(viewHolder, itemView);
-
-                } else {
-                    final View pointerOnView = findViewAt(itemView, x, y);
-                    final View view = itemView;
-                    // final View view = findClickableView(itemView, itemView, clickableViews, x, y);
-                    return (view != null ? new Target(viewHolder, view) : null);
-                }
-            }
+        if (itemView == null) {
+            return null;
         }
-        return null;
+
+        final RecyclerView.ViewHolder viewHolder = mHostView.getChildViewHolder(itemView);
+        final int position = viewHolder.getAdapterPosition();
+        final int viewType = viewHolder.getItemViewType();
+        if (position <= RecyclerView.NO_POSITION || viewType <= RecyclerView.INVALID_TYPE) {
+            return null;
+        }
+
+        // TODO: remove clickable adapter from here
+        final ClickableAdapter<?> adapter = (ClickableAdapter) mHostView.getAdapter();
+        if (!adapter.isEnabled(position)) {
+            // Quick return when element is not enabled
+            return null;
+        }
+
+        final ClickableViews clickableViews = adapter.getClickableViews(position, viewType);
+        return findTargetInViewHolder(viewHolder, clickableViews, x, y);
+    }
+
+    @Nullable
+    private Target findTargetInViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                          @NonNull final ClickableViews clickableViews,
+                                          final float x, final float y) {
+        final View itemView = viewHolder.itemView;
+
+        final int defaultViewId = clickableViews.getDefaultViewId();
+        final int[] clickableViewIds = clickableViews.getClickableViewIds();
+        if (defaultViewId == ClickableViews.NO_ID && clickableViewIds.length == 0) {
+            // Quick return when element is enabled but not clickable
+            return null;
+
+        } else if (defaultViewId == ClickableViews.ITEM_VIEW_ID && clickableViewIds.length == 0) {
+            // Quick return when element is enabled but only the whole item view is clickable
+            return new Target(viewHolder, itemView);
+
+        } else {
+            final View touchedView = findViewAt(itemView, x, y);
+            final View clickableView = (touchedView != null ?
+                    findClickableViewUpward(touchedView, itemView, clickableViews) : null);
+            return (clickableView != null ? new Target(viewHolder, clickableView) : null);
+        }
     }
 
     @Nullable
     private View findViewAt(@NonNull final View view, final float x, final float y) {
-        return view; // TODO:
-        /*if (view instanceof ViewGroup) {
+        if (!view.isShown() || !isViewAt(view, x, y)) {
+            return null;
+        }
+
+        if (view instanceof ViewGroup) {
             final float transformedX = x - view.getLeft() - ViewCompat.getTranslationX(view);
             final float transformedY = y - view.getTop() - ViewCompat.getTranslationY(view);
-
             final ViewGroup viewGroup = (ViewGroup) view;
             final int childCount = viewGroup.getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
                 final View child = viewGroup.getChildAt(i);
-                if (child.isShown() && )
+                final View foundView = findViewAt(child, transformedX, transformedY);
+                if (foundView != null) {
+                    return foundView;
+                }
             }
+        }
 
-        } else {
-            return view;
-        }*/
+        return view;
+    }
+
+    private boolean isViewAt(@NonNull final View view, final float x, final float y) {
+        final float viewX = view.getLeft() - ViewCompat.getTranslationX(view);
+        final float viewY = view.getTop() - ViewCompat.getTranslationY(view);
+        return ((x > viewX && x < (viewX + view.getWidth())) &&
+                (y > viewY && y < (viewY + view.getHeight())));
+    }
+
+    @Nullable
+    private View findClickableViewUpward(@NonNull final View view, @NonNull final View itemView,
+                                         @NonNull final ClickableViews clickableViews) {
+        View candidate = view;
+        do {
+            final boolean isDefaultView = (candidate == itemView &&
+                    clickableViews.getDefaultViewId() == ClickableViews.ITEM_VIEW_ID);
+            if (isDefaultView || isViewClickable(candidate, clickableViews)) {
+                return candidate;
+            }
+            final ViewParent parent = view.getParent();
+            candidate = (parent instanceof View ? (View) parent : null);
+        } while (candidate != null && candidate != itemView.getParent());
+
+        return null;
+    }
+
+    private boolean isViewClickable(@NonNull final View view,
+                                    @NonNull final ClickableViews clickableViews) {
+        final int viewId = view.getId();
+        if (clickableViews.getDefaultViewId() == viewId) {
+            return true;
+        }
+
+        final int[] clickableViewIds = clickableViews.getClickableViewIds();
+        for (final int id : clickableViewIds) {
+            if (viewId == id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static class Target {
@@ -156,8 +215,9 @@ class ClickableViewFinder {
                     do {
                         hotspotX = hotspotX - view.getLeft() - ViewCompat.getTranslationX(view);
                         hotspotY = hotspotY - view.getTop() - ViewCompat.getTranslationY(view);
-                        view = (View) view.getParent();
-                    } while (view != mViewHolder.itemView.getParent());
+                        final ViewParent parent = view.getParent();
+                        view = (parent instanceof View ? (View) parent : null);
+                    } while (view != null && view != mViewHolder.itemView.getParent());
 
                     mView.drawableHotspotChanged(hotspotX, hotspotY);
                 }
