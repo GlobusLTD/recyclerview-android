@@ -25,8 +25,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewParent;
 
-import com.globusltd.recyclerview.RecyclerViewBehavior;
-import com.globusltd.recyclerview.ViewHolderBehavior;
+import com.globusltd.recyclerview.ViewHolderObserver;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
 
@@ -35,7 +34,7 @@ import java.util.Set;
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongClickListener<E>,
-        RecyclerViewBehavior, ViewHolderBehavior {
+        ViewHolderObserver {
     
     @NonNull
     private ChoiceMode mChoiceMode;
@@ -115,7 +114,6 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
     /**
      * {@inheritDoc}
      */
-    @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
         if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
             mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
@@ -125,7 +123,7 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
     }
     
     @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         onViewHolderPositionChanged(viewHolder);
         // TODO: set view holder checked
     }
@@ -136,14 +134,13 @@ public class ChoiceModeOwner<E> implements OnItemClickListener<E>, OnItemLongCli
     }
     
     @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         // TODO: reset view holder checked
     }
     
     /**
      * {@inheritDoc}
      */
-    @Override
     public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
         if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
             mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);

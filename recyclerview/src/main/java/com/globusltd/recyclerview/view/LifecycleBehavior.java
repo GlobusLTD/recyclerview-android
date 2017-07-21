@@ -20,10 +20,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 
-import com.globusltd.recyclerview.ViewHolderBehavior;
+import com.globusltd.recyclerview.ViewHolderObserver;
 
 @MainThread
-public class LifecycleBehavior implements ViewHolderBehavior {
+public class LifecycleBehavior implements ViewHolderObserver {
     
     @NonNull
     private final LifecycleComposite mLifecycleComposite;
@@ -40,7 +40,7 @@ public class LifecycleBehavior implements ViewHolderBehavior {
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
@@ -59,7 +59,7 @@ public class LifecycleBehavior implements ViewHolderBehavior {
      * {@inheritDoc}
      */
     @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);

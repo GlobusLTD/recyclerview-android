@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.globusltd.recyclerview.sample.datasource.DatasoureExamplesActivity;
+import com.globusltd.recyclerview.sample.datasource.DatasourceExamplesActivity;
 
 public class SampleActivity extends AppCompatActivity {
     
@@ -30,7 +30,7 @@ public class SampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sample);
         
         findViewById(R.id.datasource_examples)
-                .setOnClickListener(v -> startActivity(new Intent(this, DatasoureExamplesActivity.class)));
+                .setOnClickListener(v -> startActivity(new Intent(this, DatasourceExamplesActivity.class)));
     }
     
 }

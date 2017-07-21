@@ -13,30 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.sample;
+package com.globusltd.recyclerview.sample.lifecycle;
 
-import android.content.res.Resources;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.globusltd.recyclerview.Adapter;
-import com.globusltd.recyclerview.datasource.Datasource;
-import com.globusltd.recyclerview.diff.DiffCallback;
-import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
-import com.globusltd.recyclerview.view.ClickableViews;
-import com.globusltd.recyclerview.view.LifecycleCallbacks;
-
-public class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SingleLineViewHolder> {
+public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.SingleLineViewHolder>*/ {
     
-    private static final int VIEW_TYPE_SINGLE_LINE = 0;
+    /*private static final int VIEW_TYPE_SINGLE_LINE = 0;
     private static final int VIEW_TYPE_TWO_LINES = 1;
     
     public SampleAdapter() {
@@ -172,6 +153,6 @@ public class SampleAdapter extends Adapter<CharSequence, SampleAdapter.SingleLin
             };
         }
         
-    }
+    }*/
     
 }

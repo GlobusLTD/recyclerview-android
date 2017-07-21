@@ -20,11 +20,11 @@
         </activity>
 
         <activity
-            android:name=".datasource.DatasoureExamplesActivity"
+            android:name=".datasource.DatasourceExamplesActivity"
             android:label="@string/datasource_examples"/>
 
         <activity
-            android:name=".datasource.SimpleListDatasourceExampleActivity"
+            android:name=".datasource.ListDatasourceExampleActivity"
             android:label="@string/simple_list_datasource_example"/>
 
     </application>

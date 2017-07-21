@@ -16,34 +16,29 @@
 package com.globusltd.recyclerview.view;
 
 import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-
-import com.globusltd.recyclerview.ClickableAdapter;
-import com.globusltd.recyclerview.ViewHolderBehavior;
 
 @MainThread
-public class EnableBehavior implements ViewHolderBehavior {
+public class EnableBehavior /*implements ViewHolderObserver*/ {
     
-    @NonNull
+    /*@NonNull
     private final ClickableAdapter<?> mAdapter;
     
     public EnableBehavior(@NonNull final ClickableAdapter<?> adapter) {
         mAdapter = adapter;
-    }
+    }*/
     
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    /*@Override
+    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         onViewHolderPositionChanged(viewHolder);
-    }
+    }*/
     
     /**
      * {@inheritDoc}
      */
-    @Override
+    /*@Override
     public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int position = viewHolder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount()) {
@@ -52,14 +47,14 @@ public class EnableBehavior implements ViewHolderBehavior {
         } else {
             viewHolder.itemView.setEnabled(false);
         }
-    }
+    }*/
     
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    /*@Override
+    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         viewHolder.itemView.setEnabled(false);
-    }
+    }*/
     
 }

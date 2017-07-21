@@ -30,8 +30,10 @@ import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.sample.TwoLinesViewHolder;
 import com.globusltd.recyclerview.view.ClickableViews;
+import com.globusltd.recyclerview.view.ItemClickHelper;
 
-class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonViewHolder> {
+class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonViewHolder>
+        implements ItemClickHelper.Callback<Person> {
 
     PersonsAdapter(@NonNull final Datasource<Person> datasource) {
         super(datasource, new PersonDiffCallbackFactory());
@@ -40,14 +42,8 @@ class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonVie
 
     @Override
     public long getItemId(final int position) {
-        return get(position).getId();
-    }
-
-    @NonNull
-    @Override
-    public ClickableViews getClickableViews(@IntRange(from = 0) final int position,
-                                            final int viewType) {
-        return TwoLinesAndButtonViewHolder.CLICKABLE_VIEWS;
+        final Person person = getDatasource().get(position);
+        return person.getId();
     }
 
     @NonNull
@@ -64,6 +60,23 @@ class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonVie
         holder.setText1(person.getLastName());
         holder.setText2(person.getFirstName());
     }
+
+    /* ItemClickHelper.Callback */
+
+    @NonNull
+    @Override
+    public Person get(@IntRange(from = 0) final int position) {
+        return getDatasource().get(position);
+    }
+
+    @NonNull
+    @Override
+    public ClickableViews getClickableViews(@IntRange(from = 0) final int position,
+                                            final int viewType) {
+        return TwoLinesAndButtonViewHolder.CLICKABLE_VIEWS;
+    }
+
+    /* End of ItemClickHelper.Callback */
 
     static class TwoLinesAndButtonViewHolder extends TwoLinesViewHolder {
 

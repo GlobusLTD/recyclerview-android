@@ -21,22 +21,14 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.globusltd.recyclerview.datasource.ListDatasource;
 import com.globusltd.recyclerview.sample.R;
-import com.globusltd.recyclerview.sample.SampleAdapter;
-import com.globusltd.recyclerview.view.EnableBehavior;
-import com.globusltd.recyclerview.view.LifecycleBehavior;
 import com.globusltd.recyclerview.view.LifecycleComposite;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
-
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnItemClickListener<CharSequence>,
         OnItemLongClickListener<CharSequence> {
@@ -52,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
         mLifecycleComposite = new LifecycleComposite();
 
-        final ListDatasource<String> datasource = new ListDatasource<>();
+        /*final ListDatasource<String> datasource = new ListDatasource<>();
         for (int i = 1; i < 101; i++) {
             datasource.add(String.format(Locale.getDefault(), "Test%1$s String", i));
         }
@@ -60,13 +52,13 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         final SampleAdapter adapter = new SampleAdapter(datasource);
         adapter.setOnItemClickListener(this);
         adapter.setOnItemLongClickListener(this);
-        adapter.registerViewHolderBehavior(new EnableBehavior(adapter));
-        adapter.registerViewHolderBehavior(new LifecycleBehavior(mLifecycleComposite));
+        adapter.registerViewHolderObserver(new EnableBehavior(adapter));
+        adapter.registerViewHolderObserver(new LifecycleBehavior(mLifecycleComposite));
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(adapter);*/
 
         findViewById(R.id.pause).setOnClickListener(v -> pauseActivity());
     }

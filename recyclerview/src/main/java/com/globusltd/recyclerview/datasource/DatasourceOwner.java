@@ -23,13 +23,12 @@ import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 
 import com.globusltd.recyclerview.DatasourceSwappable;
-import com.globusltd.recyclerview.RecyclerViewBehavior;
 
 import java.util.Set;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewBehavior {
+public class DatasourceOwner<E> implements DatasourceSwappable<E> {
 
     @NonNull
     private final DatasourceProxy<E> mDatasource;
@@ -61,7 +60,6 @@ public class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewB
     /**
      * {@inheritDoc}
      */
-    @Override
     public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
         if (mAttachedRecyclerViews.isEmpty() && mAttachedRecyclerViews.add(recyclerView)) {
             mDatasource.registerDatasourceObserver(mDatasourceObserver);
@@ -73,7 +71,6 @@ public class DatasourceOwner<E> implements DatasourceSwappable<E>, RecyclerViewB
     /**
      * {@inheritDoc}
      */
-    @Override
     public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
         if (mAttachedRecyclerViews.remove(recyclerView) && mAttachedRecyclerViews.isEmpty()) {
             mDatasource.unregisterDatasourceObserver(mDatasourceObserver);

@@ -19,7 +19,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -28,98 +28,152 @@ import com.globusltd.recyclerview.util.Pool;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * {@link ViewHolderTracker} provides view holder attach/detach events to
- * the registered {@link ViewHolderBehavior} objects.
+ * the registered {@link ViewHolderObserver} objects.
  */
 @MainThread
-public class ViewHolderTracker implements ViewHolderBehavior {
+public class ViewHolderTracker extends RecyclerViewOwner {
 
     @NonNull
-    private final List<ViewHolderBehavior> mBehaviors;
+    private final List<ViewHolderObserver> mBehaviors;
 
-    @NonNull
-    private final Pool<ViewHolderOnLayoutChangeListener> mPool;
-
-    @NonNull
-    private final Map<RecyclerView.ViewHolder, ViewHolderOnLayoutChangeListener> mOnLayoutChangeListeners;
+    @Nullable
+    private OnChildAttachStateChangeListener mOnChildAttachStateChangeListener;
 
     public ViewHolderTracker() {
         mBehaviors = new ArrayList<>();
-        mPool = new ArrayPool<>(new ViewHolderOnLayoutChangeListenerFactory());
-        mOnLayoutChangeListeners = new ArrayMap<>();
     }
 
     /**
-     * Add a new {@link ViewHolderBehavior} to the {@link ViewHolderTracker},
+     * Add a new {@link ViewHolderObserver} to the {@link ViewHolderTracker},
      * which will be called at the same times as the attach/detach methods of
      * adapter are called.
      *
-     * @param viewHolderBehavior The interface to call.
+     * @param viewHolderObserver The interface to call.
      */
-    public void registerViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
-        if (!mBehaviors.contains(viewHolderBehavior)) {
-            mBehaviors.add(viewHolderBehavior);
+    public void registerViewHolderObserver(@NonNull final ViewHolderObserver viewHolderObserver) {
+        if (!mBehaviors.contains(viewHolderObserver)) {
+            mBehaviors.add(viewHolderObserver);
         }
     }
 
     /**
-     * Remove a {@link ViewHolderBehavior} object that was previously registered
-     * with {@link #registerViewHolderBehavior(ViewHolderBehavior)}.
+     * Remove a {@link ViewHolderObserver} object that was previously registered
+     * with {@link #registerViewHolderObserver(ViewHolderObserver)}.
      */
-    public void unregisterViewHolderBehavior(@NonNull final ViewHolderBehavior viewHolderBehavior) {
-        mBehaviors.remove(viewHolderBehavior);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        if (!mOnLayoutChangeListeners.containsKey(viewHolder)) {
-            final ViewHolderOnLayoutChangeListener listener = mPool.obtain();
-            listener.viewHolder = viewHolder;
-            listener.position = viewHolder.getAdapterPosition();
-            viewHolder.itemView.addOnLayoutChangeListener(listener);
-            mOnLayoutChangeListeners.put(viewHolder, listener);
-        }
-
-        for (final ViewHolderBehavior behavior : mBehaviors) {
-            behavior.onAttachViewHolder(viewHolder);
-        }
+    public void unregisterViewHolderObserver(@NonNull final ViewHolderObserver viewHolderObserver) {
+        mBehaviors.remove(viewHolderObserver);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        for (final ViewHolderBehavior behavior : mBehaviors) {
+    public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
+        mOnChildAttachStateChangeListener = new OnChildAttachStateChangeListener(recyclerView);
+        mOnChildAttachStateChangeListener.onAttachedToRecyclerView();
+        recyclerView.addOnChildAttachStateChangeListener(mOnChildAttachStateChangeListener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+        if (mOnChildAttachStateChangeListener != null) {
+            recyclerView.removeOnChildAttachStateChangeListener(mOnChildAttachStateChangeListener);
+            mOnChildAttachStateChangeListener.onDetachedFromRecyclerView();
+            mOnChildAttachStateChangeListener = null;
+        }
+    }
+
+    private void notifyViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        final int size = mBehaviors.size();
+        for (int i = size - 1; i >= 0; i--) {
+            final ViewHolderObserver behavior = mBehaviors.get(i);
+            behavior.onViewHolderAttached(viewHolder);
+        }
+    }
+
+    private void notifyViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        final int size = mBehaviors.size();
+        for (int i = size - 1; i >= 0; i--) {
+            final ViewHolderObserver behavior = mBehaviors.get(i);
             behavior.onViewHolderPositionChanged(viewHolder);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    private void notifyViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int size = mBehaviors.size();
         for (int i = size - 1; i >= 0; i--) {
-            final ViewHolderBehavior behavior = mBehaviors.get(i);
-            behavior.onDetachViewHolder(viewHolder);
+            final ViewHolderObserver behavior = mBehaviors.get(i);
+            behavior.onViewHolderDetached(viewHolder);
+        }
+    }
+
+    private class OnChildAttachStateChangeListener implements RecyclerView.OnChildAttachStateChangeListener {
+
+        @NonNull
+        private final RecyclerView mHostView;
+
+        @NonNull
+        private final Pool<ViewHolderOnLayoutChangeListener> mPool;
+
+        @NonNull
+        private final SimpleArrayMap<RecyclerView.ViewHolder, ViewHolderOnLayoutChangeListener> mOnLayoutChangeListeners;
+
+        private OnChildAttachStateChangeListener(@NonNull final RecyclerView recyclerView) {
+            mHostView = recyclerView;
+            mPool = new ArrayPool<>(new ViewHolderOnLayoutChangeListenerFactory());
+            mOnLayoutChangeListeners = new SimpleArrayMap<>();
         }
 
-        final ViewHolderOnLayoutChangeListener listener = mOnLayoutChangeListeners.remove(viewHolder);
-        if (listener != null) {
-            viewHolder.itemView.removeOnLayoutChangeListener(listener);
-
-            listener.viewHolder = null;
-            listener.position = RecyclerView.NO_POSITION;
-            mPool.recycle(listener);
+        void onAttachedToRecyclerView() {
+            final int childCount = mHostView.getChildCount();
+            for (int index = 0; index < childCount - 1; index++) {
+                final View child = mHostView.getChildAt(index);
+                onChildViewAttachedToWindow(child);
+            }
         }
+
+        @Override
+        public void onChildViewAttachedToWindow(final View view) {
+            final RecyclerView.ViewHolder viewHolder = mHostView.findContainingViewHolder(view);
+            if (viewHolder != null && !mOnLayoutChangeListeners.containsKey(viewHolder)) {
+                final ViewHolderOnLayoutChangeListener listener = mPool.obtain();
+                listener.viewHolder = viewHolder;
+                listener.position = viewHolder.getAdapterPosition();
+                view.addOnLayoutChangeListener(listener);
+                mOnLayoutChangeListeners.put(viewHolder, listener);
+
+                notifyViewHolderAttached(viewHolder);
+            }
+        }
+
+        @Override
+        public void onChildViewDetachedFromWindow(final View view) {
+            final RecyclerView.ViewHolder viewHolder = mHostView.findContainingViewHolder(view);
+            final ViewHolderOnLayoutChangeListener listener = mOnLayoutChangeListeners.remove(viewHolder);
+            if (viewHolder != null && listener != null) {
+                view.removeOnLayoutChangeListener(listener);
+                listener.viewHolder = null;
+                listener.position = RecyclerView.NO_POSITION;
+                mPool.recycle(listener);
+
+                notifyViewHolderDetached(viewHolder);
+            }
+        }
+
+        void onDetachedFromRecyclerView() {
+            final int size = mOnLayoutChangeListeners.size();
+            for (int index = size - 1; index >= 0; index--) {
+                final RecyclerView.ViewHolder viewHolder = mOnLayoutChangeListeners.keyAt(index);
+                onChildViewDetachedFromWindow(viewHolder.itemView);
+            }
+        }
+
     }
 
     private class ViewHolderOnLayoutChangeListenerFactory implements
@@ -150,10 +204,8 @@ public class ViewHolderTracker implements ViewHolderBehavior {
             final boolean isPositionChanged = (viewHolder != null && viewHolder.getAdapterPosition() != position);
             if (hasSameView && isPositionChanged) {
                 position = viewHolder.getAdapterPosition();
-                if (position == RecyclerView.NO_POSITION) {
-                    onDetachViewHolder(viewHolder);
-                } else {
-                    onViewHolderPositionChanged(viewHolder);
+                if (position != RecyclerView.NO_POSITION) {
+                    notifyViewHolderPositionChanged(viewHolder);
                 }
             }
         }

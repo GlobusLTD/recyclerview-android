@@ -21,7 +21,7 @@ import android.support.annotation.RestrictTo;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Base class for any choice mode that can be used with {@link com.globusltd.recyclerview.Adapter}.
+ * Base class for any choice mode.
  * Class is designed for handle notification events to the visible view holders.
  */
 @MainThread

@@ -24,7 +24,7 @@ import com.globusltd.recyclerview.datasource.ListDatasource;
 
 import java.util.Arrays;
 
-public class SimpleListDatasourceExampleViewModel extends ViewModel {
+public class ListDatasourceExampleViewModel extends ViewModel {
     
     @NonNull
     private final ListDatasource<Person> mDatasource;
@@ -32,7 +32,7 @@ public class SimpleListDatasourceExampleViewModel extends ViewModel {
     @NonNull
     private final PersonGenerator mPersonGenerator;
     
-    public SimpleListDatasourceExampleViewModel() {
+    public ListDatasourceExampleViewModel() {
         mDatasource = new ListDatasource<>();
         mPersonGenerator = new PersonGenerator();
     }

@@ -15,53 +15,39 @@
  */
 package com.globusltd.recyclerview.view;
 
-import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 
-import com.globusltd.recyclerview.ClickableAdapter;
-import com.globusltd.recyclerview.ViewHolderBehavior;
-import com.globusltd.recyclerview.util.ArrayPool;
-import com.globusltd.recyclerview.util.Pool;
+import com.globusltd.recyclerview.RecyclerViewOwner;
 
-import java.util.Map;
-
-/**
- * Class that manages attaching and detaching click listeners
- * when ViewHolder is bond to the data.
- *
- * @param <E> Type of elements handled by click listeners.
- */
 @MainThread
-@Deprecated
-public class ItemClickHelper<E> implements ViewHolderBehavior {
-    
+public class ItemClickHelper<E> extends RecyclerViewOwner {
+
     @NonNull
-    private final ClickableAdapter<E> mAdapter;
-    
+    private final Callback<E> mCallback;
+
     @NonNull
-    private final Pool<ViewHolderClickListener> mPool;
-    
-    @NonNull
-    private final Map<RecyclerView.ViewHolder, ViewHolderClickListener> mActiveViewHolders;
-    
+    private final RecyclerView.OnItemTouchListener mOnItemTouchListener;
+
     @Nullable
     private OnItemClickListener<E> mOnItemClickListener;
-    
+
     @Nullable
     private OnItemLongClickListener<E> mOnItemLongClickListener;
-    
-    public ItemClickHelper(@NonNull final ClickableAdapter<E> adapter) {
-        mAdapter = adapter;
-        mPool = new ArrayPool<>(new ViewHolderClickListenerFactory());
-        mActiveViewHolders = new ArrayMap<>();
+
+    @Nullable
+    private EnchancedGestureDetector mGestureDetector;
+
+    public ItemClickHelper(@NonNull final Callback<E> callback) {
+        mCallback = callback;
+        mOnItemTouchListener = new OnItemTouchListener();
     }
-    
+
     /**
      * Register a callback to be invoked when view is clicked.
      *
@@ -70,7 +56,7 @@ public class ItemClickHelper<E> implements ViewHolderBehavior {
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
-    
+
     /**
      * Register a callback to be invoked when view is long clicked.
      *
@@ -78,154 +64,163 @@ public class ItemClickHelper<E> implements ViewHolderBehavior {
      */
     public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> itemLongClickListener) {
         mOnItemLongClickListener = itemLongClickListener;
+        if (mGestureDetector != null) {
+            mGestureDetector.setIsLongpressEnabled(itemLongClickListener != null);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
-        onViewHolderPositionChanged(holder);
+    public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
+        final EnchancedGestureDetector.OnGestureListener onGestureListener = onCreateGestureListener(recyclerView);
+        mGestureDetector = new EnchancedGestureDetector(recyclerView.getContext(), onGestureListener);
+        mGestureDetector.setIsLongpressEnabled(mOnItemLongClickListener != null);
+        recyclerView.addOnItemTouchListener(mOnItemTouchListener);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder holder) {
-        final int position = holder.getAdapterPosition();
-        if (isPositionAvailable(position)) {
-            final ViewHolderClickListener listener = mActiveViewHolders.containsKey(holder) ?
-                    mActiveViewHolders.get(holder) : mPool.obtain();
-            mActiveViewHolders.put(holder, listener);
-            listener.viewHolder = holder;
-            
-            final int viewType = holder.getItemViewType();
-            final ClickableViews clickableViews = mAdapter.getClickableViews(position, viewType);
-            final boolean isEnabled = mAdapter.isEnabled(position);
-            
-            final View.OnClickListener onClickListener = (isEnabled ? listener : null);
-            setClickable(holder.itemView, clickableViews.getDefaultViewId(), onClickListener);
-            for (final int viewId : clickableViews.getClickableViewIds()) {
-                setClickable(holder.itemView, viewId, onClickListener);
+    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+        recyclerView.removeOnItemTouchListener(mOnItemTouchListener);
+        mGestureDetector = null;
+    }
+
+    private boolean performClick(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                 @NonNull final View view) {
+        final int position = viewHolder.getAdapterPosition();
+        final E item = mCallback.get(position);
+        return (mOnItemClickListener != null && mOnItemClickListener.onItemClick(view, item, position));
+    }
+
+    private boolean performLongPress(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                     @NonNull final View view) {
+        if (viewHolder.itemView == view) {
+            final int position = viewHolder.getAdapterPosition();
+            final E item = mCallback.get(position);
+            return (mOnItemLongClickListener != null && mOnItemLongClickListener.onItemLongClick(view, item, position));
+        }
+        return false;
+    }
+
+    private class OnItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
+
+        @Override
+        public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
+            return (mOnItemClickListener != null || mOnItemLongClickListener != null) &&
+                    (mGestureDetector != null && mGestureDetector.onTouchEvent(e));
+        }
+
+        @Override
+        public void onTouchEvent(final RecyclerView rv, final MotionEvent e) {
+            if (mGestureDetector != null) {
+                mGestureDetector.onTouchEvent(e);
             }
-            
-            final View.OnLongClickListener onLongClickListener = (isEnabled ? listener : null);
-            setLongClickable(holder.itemView, clickableViews.getDefaultViewId(), onLongClickListener);
         }
+
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder holder) {
-        final ViewHolderClickListener listener = mActiveViewHolders.remove(holder);
-        if (listener != null && isPositionAvailable(listener.getPosition())) {
-            final ClickableViews clickableViews = mAdapter.getClickableViews(listener.getPosition(),
-                    listener.getViewType());
-            
-            setClickable(holder.itemView, clickableViews.getDefaultViewId(), null);
-            setLongClickable(holder.itemView, clickableViews.getDefaultViewId(), null);
-            for (final int viewId : clickableViews.getClickableViewIds()) {
-                setClickable(holder.itemView, viewId, null);
-            }
-            
-            listener.viewHolder = null;
-            
-            mPool.recycle(listener);
-        }
+
+    @NonNull
+    private EnchancedGestureDetector.OnGestureListener onCreateGestureListener(@NonNull final RecyclerView recyclerView) {
+        return new DefaultGestureListener(recyclerView);
     }
-    
-    private void setClickable(@NonNull final View itemView, @IdRes final int viewId,
-                              @Nullable final View.OnClickListener listener) {
-        final View view = findViewById(itemView, viewId);
-        if (view != null) {
-            view.setOnClickListener(listener);
-            view.setClickable(listener != null);
-        }
-    }
-    
-    private void setLongClickable(@NonNull final View itemView, @IdRes final int viewId,
-                                  @Nullable final View.OnLongClickListener listener) {
-        final View view = findViewById(itemView, viewId);
-        if (view != null) {
-            view.setOnLongClickListener(listener);
-            view.setLongClickable(listener != null);
-        }
-    }
-    
-    @Nullable
-    private View findViewById(@NonNull final View itemView, @IdRes final int viewId) {
-        switch (viewId) {
-            case View.NO_ID:
-                return null;
-            
-            case ClickableViews.ITEM_VIEW_ID:
-                return itemView;
-            
-            default:
-                return itemView.findViewById(viewId);
-        }
-    }
-    
-    private boolean isPositionAvailable(@IntRange(from = RecyclerView.NO_POSITION) final int position) {
-        return position > RecyclerView.NO_POSITION && position < mAdapter.getItemCount();
-    }
-    
-    private class ViewHolderClickListenerFactory implements Pool.Factory<ViewHolderClickListener> {
-        
+
+    private class DefaultGestureListener implements EnchancedGestureDetector.OnGestureListener {
+
         @NonNull
-        @Override
-        public ViewHolderClickListener create() {
-            return new ViewHolderClickListener();
-        }
-        
-    }
-    
-    private class ViewHolderClickListener implements View.OnClickListener, View.OnLongClickListener {
-        
+        private final ClickableViewFinder mViewFinder;
+
         @Nullable
-        RecyclerView.ViewHolder viewHolder;
-        
-        // @IntRange(from = RecyclerView.NO_POSITION)
-        int getPosition() {
-            return (viewHolder != null ? viewHolder.getAdapterPosition() :
-                    RecyclerView.NO_POSITION);
+        private ClickableViewFinder.Target mTarget;
+
+        DefaultGestureListener(@NonNull final RecyclerView recyclerView) {
+            mViewFinder = new ClickableViewFinder(recyclerView, mCallback);
         }
-        
-        // @IntRange(from = RecyclerView.NO_ID)
-        int getViewType() {
-            return (viewHolder != null ? viewHolder.getItemViewType() :
-                    RecyclerView.INVALID_TYPE);
-        }
-        
+
         @Override
-        public void onClick(final View view) {
-            // The position check below is a possible solution for the bug which causes
-            // ViewHolder.getAdapterPosition to return NO_POSITION for a visible item.
-            final int position = getPosition();
-            if (isPositionAvailable(position)) {
-                if (mOnItemClickListener != null) {
-                    final E item = mAdapter.get(position);
-                    mOnItemClickListener.onItemClick(view, item, position);
-                }
+        public boolean onDown(@NonNull final MotionEvent event) {
+            mTarget = mViewFinder.findTarget(event.getX(), event.getY());
+            return (mTarget != null);
+        }
+
+        @Override
+        public void onShowPress(@NonNull final MotionEvent event) {
+            if (mTarget != null) {
+                mTarget.setPressed(true, event.getX(), event.getY());
             }
         }
-        
+
         @Override
-        public boolean onLongClick(final View view) {
-            // The position check below is a possible solution for the bug which causes
-            // ViewHolder.getAdapterPosition to return NO_POSITION for a visible item.
-            final int position = getPosition();
-            if (isPositionAvailable(position)) {
-                if (mOnItemLongClickListener != null) {
-                    final E item = mAdapter.get(position);
-                    return mOnItemLongClickListener.onItemLongClick(view, item, position);
-                }
+        public boolean onSingleTapUp(@NonNull final MotionEvent event) {
+            if (mTarget != null) {
+                final boolean handled = performClick(mTarget.getViewHolder(), mTarget.getView());
+                mTarget.setPressed(false);
+                mTarget = null;
+                return handled;
             }
             return false;
         }
-        
+
+        @Override
+        public boolean onScrollBegin(@NonNull final MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(@NonNull final MotionEvent first, @NonNull final MotionEvent previous,
+                                @NonNull final MotionEvent current, final float distanceX, final float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(@NonNull final MotionEvent e) {
+            if (mTarget != null) {
+                performLongPress(mTarget.getViewHolder(), mTarget.getView());
+            }
+        }
+
+        @Override
+        public boolean onFling(@NonNull final MotionEvent e1, @NonNull final MotionEvent e2,
+                               final float velocityX, final float velocityY) {
+            return false;
+        }
+
+        @Override
+        public void onUp(@NonNull final MotionEvent e) {
+            if (mTarget != null) {
+                mTarget.setPressed(false);
+                mTarget = null;
+            }
+        }
+
     }
-    
+
+    public interface Callback<E> {
+
+        /**
+         * Returns the element at the specified position.
+         *
+         * @param position position of the element to return.
+         * @return the element at the specified position.
+         * @throws IndexOutOfBoundsException if the index is out of range
+         *                                   (<tt>index &lt; 0 || index &gt;= size()</tt>)
+         */
+        @NonNull
+        E get(@IntRange(from = 0) final int position);
+
+        /**
+         * Returns information about all of the clickable views at specified position.
+         * Note that it's better to preallocate ClickableViews instance for each view type.
+         *
+         * @param position an index of the item.
+         * @return A {@link ClickableViews} instance.
+         */
+        @NonNull
+        ClickableViews getClickableViews(@IntRange(from = 0) final int position, final int viewType);
+
+    }
+
 }

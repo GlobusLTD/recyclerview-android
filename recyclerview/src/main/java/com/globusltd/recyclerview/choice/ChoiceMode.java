@@ -20,7 +20,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 /**
- * Interface describes choice mode that can be used with {@link com.globusltd.recyclerview.Adapter}.
+ * Interface describes choice mode.
  */
 @MainThread
 public interface ChoiceMode {

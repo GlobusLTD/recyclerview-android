@@ -26,11 +26,11 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.Checkable;
 
-import com.globusltd.recyclerview.ViewHolderBehavior;
+import com.globusltd.recyclerview.ViewHolderObserver;
 
 @MainThread
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class ChoiceModeBehavior implements ViewHolderBehavior {
+public class ChoiceModeBehavior implements ViewHolderObserver {
     
     @NonNull
     private final SparseBooleanArray mCheckableViewTypes;
@@ -40,7 +40,7 @@ public class ChoiceModeBehavior implements ViewHolderBehavior {
     }
     
     @Override
-    public void onAttachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         onViewHolderPositionChanged(viewHolder);
     }
     
@@ -50,7 +50,7 @@ public class ChoiceModeBehavior implements ViewHolderBehavior {
     }
     
     @Override
-    public void onDetachViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         setViewChecked(viewHolder, false);
     }
     

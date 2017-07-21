@@ -24,40 +24,63 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.globusltd.recyclerview.view.ItemClickHelperV2;
+import com.globusltd.recyclerview.ViewHolderObserver;
+import com.globusltd.recyclerview.ViewHolderTracker;
+import com.globusltd.recyclerview.view.ItemClickHelper;
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
 
-public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
+public class ListDatasourceExampleActivity extends AppCompatActivity {
     
-    private SimpleListDatasourceExampleViewModel mViewModel;
+    private ListDatasourceExampleViewModel mViewModel;
     
     private RecyclerView mRecyclerView;
+    private ItemClickHelper<Person> mItemClickHelper;
+private ViewHolderTracker mViewHolderTracker;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_list_example);
     
-        mViewModel = ViewModelProviders.of(this).get(SimpleListDatasourceExampleViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(ListDatasourceExampleViewModel.class);
         
         final Datasource<Person> datasource = mViewModel.getDatasource();
         final PersonsAdapter adapter = new PersonsAdapter(datasource);
-        //adapter.setOnItemClickListener(this::onItemClick);
-        //adapter.setOnItemLongClickListener(this::onItemLongClick);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
-    
-        final ItemClickHelperV2<Person> itemClickHelper = new ItemClickHelperV2<>(adapter);
-        itemClickHelper.setOnItemClickListener(this::onItemClick);
-        itemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
-        itemClickHelper.attachToRecyclerView(mRecyclerView);
+
+        mItemClickHelper = new ItemClickHelper<>(adapter);
+        mItemClickHelper.setOnItemClickListener(this::onItemClick);
+        mItemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
+        mItemClickHelper.setRecyclerView(mRecyclerView);
+
+        mViewHolderTracker = new ViewHolderTracker();
+        mViewHolderTracker.registerViewHolderObserver(new ViewHolderObserver() {
+            @Override
+            public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+                Log.i("1111", "attached " + viewHolder);
+            }
+
+            @Override
+            public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+                Log.i("1111", "pos changed " + viewHolder);
+            }
+
+            @Override
+            public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+                Log.i("1111", "detached " + viewHolder);
+            }
+        });
+        mViewHolderTracker.setRecyclerView(mRecyclerView);
+
         
         findViewById(R.id.action_add).setOnClickListener(v -> mViewModel.addSingleItem());
         findViewById(R.id.action_add_multiple).setOnClickListener(v -> mViewModel.addMultipleItems());
@@ -84,6 +107,8 @@ public class SimpleListDatasourceExampleActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        mViewHolderTracker.setRecyclerView(null);
+        mItemClickHelper.setRecyclerView(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }

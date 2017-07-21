@@ -22,7 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.globusltd.recyclerview.sample.R;
 
-public class DatasoureExamplesActivity extends AppCompatActivity {
+public class DatasourceExamplesActivity extends AppCompatActivity {
     
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class DatasoureExamplesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_datasource_examples);
         
         findViewById(R.id.simple_list_datasource_example)
-                .setOnClickListener(v -> startActivity(new Intent(this, SimpleListDatasourceExampleActivity.class)));
+                .setOnClickListener(v -> startActivity(new Intent(this, ListDatasourceExampleActivity.class)));
     }
     
 }

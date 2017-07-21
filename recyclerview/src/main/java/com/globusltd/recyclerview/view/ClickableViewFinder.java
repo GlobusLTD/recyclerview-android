@@ -25,8 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.globusltd.recyclerview.ClickableAdapter;
-
 /**
  * Helper class for searching view that actually has tapped by the user.
  */
@@ -36,8 +34,13 @@ class ClickableViewFinder {
     @NonNull
     private final RecyclerView mHostView;
 
-    ClickableViewFinder(@NonNull final RecyclerView hostView) {
+    @NonNull
+    private final ItemClickHelper.Callback<?> mCallback;
+
+    ClickableViewFinder(@NonNull final RecyclerView hostView,
+                        @NonNull final ItemClickHelper.Callback<?> callback) {
         mHostView = hostView;
+        mCallback = callback;
     }
 
     /**
@@ -62,14 +65,7 @@ class ClickableViewFinder {
             return null;
         }
 
-        // TODO: remove clickable adapter from here
-        final ClickableAdapter<?> adapter = (ClickableAdapter) mHostView.getAdapter();
-        if (!adapter.isEnabled(position)) {
-            // Quick return when element is not enabled
-            return null;
-        }
-
-        final ClickableViews clickableViews = adapter.getClickableViews(position, viewType);
+        final ClickableViews clickableViews = mCallback.getClickableViews(position, viewType);
         return findTargetInViewHolder(viewHolder, clickableViews, x, y);
     }
 
@@ -82,11 +78,11 @@ class ClickableViewFinder {
         final int defaultViewId = clickableViews.getDefaultViewId();
         final int[] clickableViewIds = clickableViews.getClickableViewIds();
         if (defaultViewId == ClickableViews.NO_ID && clickableViewIds.length == 0) {
-            // Quick return when element is enabled but not clickable
+            // Quick return when element is not clickable
             return null;
 
         } else if (defaultViewId == ClickableViews.ITEM_VIEW_ID && clickableViewIds.length == 0) {
-            // Quick return when element is enabled but only the whole item view is clickable
+            // Quick return when only the whole item view is clickable
             return new Target(viewHolder, itemView);
 
         } else {
@@ -106,6 +102,7 @@ class ClickableViewFinder {
         if (view instanceof ViewGroup) {
             final float transformedX = x - view.getLeft() - ViewCompat.getTranslationX(view);
             final float transformedY = y - view.getTop() - ViewCompat.getTranslationY(view);
+
             final ViewGroup viewGroup = (ViewGroup) view;
             final int childCount = viewGroup.getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
