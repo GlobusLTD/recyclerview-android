@@ -3,6 +3,8 @@
     package="com.globusltd.recyclerview.sample"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,7 +27,11 @@
 
         <activity
             android:name=".datasource.ListDatasourceExampleActivity"
-            android:label="@string/simple_list_datasource_example"/>
+            android:label="@string/list_datasource_example"/>
+
+        <activity
+            android:name=".datasource.CursorDatasourceExampleActivity"
+            android:label="@string/cursor_datasource_example"/>
 
     </application>
 

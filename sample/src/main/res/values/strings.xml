@@ -5,6 +5,7 @@
     <string name="action_delete">Delete</string>
 
     <string name="datasource_examples">Datasource Examples</string>
-    <string name="simple_list_datasource_example">Simple ListDatasource Example</string>
+    <string name="list_datasource_example">ListDatasource Example</string>
+    <string name="cursor_datasource_example">CursorDatasource Example</string>
 
 </resources>

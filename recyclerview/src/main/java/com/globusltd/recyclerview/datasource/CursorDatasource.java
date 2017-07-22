@@ -37,7 +37,7 @@ import java.io.Closeable;
  * the underlaying cursor instance. Make sure you close this datasource when
  * you don't need its data anymore, for example, when {@link Activity#onDestroy()} or
  * {@link Fragment#onDestroyView()} are called.
- * <p>This example illustrates the way to release a datasource:
+ * <p>This example illustrates the one of possible ways to release a datasource:
  * <pre>
  *     @Override
  *     public void onDestroy() {

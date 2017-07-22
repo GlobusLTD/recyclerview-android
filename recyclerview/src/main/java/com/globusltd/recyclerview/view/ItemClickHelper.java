@@ -25,6 +25,15 @@ import android.view.View;
 
 import com.globusltd.recyclerview.RecyclerViewOwner;
 
+/**
+ * This is a utility class to add item click and item long click support to RecyclerView.
+ * <p>
+ * It works with a RecyclerView and a Callback class, which configures what type of interactions
+ * are enabled. In most situations it's better to make your adapter as Callback implementation.
+ * <p>
+ * Depending on which functionality you need, you should provide
+ * {@link OnItemClickListener} and / or {@link OnItemLongClickListener}.
+ */
 @MainThread
 public class ItemClickHelper<E> extends RecyclerViewOwner {
 
@@ -198,6 +207,17 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
 
     }
 
+    /**
+     * This interface is the contract between ItemClickHelper and your application.
+     * It lets you control which click behaviors are enabled per each ViewHolder.
+     * <p>
+     * To control which view can be clicked by the user, you should override
+     * {@link #getClickableViews(int, int)} and return appropriate set of clickable views.
+     * You can use predefined clickable views like {@link ClickableViews#NONE} to make
+     * specified view not clickable based on position and view type,
+     * or {@link ClickableViews#ITEM_VIEW} to make only root view holder's view clickable.
+     * Alternatively, you can provide your own set of the identifiers of the clickable views.
+     */
     public interface Callback<E> {
 
         /**

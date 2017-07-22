@@ -7,15 +7,15 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/simple_list_datasource_example"
+        android:id="@+id/list_datasource_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/simple_list_datasource_example"/>
+        android:text="@string/list_datasource_example"/>
 
-    <!--Button
-        android:id="@+id/button2"
+    <Button
+        android:id="@+id/cursor_datasource_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"/-->
+        android:text="@string/cursor_datasource_example"/>
 
 </LinearLayout>

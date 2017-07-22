@@ -41,7 +41,7 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_manual_list_example);
+        setContentView(R.layout.activity_list_datasource_example);
 
         mViewModel = ViewModelProviders.of(this).get(ListDatasourceExampleViewModel.class);
 
@@ -57,7 +57,6 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
         mItemClickHelper.setOnItemClickListener(this::onItemClick);
         mItemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
         mItemClickHelper.setRecyclerView(mRecyclerView);
-
 
         findViewById(R.id.action_add).setOnClickListener(v -> mViewModel.addSingleItem());
         findViewById(R.id.action_add_multiple).setOnClickListener(v -> mViewModel.addMultipleItems());

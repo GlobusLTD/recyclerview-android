@@ -111,7 +111,7 @@ class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonVie
 
                 @Override
                 public boolean areContentsTheSame(@NonNull final Person oldItem, @NonNull final Person newItem) {
-                    return TextUtils.equals(oldItem.getFirstName(), newItem.getLastName()) &&
+                    return TextUtils.equals(oldItem.getFirstName(), newItem.getFirstName()) &&
                             TextUtils.equals(oldItem.getLastName(), newItem.getLastName());
                 }
 
