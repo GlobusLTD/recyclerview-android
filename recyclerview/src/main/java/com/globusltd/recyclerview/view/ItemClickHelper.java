@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview.view;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -26,7 +27,7 @@ import android.view.View;
 import com.globusltd.recyclerview.RecyclerViewOwner;
 
 /**
- * This is a utility class to add item click and item long click support to RecyclerView.
+ * This is an utility class to add item click and item long click support to RecyclerView.
  * <p>
  * It works with a RecyclerView and a Callback class, which configures what type of interactions
  * are enabled. In most situations it's better to make your adapter as Callback implementation.
@@ -60,7 +61,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     /**
      * Register a callback to be invoked when view is clicked.
      *
-     * @param onItemClickListener The callback that will run
+     * @param onItemClickListener The callback that will run.
      */
     public void setOnItemClickListener(@Nullable final OnItemClickListener<E> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
@@ -69,18 +70,19 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     /**
      * Register a callback to be invoked when view is long clicked.
      *
-     * @param itemLongClickListener The callback that will run
+     * @param onItemLongClickListener The callback that will run.
      */
-    public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> itemLongClickListener) {
-        mOnItemLongClickListener = itemLongClickListener;
+    public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
+        mOnItemLongClickListener = onItemLongClickListener;
         if (mGestureDetector != null) {
-            mGestureDetector.setIsLongpressEnabled(itemLongClickListener != null);
+            mGestureDetector.setIsLongpressEnabled(onItemLongClickListener != null);
         }
     }
 
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         final EnchancedGestureDetector.OnGestureListener onGestureListener = onCreateGestureListener(recyclerView);
@@ -92,27 +94,28 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
         recyclerView.removeOnItemTouchListener(mOnItemTouchListener);
         mGestureDetector = null;
     }
 
-    private boolean performClick(@NonNull final RecyclerView.ViewHolder viewHolder,
-                                 @NonNull final View view) {
+    protected boolean performClick(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                   @NonNull final View view) {
         final int position = viewHolder.getAdapterPosition();
         final E item = mCallback.get(position);
         return (mOnItemClickListener != null && mOnItemClickListener.onItemClick(view, item, position));
     }
 
-    private boolean performLongPress(@NonNull final RecyclerView.ViewHolder viewHolder,
-                                     @NonNull final View view) {
-        if (viewHolder.itemView == view) {
+    protected boolean performLongPress(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                       @NonNull final View view) {
+        //if (viewHolder.itemView == view) {
             final int position = viewHolder.getAdapterPosition();
             final E item = mCallback.get(position);
             return (mOnItemLongClickListener != null && mOnItemLongClickListener.onItemLongClick(view, item, position));
-        }
-        return false;
+        //}
+        //return false;
     }
 
     private class OnItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {

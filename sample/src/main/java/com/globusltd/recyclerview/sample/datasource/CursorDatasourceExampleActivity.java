@@ -60,6 +60,7 @@ public class CursorDatasourceExampleActivity extends AppCompatActivity
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRecyclerView.setAdapter(mAdapter);
 
+        // TODO: request runtime permission
         getSupportLoaderManager().initLoader(0, Bundle.EMPTY, this);
     }
 

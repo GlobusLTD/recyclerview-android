@@ -36,10 +36,11 @@ public abstract class RecyclerViewOwner {
      * @param recyclerView The RecyclerView instance to which you want to add this helper or
      *                     {@code null} if you want to remove RecyclerViewOwner from the current
      *                     RecyclerView.
+     * @return true if a RecyclerView instance is changed, false otherwise.
      */
-    public void setRecyclerView(@Nullable final RecyclerView recyclerView) {
+    public boolean setRecyclerView(@Nullable final RecyclerView recyclerView) {
         if (mRecyclerView == recyclerView) {
-            return; // Nothing to do
+            return false; // Nothing to do
         }
         if (mRecyclerView != null) {
             onDetachedFromRecyclerView(mRecyclerView);
@@ -48,6 +49,22 @@ public abstract class RecyclerViewOwner {
         if (mRecyclerView != null) {
             onAttachedToRecyclerView(mRecyclerView);
         }
+        return true;
+    }
+
+    /**
+     * Returns true is this class is bond to RecyclerView instance, false otherwiseo.
+     */
+    protected boolean isAttached() {
+        return mRecyclerView != null;
+    }
+
+    /**
+     * Returns a RecyclerView instance this class is bond to.
+     */
+    @Nullable
+    protected RecyclerView getRecyclerView() {
+        return mRecyclerView;
     }
 
     /**

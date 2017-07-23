@@ -18,7 +18,7 @@ package com.globusltd.recyclerview.choice;
 /**
  * Defines an extension for view holders that make them able to handle choice mode.
  */
-public interface ChoiceModeCheckable {
+public interface CheckableViewHolder {
     
     void setInChoiceMode(final boolean isInChoiceMode);
     
