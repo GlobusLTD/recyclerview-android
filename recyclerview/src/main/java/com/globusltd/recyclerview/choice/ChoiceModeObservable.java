@@ -45,5 +45,19 @@ public class ChoiceModeObservable extends Observable<ChoiceModeObserver> {
             mObservers.get(i).onItemCheckedChanged(itemId, fromUser);
         }
     }
+
+    /**
+     * Notifies the registered observers that the selection of the all items
+     * in the choice mode have been changed.
+     *
+     * @param fromUser True if the checked state change was initiated by the user.
+     */
+    public void notifyAllItemsCheckedChanged(final boolean fromUser) {
+        final int size = mObservers.size();
+        for (int i = size - 1; i >= 0; i--) {
+            mObservers.get(i).notifyAllItemsCheckedChanged(fromUser);
+        }
+    }
+
     
 }

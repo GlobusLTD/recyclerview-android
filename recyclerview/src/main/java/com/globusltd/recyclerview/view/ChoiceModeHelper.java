@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -56,8 +55,8 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
     @NonNull
     private final ViewHolderTracker mViewHolderTracker;
 
-    @Nullable
-    private ViewHolderObserver mViewHolderObserver;
+    @NonNull
+    private final ViewHolderObserver mViewHolderObserver;
 
     public ChoiceModeHelper(@NonNull final Callback<E> callback) {
         this(callback, DEFAULT_CHOICE_MODE);
@@ -71,6 +70,7 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
         mCheckableViewTypes = new SparseBooleanArray();
         mCheckableViewHolderTypes = new SparseBooleanArray();
         mViewHolderTracker = new ViewHolderTracker();
+        mViewHolderObserver = new ChoiceModeViewHolderObserver();
     }
 
     /**
@@ -83,42 +83,31 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
         mChoiceMode = choiceMode;
         if (isAttached()) {
             mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
-            // TODO: invalidate visible view holders
+            mChoiceModeObserver.notifyAllItemsCheckedChanged(false);
         }
-    }
-
-    @Override
-    public boolean setRecyclerView(@Nullable final RecyclerView recyclerView) {
-        final boolean handled = super.setRecyclerView(recyclerView);
-        if (handled) {
-            mCheckableViewTypes.clear();
-            mCheckableViewHolderTypes.clear();
-            if (mViewHolderObserver != null) {
-                mViewHolderTracker.unregisterViewHolderObserver(mViewHolderObserver);
-                mViewHolderObserver = null;
-            }
-            if (recyclerView != null) {
-                mViewHolderObserver = new ChoiceModeViewHolderObserver();
-                mViewHolderTracker.registerViewHolderObserver(mViewHolderObserver);
-            }
-            mViewHolderTracker.setRecyclerView(recyclerView);
-        }
-        return handled;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
+    protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+
         mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
+        mViewHolderTracker.registerViewHolderObserver(mViewHolderObserver);
+        mViewHolderTracker.setRecyclerView(recyclerView);
     }
 
     @Override
-    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
-        mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
+    protected void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
+
+        mCheckableViewTypes.clear();
+        mCheckableViewHolderTypes.clear();
+        mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
+        mViewHolderTracker.unregisterViewHolderObserver(mViewHolderObserver);
+        mViewHolderTracker.setRecyclerView(null);
     }
 
     /**
@@ -172,6 +161,19 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
                     recyclerView.findViewHolderForItemId(itemId) : null);
             if (viewHolder != null) {
                 onViewHolderCheckedChanged(viewHolder, fromUser);
+            }
+        }
+
+        @Override
+        public void notifyAllItemsCheckedChanged(final boolean fromUser) {
+            final RecyclerView recyclerView = getRecyclerView();
+            final int childCount = (recyclerView != null ? recyclerView.getChildCount() : 0);
+            for (int index = 0; index < childCount; index++) {
+                final View itemView = recyclerView.getChildAt(index);
+                final RecyclerView.ViewHolder viewHolder = recyclerView.findContainingViewHolder(itemView);
+                if (viewHolder != null) {
+                    onViewHolderCheckedChanged(viewHolder, fromUser);
+                }
             }
         }
 

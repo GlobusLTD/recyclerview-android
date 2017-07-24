@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.sample.datasource;
+package com.globusltd.recyclerview.sample.data;
 
 import android.support.annotation.NonNull;
 
 import java.util.Random;
 
-class PersonGenerator {
+public class PersonGenerator {
     
     private static final String[] FIRST_NAMES = {
             "Alfred", "Anna", "Brad", "Cristina",
@@ -37,13 +37,13 @@ class PersonGenerator {
     private int mCounter;
     
     private Random mRandom;
-    
-    PersonGenerator() {
+
+    public PersonGenerator() {
         mRandom = new Random();
     }
     
     @NonNull
-    Person generate() {
+    public Person generate() {
         final int firstNamePosition = Math.abs(mRandom.nextInt()) % FIRST_NAMES.length;
         final String firstName = FIRST_NAMES[firstNamePosition];
         final int lastNamePosition = Math.abs(mRandom.nextInt()) % LAST_NAMES.length;

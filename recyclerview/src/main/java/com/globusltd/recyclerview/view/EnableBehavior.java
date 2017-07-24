@@ -18,7 +18,7 @@ package com.globusltd.recyclerview.view;
 import android.support.annotation.MainThread;
 
 @MainThread
-public class EnableBehavior /*implements ViewHolderObserver*/ {
+public class EnableBehavior /* TODO: implements ViewHolderObserver*/ {
     
     /*@NonNull
     private final ClickableAdapter<?> mAdapter;

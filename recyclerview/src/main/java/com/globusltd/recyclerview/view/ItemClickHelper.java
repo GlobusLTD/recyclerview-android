@@ -84,7 +84,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
      */
     @CallSuper
     @Override
-    public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
+    protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         final EnchancedGestureDetector.OnGestureListener onGestureListener = onCreateGestureListener(recyclerView);
         mGestureDetector = new EnchancedGestureDetector(recyclerView.getContext(), onGestureListener);
         mGestureDetector.setIsLongpressEnabled(mOnItemLongClickListener != null);
@@ -96,7 +96,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
      */
     @CallSuper
     @Override
-    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+    protected void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
         recyclerView.removeOnItemTouchListener(mOnItemTouchListener);
         mGestureDetector = null;
     }
@@ -122,8 +122,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
 
         @Override
         public boolean onInterceptTouchEvent(final RecyclerView rv, final MotionEvent e) {
-            return (mOnItemClickListener != null || mOnItemLongClickListener != null) &&
-                    (mGestureDetector != null && mGestureDetector.onTouchEvent(e));
+            return (mGestureDetector != null && mGestureDetector.onTouchEvent(e));
         }
 
         @Override
@@ -177,6 +176,14 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
         }
 
         @Override
+        public void onHidePress() {
+            if (mTarget != null) {
+                mTarget.setPressed(false);
+                mTarget = null;
+            }
+        }
+
+        @Override
         public boolean onScrollBegin(@NonNull final MotionEvent e) {
             return false;
         }
@@ -202,10 +209,6 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
 
         @Override
         public void onUp(@NonNull final MotionEvent e) {
-            if (mTarget != null) {
-                mTarget.setPressed(false);
-                mTarget = null;
-            }
         }
 
     }

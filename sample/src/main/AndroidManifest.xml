@@ -33,6 +33,18 @@
             android:name=".datasource.CursorDatasourceExampleActivity"
             android:label="@string/cursor_datasource_example"/>
 
+        <activity
+            android:name=".choicemode.ChoiceModeExamplesActivity"
+            android:label="@string/choice_mode_examples"/>
+
+        <activity
+            android:name=".choicemode.SingleChoiceModeExampleActivity"
+            android:label="@string/single_choice_mode_example"/>
+
+        <activity
+            android:name=".choicemode.MultipleChoiceModeExampleActivity"
+            android:label="@string/multiple_choice_mode_example"/>
+
     </application>
 
 </manifest>

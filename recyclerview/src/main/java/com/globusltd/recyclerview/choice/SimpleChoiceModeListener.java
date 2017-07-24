@@ -17,8 +17,8 @@ package com.globusltd.recyclerview.choice;
 
 /**
  * A SimpleChoiceModeListener receives events for this choice mode.
- * It receives {@link #onItemCheckedStateChanged(long, boolean)} events when the user
- * selects and deselects list items.
+ * It receives {@link #onItemCheckedStateChanged(long, boolean, boolean)} events
+ * when the user selects and deselects list items.
  */
 public interface SimpleChoiceModeListener {
     
@@ -26,9 +26,10 @@ public interface SimpleChoiceModeListener {
      * Called when an item is checked or unchecked during selection mode.
      *
      * @param itemId  The item id that was checked or unchecked.
-     * @param checked <code>true</code> if the item is now checked, <code>false</code>
+     * @param checked true if the item is now checked, false
      *                if the item is now unchecked.
+     * @param fromUser true if the checked state change was initiated by the user.
      */
-    void onItemCheckedStateChanged(final long itemId, final boolean checked);
+    void onItemCheckedStateChanged(final long itemId, final boolean checked, final boolean fromUser);
     
 }

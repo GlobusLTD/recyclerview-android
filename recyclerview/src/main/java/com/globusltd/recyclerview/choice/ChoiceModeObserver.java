@@ -22,15 +22,24 @@ import android.support.v7.widget.RecyclerView;
  * See {@link ChoiceMode#registerChoiceModeObserver(ChoiceModeObserver)} .
  */
 public abstract class ChoiceModeObserver {
-    
+
     /**
      * Called when the selection of the item in the choice mode have been changed.
      *
-     * @param itemId The item's id or {@link RecyclerView#NO_ID}.
+     * @param itemId   The item's id or {@link RecyclerView#NO_ID}.
      * @param fromUser True if the checked state change was initiated by the user.
      */
     public void onItemCheckedChanged(final long itemId, final boolean fromUser) {
         // Do nothing
     }
-    
+
+    /**
+     * Called when the selection of the all items in the choice mode have been changed.
+     *
+     * @param fromUser True if the checked state change was initiated by the user.
+     */
+    public void notifyAllItemsCheckedChanged(final boolean fromUser) {
+        // Do nothing
+    }
+
 }

@@ -16,52 +16,63 @@
 package com.globusltd.recyclerview.choice;
 
 import android.os.Bundle;
-import android.support.annotation.IntRange;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+
+import com.globusltd.collections.LongArrayList;
 
 /**
- * {@link ChoiceMode} that allows up to one choice.
+ * {@link ChoiceMode} that allows any number of items to be chosen
  */
-@MainThread
-public class SingleChoiceMode extends ObservableChoiceMode {
+public class MultipleChoiceMode  extends ObservableChoiceMode {
 
-    private static final String KEY_SINGLE_CHOICE_MODE = "single_choice_mode";
-    private static final String KEY_CHECKED_ID = "checked_id";
-    
+    private static final String KEY_MULTIPLE_CHOICE_MODE = "multiple_choice_mode";
+    private static final String KEY_CHECKED_IDS = "checked_ids";
+
     /**
-     * Single choice mode callback.
+     * Multiple choice mode callback.
      */
     @Nullable
     private SimpleChoiceModeListener mChoiceModeListener;
-    
-    /**
-     * Running state of which ID are currently checked.
-     */
-    private long mCheckedId = RecyclerView.NO_ID;
 
-    public SingleChoiceMode() {
+    /**
+     * Running state of which IDs are currently checked.
+     * If there is a value for a given key, the checked state for that ID is true.
+     */
+    @NonNull
+    private final LongArrayList mCheckedIds;
+
+    public MultipleChoiceMode() {
         this(null);
     }
-    
-    public SingleChoiceMode(@Nullable final Bundle savedInstanceState) {
+
+    public MultipleChoiceMode(@Nullable final Bundle savedInstanceState) {
         super();
+        mCheckedIds = new LongArrayList();
+
         final Bundle state = (savedInstanceState != null ?
-                savedInstanceState.getBundle(KEY_SINGLE_CHOICE_MODE) : null);
+                savedInstanceState.getBundle(KEY_MULTIPLE_CHOICE_MODE) : null);
         if (state != null) {
-            mCheckedId = state.getLong(KEY_CHECKED_ID, RecyclerView.NO_ID);
+            final LongArrayList checkedIdStates = state.getParcelable(KEY_CHECKED_IDS);
+            if (checkedIdStates == null) {
+                throw new IllegalArgumentException("Did you put checked id states to the saved state?");
+            }
+
+            final int count = checkedIdStates.size();
+            mCheckedIds.clear();
+            for (int i = 0; i < count; i++) {
+                mCheckedIds.add(checkedIdStates.get(i));
+            }
         }
     }
-    
+
     /**
-     * Sets single choice mode callback.
+     * Sets multiple choice mode callback.
      */
     public void setChoiceModeListener(@Nullable final SimpleChoiceModeListener listener) {
         mChoiceModeListener = listener;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -69,77 +80,68 @@ public class SingleChoiceMode extends ObservableChoiceMode {
     public boolean isActivated() {
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    @IntRange(from = 0, to = 1)
     @Override
     public int getCheckedItemCount() {
-        return (mCheckedId != RecyclerView.NO_ID ? 1 : 0);
+        return mCheckedIds.size();
     }
-    
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean isItemChecked(final long itemId) {
-        return (mCheckedId == itemId);
+        return mCheckedIds.contains(itemId);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void setItemChecked(final long itemId, final boolean checked) {
         setItemCheckedInternal(itemId, checked, false);
     }
-    
+
     private void setItemCheckedInternal(final long itemId, final boolean checked,
                                         final boolean fromUser) {
-        final long checkedId = mCheckedId;
-        mCheckedId = (checked ? itemId : RecyclerView.NO_ID);
-    
+        final int indexOf = mCheckedIds.indexOf(itemId);
+        if (indexOf > -1) {
+            mCheckedIds.removeAt(indexOf);
+        }
+        if (checked) {
+            mCheckedIds.add(itemId);
+        }
+
         if (mChoiceModeListener != null) {
             mChoiceModeListener.onItemCheckedStateChanged(itemId, checked, fromUser);
         }
-    
-        notifyItemCheckedChanged(checkedId, fromUser);
-        notifyItemCheckedChanged(mCheckedId, fromUser);
+        notifyItemCheckedChanged(itemId, fromUser);
     }
-    
+
     /**
-     * Returns an identifier of checked item or
-     * {@link RecyclerView#NO_ID} if no item is checked.
+     * Returns an unsorted {@link LongArrayList} of checked item ids.
+     * Don't modify it without copying.
      */
-    public long getCheckedItem() {
-        return mCheckedId;
+    @NonNull
+    public LongArrayList getCheckedItems() {
+        return mCheckedIds;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void clearChoices() {
-        final long itemId = mCheckedId;
-        mCheckedId = RecyclerView.NO_ID;
-        notifyItemCheckedChanged(itemId, false);
+        mCheckedIds.clear();
+        notifyAllItemsCheckedChanged(false);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public boolean onClick(final long itemId) {
-        if (!isItemChecked(itemId)) {
-            setItemCheckedInternal(itemId, true, true);
-        }
-        return true;
+        final boolean checked = !isItemChecked(itemId);
+        setItemCheckedInternal(itemId, checked, true);
+        return false;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public boolean onLongClick(final long itemId) {
         return true;
@@ -153,8 +155,8 @@ public class SingleChoiceMode extends ObservableChoiceMode {
      */
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         final Bundle state = new Bundle();
-        state.putLong(KEY_CHECKED_ID, mCheckedId);
-        outState.putBundle(KEY_SINGLE_CHOICE_MODE, state);
+        state.putParcelable(KEY_CHECKED_IDS, mCheckedIds);
+        outState.putBundle(KEY_MULTIPLE_CHOICE_MODE, state);
     }
-    
+
 }

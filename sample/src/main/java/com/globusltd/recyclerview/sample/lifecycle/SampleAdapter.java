@@ -15,7 +15,7 @@
  */
 package com.globusltd.recyclerview.sample.lifecycle;
 
-public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.SingleLineViewHolder>*/ {
+public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.SimpleCheckedViewHolder>*/ {
     
     /*private static final int VIEW_TYPE_SINGLE_LINE = 0;
     private static final int VIEW_TYPE_TWO_LINES = 1;
@@ -46,14 +46,14 @@ public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.Single
     
     @NonNull
     @Override
-    public SingleLineViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
+    public SimpleCheckedViewHolder onCreateViewHolder(@NonNull final LayoutInflater inflater,
                                                    @NonNull final ViewGroup parent,
                                                    final int viewType) {
-        final SingleLineViewHolder viewHolder;
+        final SimpleCheckedViewHolder viewHolder;
         switch (viewType) {
             case VIEW_TYPE_SINGLE_LINE:
                 final View singleLineView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                viewHolder = new SingleLineViewHolder(singleLineView);
+                viewHolder = new SimpleCheckedViewHolder(singleLineView);
                 break;
             
             case VIEW_TYPE_TWO_LINES:
@@ -77,17 +77,17 @@ public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.Single
     }
     
     @Override
-    public void onBindViewHolder(@NonNull final SingleLineViewHolder holder,
+    public void onBindViewHolder(@NonNull final SimpleCheckedViewHolder holder,
                                  @NonNull final CharSequence item, final int position) {
         holder.setText1(item);
     }
     
-    static class SingleLineViewHolder extends RecyclerView.ViewHolder {
+    static class SimpleCheckedViewHolder extends RecyclerView.ViewHolder {
         
         @NonNull
         private final TextView mTextView1;
         
-        SingleLineViewHolder(@NonNull final View itemView) {
+        SimpleCheckedViewHolder(@NonNull final View itemView) {
             super(itemView);
             mTextView1 = (TextView) itemView.findViewById(android.R.id.text1);
         }
@@ -98,7 +98,7 @@ public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.Single
         
     }
     
-    private static class TwoLinesViewHolder extends SingleLineViewHolder implements LifecycleCallbacks {
+    private static class TwoLinesViewHolder extends SimpleCheckedViewHolder implements LifecycleCallbacks {
         
         @NonNull
         private final TextView mTextView2;

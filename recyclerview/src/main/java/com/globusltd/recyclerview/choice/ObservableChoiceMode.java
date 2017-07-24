@@ -64,10 +64,20 @@ public abstract class ObservableChoiceMode implements ChoiceMode {
      * have been changed. Note that method can be called multiple times.
      *
      * @param itemId The item's id or {@link RecyclerView#NO_ID}.
-     * @param fromUser True if the checked state change was initiated by the user.
+     * @param fromUser true if the checked state change was initiated by the user.
      */
     public void notifyItemCheckedChanged(final long itemId, final boolean fromUser) {
         mChoiceModeObservable.notifyItemCheckedChanged(itemId, fromUser);
+    }
+
+    /**
+     * Notifies the registered observers that the selection of the all items
+     * in the choice mode have been changed.
+     *
+     * @param fromUser true if the checked state change was initiated by the user.
+     */
+    public void notifyAllItemsCheckedChanged(final boolean fromUser) {
+        mChoiceModeObservable.notifyAllItemsCheckedChanged(fromUser);
     }
     
 }

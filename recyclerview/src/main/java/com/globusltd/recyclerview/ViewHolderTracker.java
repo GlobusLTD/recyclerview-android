@@ -72,7 +72,7 @@ public class ViewHolderTracker extends RecyclerViewOwner {
      * {@inheritDoc}
      */
     @Override
-    public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
+    protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         mOnChildAttachStateChangeListener = new OnChildAttachStateChangeListener(recyclerView);
         mOnChildAttachStateChangeListener.onAttachedToRecyclerView();
         recyclerView.addOnChildAttachStateChangeListener(mOnChildAttachStateChangeListener);
@@ -82,7 +82,7 @@ public class ViewHolderTracker extends RecyclerViewOwner {
      * {@inheritDoc}
      */
     @Override
-    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+    protected void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
         if (mOnChildAttachStateChangeListener != null) {
             recyclerView.removeOnChildAttachStateChangeListener(mOnChildAttachStateChangeListener);
             mOnChildAttachStateChangeListener.onDetachedFromRecyclerView();

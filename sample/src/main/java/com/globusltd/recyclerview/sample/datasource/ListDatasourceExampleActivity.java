@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
+import com.globusltd.recyclerview.sample.data.Person;
 import com.globusltd.recyclerview.view.ItemClickHelper;
 
 public class ListDatasourceExampleActivity extends AppCompatActivity {
@@ -58,8 +59,8 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
         mItemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
         mItemClickHelper.setRecyclerView(mRecyclerView);
 
-        findViewById(R.id.action_add).setOnClickListener(v -> mViewModel.addSingleItem());
-        findViewById(R.id.action_add_multiple).setOnClickListener(v -> mViewModel.addMultipleItems());
+        findViewById(R.id.action_add_item).setOnClickListener(v -> mViewModel.addSingleItem());
+        findViewById(R.id.action_add_multiple_items).setOnClickListener(v -> mViewModel.addMultipleItems());
     }
 
     public boolean onItemClick(@NonNull final View view, @NonNull final Person person,

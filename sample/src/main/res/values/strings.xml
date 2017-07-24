@@ -7,5 +7,14 @@
     <string name="datasource_examples">Datasource Examples</string>
     <string name="list_datasource_example">ListDatasource Example</string>
     <string name="cursor_datasource_example">CursorDatasource Example</string>
+    <string name="action_add_item">Add item</string>
+    <string name="action_add_multiple_items">Add multiple items</string>
+
+    <string name="choice_mode_examples">ChoiceMode Examples</string>
+    <string name="single_choice_mode_example">SingleChoiceMode Example</string>
+    <string name="multiple_choice_mode_example">MultipleChoiceMode Example</string>
+    <string name="action_clear_choices">Clear choices</string>
+    <string name="action_get_checked_item">Get checked item</string>
+    <string name="action_get_checked_items">Get checked items</string>
 
 </resources>

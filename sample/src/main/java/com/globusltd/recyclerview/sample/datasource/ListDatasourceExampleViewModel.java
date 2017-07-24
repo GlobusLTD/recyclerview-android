@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.datasource.ListDatasource;
+import com.globusltd.recyclerview.sample.data.Person;
+import com.globusltd.recyclerview.sample.data.PersonGenerator;
 
 import java.util.Arrays;
 
@@ -57,7 +59,6 @@ public class ListDatasourceExampleViewModel extends ViewModel {
     
     void removeItemAtPosition(@IntRange(from = 0) final int position) {
         mDatasource.remove(position);
-        //mDatasource.move(position, position - 1);
     }
     
 }

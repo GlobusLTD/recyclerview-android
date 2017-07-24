@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.sample;
+package com.globusltd.recyclerview.sample.choicemode;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.globusltd.recyclerview.sample.choicemode.ChoiceModeExamplesActivity;
-import com.globusltd.recyclerview.sample.datasource.DatasourceExamplesActivity;
+import com.globusltd.recyclerview.sample.R;
 
-public class SampleActivity extends AppCompatActivity {
+public class ChoiceModeExamplesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sample);
+        setContentView(R.layout.activity_choice_mode_examples);
 
-        findViewById(R.id.datasource_examples)
-                .setOnClickListener(v -> startActivity(new Intent(this, DatasourceExamplesActivity.class)));
+        findViewById(R.id.single_choice_mode_example)
+                .setOnClickListener(v -> startActivity(new Intent(this, SingleChoiceModeExampleActivity.class)));
 
-        findViewById(R.id.choice_mode_examples)
-                .setOnClickListener(v -> startActivity(new Intent(this, ChoiceModeExamplesActivity.class)));
+        findViewById(R.id.multiple_choice_mode_example)
+                .setOnClickListener(v -> startActivity(new Intent(this, MultipleChoiceModeExampleActivity.class)));
     }
 
 }

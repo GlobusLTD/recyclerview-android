@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.sample.datasource;
+package com.globusltd.recyclerview.sample.data;
 
 import java.util.Locale;
 
@@ -25,7 +25,7 @@ public class Person {
     
     private String mLastName;
     
-    public Person(final int id, final String firstName, final String lastName) {
+    Person(final int id, final String firstName, final String lastName) {
         mId = id;
         mFirstName = firstName;
         mLastName = lastName;
