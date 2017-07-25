@@ -43,7 +43,7 @@ public class SingleChoiceModeExampleActivity extends AppCompatActivity {
 
         final PersonsViewModel viewModel = ViewModelProviders.of(this).get(PersonsViewModel.class);
         final Datasource<Person> datasource = viewModel.getDatasource();
-        final SimpleCheckablePersonsAdapter adapter = new SimpleCheckablePersonsAdapter(datasource, false);
+        final CheckedPersonsAdapter adapter = new CheckedPersonsAdapter(datasource, false);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

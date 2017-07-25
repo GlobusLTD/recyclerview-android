@@ -13,6 +13,12 @@
         android:text="@string/single_choice_mode_example"/>
 
     <Button
+        android:id="@+id/single_modal_choice_mode_example"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/single_modal_choice_mode_example"/>
+
+    <Button
         android:id="@+id/multiple_choice_mode_example"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

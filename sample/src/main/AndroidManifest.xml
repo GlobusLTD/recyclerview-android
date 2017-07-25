@@ -42,6 +42,10 @@
             android:label="@string/single_choice_mode_example"/>
 
         <activity
+            android:name=".choicemode.SingleModalChoiceModeExampleActivity"
+            android:label="@string/single_modal_choice_mode_example"/>
+
+        <activity
             android:name=".choicemode.MultipleChoiceModeExampleActivity"
             android:label="@string/multiple_choice_mode_example"/>
 

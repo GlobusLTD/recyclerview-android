@@ -46,7 +46,7 @@ public class MultipleChoiceModeExampleActivity extends AppCompatActivity {
 
         final PersonsViewModel viewModel = ViewModelProviders.of(this).get(PersonsViewModel.class);
         final Datasource<Person> datasource = viewModel.getDatasource();
-        final SimpleCheckablePersonsAdapter adapter = new SimpleCheckablePersonsAdapter(datasource, true);
+        final CheckedPersonsAdapter adapter = new CheckedPersonsAdapter(datasource, true);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

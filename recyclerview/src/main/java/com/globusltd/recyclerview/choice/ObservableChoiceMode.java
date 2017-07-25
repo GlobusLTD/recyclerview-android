@@ -15,6 +15,7 @@
  */
 package com.globusltd.recyclerview.choice;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
@@ -37,6 +38,7 @@ public abstract class ObservableChoiceMode implements ChoiceMode {
     
     /**
      * Returns true when choice mode is attached to adapter and RecyclerView.
+     *
      * @return true when choice mode is attached to adapter and RecyclerView, false otherwise.
      */
     public final boolean isAttached() {
@@ -46,6 +48,7 @@ public abstract class ObservableChoiceMode implements ChoiceMode {
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void registerChoiceModeObserver(@NonNull final ChoiceModeObserver observer) {
         mChoiceModeObservable.registerObserver(observer);
@@ -54,6 +57,7 @@ public abstract class ObservableChoiceMode implements ChoiceMode {
     /**
      * {@inheritDoc}
      */
+    @CallSuper
     @Override
     public void unregisterChoiceModeObserver(@NonNull final ChoiceModeObserver observer) {
         mChoiceModeObservable.unregisterObserver(observer);
@@ -63,13 +67,13 @@ public abstract class ObservableChoiceMode implements ChoiceMode {
      * Notifies the registered observers that the selection of the item in the choice mode
      * have been changed. Note that method can be called multiple times.
      *
-     * @param itemId The item's id or {@link RecyclerView#NO_ID}.
+     * @param itemId   The item's id or {@link RecyclerView#NO_ID}.
      * @param fromUser true if the checked state change was initiated by the user.
      */
     public void notifyItemCheckedChanged(final long itemId, final boolean fromUser) {
         mChoiceModeObservable.notifyItemCheckedChanged(itemId, fromUser);
     }
-
+    
     /**
      * Notifies the registered observers that the selection of the all items
      * in the choice mode have been changed.

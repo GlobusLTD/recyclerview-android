@@ -12,9 +12,20 @@
 
     <string name="choice_mode_examples">ChoiceMode Examples</string>
     <string name="single_choice_mode_example">SingleChoiceMode Example</string>
+    <string name="single_modal_choice_mode_example">SingleModalChoiceMode Example</string>
     <string name="multiple_choice_mode_example">MultipleChoiceMode Example</string>
     <string name="action_clear_choices">Clear choices</string>
     <string name="action_get_checked_item">Get checked item</string>
     <string name="action_get_checked_items">Get checked items</string>
+
+    <string name="action_mode_no_items_selected">No items selected</string>
+    <plurals name="action_mode_x_items_selected">
+        <item quantity="zero">No items selected</item>
+        <item quantity="one">%s item selected</item>
+        <item quantity="two">%s items selected</item>
+        <item quantity="few">%s items selected</item>
+        <item quantity="many">%s items selected</item>
+        <item quantity="other">%s items selected</item>
+    </plurals>
 
 </resources>

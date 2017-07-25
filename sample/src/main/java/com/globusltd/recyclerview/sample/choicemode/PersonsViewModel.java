@@ -9,13 +9,13 @@ import com.globusltd.recyclerview.sample.data.Person;
 import com.globusltd.recyclerview.sample.data.PersonGenerator;
 
 public class PersonsViewModel extends ViewModel {
-
+    
     @NonNull
     private final PersonGenerator mPersonGenerator;
-
+    
     @NonNull
     private final ListDatasource<Person> mDatasource;
-
+    
     public PersonsViewModel() {
         mPersonGenerator = new PersonGenerator();
         mDatasource = new ListDatasource<>();
@@ -23,10 +23,21 @@ public class PersonsViewModel extends ViewModel {
             mDatasource.add(mPersonGenerator.generate());
         }
     }
-
+    
     @NonNull
     Datasource<Person> getDatasource() {
         return mDatasource;
     }
-
+    
+    void deleteById(final long itemId) {
+        final int size = mDatasource.size();
+        for (int index = size - 1; index >= 0; index--) {
+            final Person person = mDatasource.get(index);
+            if (person.getId() == itemId) {
+                mDatasource.remove(index);
+                break;
+            }
+        }
+    }
+    
 }

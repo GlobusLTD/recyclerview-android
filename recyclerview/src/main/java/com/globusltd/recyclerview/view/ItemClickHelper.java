@@ -74,9 +74,9 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
      */
     public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
         mOnItemLongClickListener = onItemLongClickListener;
-        if (mGestureDetector != null) {
+        /* TODO: if (mGestureDetector != null) {
             mGestureDetector.setIsLongpressEnabled(onItemLongClickListener != null);
-        }
+        }*/
     }
 
     /**
@@ -87,7 +87,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         final EnchancedGestureDetector.OnGestureListener onGestureListener = onCreateGestureListener(recyclerView);
         mGestureDetector = new EnchancedGestureDetector(recyclerView.getContext(), onGestureListener);
-        mGestureDetector.setIsLongpressEnabled(mOnItemLongClickListener != null);
+        // TODO: mGestureDetector.setIsLongpressEnabled(mOnItemLongClickListener != null);
         recyclerView.addOnItemTouchListener(mOnItemTouchListener);
     }
 

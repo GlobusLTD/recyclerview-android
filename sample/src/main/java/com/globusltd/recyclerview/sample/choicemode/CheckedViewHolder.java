@@ -22,26 +22,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
-class SimpleCheckedViewHolder extends RecyclerView.ViewHolder {
+class CheckedViewHolder extends RecyclerView.ViewHolder {
 
     @NonNull
-    static SimpleCheckedViewHolder inflateSingleChoice(@NonNull final LayoutInflater inflater,
-                                                       @NonNull final ViewGroup parent) {
+    static CheckedViewHolder inflateSingleChoice(@NonNull final LayoutInflater inflater,
+                                                 @NonNull final ViewGroup parent) {
         final View itemView = inflater.inflate(android.R.layout.simple_list_item_single_choice, parent, false);
-        return new SimpleCheckedViewHolder(itemView);
+        return new CheckedViewHolder(itemView);
     }
 
     @NonNull
-    static SimpleCheckedViewHolder inflateMultipleChoice(@NonNull final LayoutInflater inflater,
-                                                         @NonNull final ViewGroup parent) {
+    static CheckedViewHolder inflateMultipleChoice(@NonNull final LayoutInflater inflater,
+                                                   @NonNull final ViewGroup parent) {
         final View itemView = inflater.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
-        return new SimpleCheckedViewHolder(itemView);
+        return new CheckedViewHolder(itemView);
     }
 
     @NonNull
     private final CheckedTextView mTextView1;
 
-    private SimpleCheckedViewHolder(@NonNull final View itemView) {
+    private CheckedViewHolder(@NonNull final View itemView) {
         super(itemView);
         mTextView1 = (CheckedTextView) itemView.findViewById(android.R.id.text1);
     }
