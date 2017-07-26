@@ -53,6 +53,8 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     @Nullable
     private EnchancedGestureDetector mGestureDetector;
 
+    private boolean mLongpressEnabled;
+
     public ItemClickHelper(@NonNull final Callback<E> callback) {
         mCallback = callback;
         mOnItemTouchListener = new OnItemTouchListener();
@@ -74,9 +76,18 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
      */
     public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
         mOnItemLongClickListener = onItemLongClickListener;
-        /* TODO: if (mGestureDetector != null) {
-            mGestureDetector.setIsLongpressEnabled(onItemLongClickListener != null);
-        }*/
+        setLongpressEnabled(mLongpressEnabled);
+    }
+
+    private boolean hasOnItemLongClickListener() {
+        return mOnItemClickListener != null;
+    }
+
+    protected void setLongpressEnabled(final boolean enabled) {
+        mLongpressEnabled = enabled;
+        if (mGestureDetector != null) {
+            mGestureDetector.setLongpressEnabled(enabled || hasOnItemLongClickListener());
+        }
     }
 
     /**
@@ -85,9 +96,9 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     @CallSuper
     @Override
     protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
-        final EnchancedGestureDetector.OnGestureListener onGestureListener = onCreateGestureListener(recyclerView);
+        final EnchancedGestureDetector.OnGestureListener onGestureListener = new DefaultGestureListener(recyclerView);
         mGestureDetector = new EnchancedGestureDetector(recyclerView.getContext(), onGestureListener);
-        // TODO: mGestureDetector.setIsLongpressEnabled(mOnItemLongClickListener != null);
+        mGestureDetector.setLongpressEnabled(mLongpressEnabled || hasOnItemLongClickListener());
         recyclerView.addOnItemTouchListener(mOnItemTouchListener);
     }
 
@@ -111,9 +122,9 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     protected boolean performLongPress(@NonNull final RecyclerView.ViewHolder viewHolder,
                                        @NonNull final View view) {
         //if (viewHolder.itemView == view) {
-            final int position = viewHolder.getAdapterPosition();
-            final E item = mCallback.get(position);
-            return (mOnItemLongClickListener != null && mOnItemLongClickListener.onItemLongClick(view, item, position));
+        final int position = viewHolder.getAdapterPosition();
+        final E item = mCallback.get(position);
+        return (mOnItemLongClickListener != null && mOnItemLongClickListener.onItemLongClick(view, item, position));
         //}
         //return false;
     }
@@ -134,12 +145,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
 
     }
 
-    @NonNull
-    private EnchancedGestureDetector.OnGestureListener onCreateGestureListener(@NonNull final RecyclerView recyclerView) {
-        return new DefaultGestureListener(recyclerView);
-    }
-
-    private class DefaultGestureListener implements EnchancedGestureDetector.OnGestureListener {
+    private class DefaultGestureListener extends EnchancedGestureDetector.SimpleOnGestureListener {
 
         @NonNull
         private final ClickableViewFinder mViewFinder;
@@ -184,31 +190,10 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
         }
 
         @Override
-        public boolean onScrollBegin(@NonNull final MotionEvent e) {
-            return false;
-        }
-
-        @Override
-        public boolean onScroll(@NonNull final MotionEvent first, @NonNull final MotionEvent previous,
-                                @NonNull final MotionEvent current, final float distanceX, final float distanceY) {
-            return false;
-        }
-
-        @Override
         public void onLongPress(@NonNull final MotionEvent e) {
             if (mTarget != null) {
                 performLongPress(mTarget.getViewHolder(), mTarget.getView());
             }
-        }
-
-        @Override
-        public boolean onFling(@NonNull final MotionEvent e1, @NonNull final MotionEvent e2,
-                               final float velocityX, final float velocityY) {
-            return false;
-        }
-
-        @Override
-        public void onUp(@NonNull final MotionEvent e) {
         }
 
     }

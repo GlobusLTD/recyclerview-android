@@ -37,6 +37,9 @@ public class ChoiceModeExamplesActivity extends AppCompatActivity {
 
         findViewById(R.id.multiple_choice_mode_example)
                 .setOnClickListener(v -> startActivity(new Intent(this, MultipleChoiceModeExampleActivity.class)));
+
+        findViewById(R.id.multiple_modal_choice_mode_example)
+                .setOnClickListener(v -> startActivity(new Intent(this, MultipleModalChoiceModeExampleActivity.class)));
     }
 
 }

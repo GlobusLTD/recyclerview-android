@@ -77,6 +77,22 @@ public class MultipleChoiceMode  extends ObservableChoiceMode {
      * {@inheritDoc}
      */
     @Override
+    public boolean requiresStableIds() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean requiresLongpress() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isActivated() {
         return true;
     }
@@ -144,6 +160,7 @@ public class MultipleChoiceMode  extends ObservableChoiceMode {
 
     @Override
     public boolean onLongClick(final long itemId) {
+        // Consume event when it happens
         return true;
     }
 
@@ -155,7 +172,7 @@ public class MultipleChoiceMode  extends ObservableChoiceMode {
      */
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         final Bundle state = new Bundle();
-        state.putParcelable(KEY_CHECKED_IDS, mCheckedIds);
+        state.putParcelable(KEY_CHECKED_IDS, new LongArrayList(mCheckedIds));
         outState.putBundle(KEY_MULTIPLE_CHOICE_MODE, state);
     }
 

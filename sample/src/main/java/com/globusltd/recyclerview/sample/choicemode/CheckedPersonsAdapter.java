@@ -1,10 +1,23 @@
+/*
+ * Copyright 2017 Globus Ltd.
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.globusltd.recyclerview.sample.choicemode;
 
-import android.content.res.Resources;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -13,8 +26,8 @@ import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.diff.DiffCallback;
 import com.globusltd.recyclerview.diff.DiffCallbackFactory;
 import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
-import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.sample.data.Person;
+import com.globusltd.recyclerview.sample.util.TouchFeedback;
 import com.globusltd.recyclerview.view.ClickableViews;
 import com.globusltd.recyclerview.view.ItemClickHelper;
 
@@ -47,11 +60,7 @@ class CheckedPersonsAdapter extends Adapter<Person, CheckedViewHolder>
 
         // Typically you should specify ?attr/selectableItemBackground as background in layout file,
         // but for platform views you can specify it programmatically
-        final Resources.Theme theme = parent.getContext().getTheme();
-        final TypedValue outValue = new TypedValue();
-        if (theme.resolveAttribute(R.attr.selectableItemBackground, outValue, true)) {
-            viewHolder.itemView.setBackgroundResource(outValue.resourceId);
-        }
+        TouchFeedback.selectableItemBackground(viewHolder.itemView);
 
         return viewHolder;
     }

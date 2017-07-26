@@ -24,12 +24,26 @@ import android.support.annotation.NonNull;
  */
 @MainThread
 public interface ChoiceMode {
-    
+
+    /**
+     * Returns whether stable item ids are required by this choice mode.
+     *
+     * @return whether stable item ids should be required.
+     */
+    boolean requiresStableIds();
+
+    /**
+     * Returns whether long press is required by this choice mode.
+     *
+     * @return whether long press should be required.
+     */
+    boolean requiresLongpress();
+
     /**
      * Returns true if choice mode is active.
      */
     boolean isActivated();
-    
+
     /**
      * Returns the number of items currently selected.
      * <p/>
@@ -40,7 +54,7 @@ public interface ChoiceMode {
      */
     @IntRange(from = 0)
     int getCheckedItemCount();
-    
+
     /**
      * Returns the checked state of the specified position.
      *
@@ -48,7 +62,7 @@ public interface ChoiceMode {
      * @return The item's checked state or <code>false</code>.
      */
     boolean isItemChecked(final long itemId);
-    
+
     /**
      * Sets the checked state of the specified position.
      *
@@ -56,12 +70,12 @@ public interface ChoiceMode {
      * @param checked The new checked state for the item.
      */
     void setItemChecked(final long itemId, final boolean checked);
-    
+
     /**
      * Clears any checked items.
      */
     void clearChoices();
-    
+
     /**
      * Dispatches click on a specific item.
      *
@@ -69,7 +83,7 @@ public interface ChoiceMode {
      * @return true if click is handled by choice mode.
      */
     boolean onClick(final long itemId);
-    
+
     /**
      * Dispatches long click on a specific item.
      *
@@ -77,7 +91,7 @@ public interface ChoiceMode {
      * @return true if click is handled by choice mode.
      */
     boolean onLongClick(final long itemId);
-    
+
     /**
      * Register a new observer to listen for selection changes.
      * <p>
@@ -91,7 +105,7 @@ public interface ChoiceMode {
      * @see #unregisterChoiceModeObserver(ChoiceModeObserver)
      */
     void registerChoiceModeObserver(@NonNull final ChoiceModeObserver observer);
-    
+
     /**
      * Unregister an observer currently listening for selection changes.
      * <p>
@@ -102,5 +116,5 @@ public interface ChoiceMode {
      * @see #registerChoiceModeObserver(ChoiceModeObserver)
      */
     void unregisterChoiceModeObserver(@NonNull final ChoiceModeObserver observer);
-    
+
 }

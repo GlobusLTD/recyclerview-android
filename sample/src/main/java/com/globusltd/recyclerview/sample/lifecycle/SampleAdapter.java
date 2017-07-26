@@ -67,11 +67,7 @@ public class SampleAdapter /*extends Adapter1<CharSequence, SampleAdapter.Simple
         
         // Typically you should specify ?attr/selectableItemBackground as background in layout file,
         // but for platform views you can specify it programmatically
-        final Resources.Theme theme = parent.getContext().getTheme();
-        final TypedValue outValue = new TypedValue();
-        if (theme.resolveAttribute(R.attr.selectableItemBackground, outValue, true)) {
-            viewHolder.itemView.setBackgroundResource(outValue.resourceId);
-        }
+        TouchFeedback.selectableItemBackground(viewHolder.itemView);
         
         return viewHolder;
     }

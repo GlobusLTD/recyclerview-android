@@ -61,7 +61,23 @@ public class SingleChoiceMode extends ObservableChoiceMode {
     public void setChoiceModeListener(@Nullable final SimpleChoiceModeListener listener) {
         mChoiceModeListener = listener;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean requiresStableIds() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean requiresLongpress() {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -142,6 +158,7 @@ public class SingleChoiceMode extends ObservableChoiceMode {
      */
     @Override
     public boolean onLongClick(final long itemId) {
+        // Consume event when it happens
         return true;
     }
 

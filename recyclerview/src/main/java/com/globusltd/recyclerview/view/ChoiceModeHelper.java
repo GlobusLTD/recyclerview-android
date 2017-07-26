@@ -81,7 +81,11 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
     public void setChoiceMode(@NonNull final ChoiceMode choiceMode) {
         mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
         mChoiceMode = choiceMode;
-        if (isAttached()) {
+
+        final RecyclerView recyclerView = getRecyclerView();
+        if (recyclerView != null) {
+            checkIfAdapterCompatibleToChoiceModeOrThrow(recyclerView, mChoiceMode);
+            setLongpressEnabled(mChoiceMode.requiresLongpress());
             mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
             mChoiceModeObserver.notifyAllItemsCheckedChanged(false);
         }
@@ -94,11 +98,28 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
     protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
 
+        checkIfAdapterCompatibleToChoiceModeOrThrow(recyclerView, mChoiceMode);
+        setLongpressEnabled(mChoiceMode.requiresLongpress());
         mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
         mViewHolderTracker.registerViewHolderObserver(mViewHolderObserver);
         mViewHolderTracker.setRecyclerView(recyclerView);
     }
 
+    private void checkIfAdapterCompatibleToChoiceModeOrThrow(@NonNull final RecyclerView recyclerView,
+                                                             @NonNull final ChoiceMode choiceMode) {
+        final RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+        if (adapter == null) {
+            throw new IllegalStateException("Call RecyclerView#setAdapter with non-null argument " +
+                    "before calling ChoiceModeHepler#setChoiceMode");
+        }
+        if (!adapter.hasStableIds() && choiceMode.requiresStableIds()) {
+            throw new IllegalStateException("RecyclerView.Adapter should have stable ids");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);

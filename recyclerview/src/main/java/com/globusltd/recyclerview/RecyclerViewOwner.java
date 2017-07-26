@@ -51,13 +51,6 @@ public abstract class RecyclerViewOwner {
     }
 
     /**
-     * Returns true is this class is bond to RecyclerView instance, false otherwiseo.
-     */
-    protected boolean isAttached() {
-        return mRecyclerView != null;
-    }
-
-    /**
      * Returns a RecyclerView instance this class is bond to.
      */
     @Nullable

@@ -20,17 +20,18 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-/**
- * {@link ChoiceMode} that allows up to one choice in a modal selection mode.
- */
-public class SingleModalChoiceMode extends ObservableChoiceMode {
+import com.globusltd.collections.LongArrayList;
 
-    private static final String KEY_SINGLE_MODAL_CHOICE_MODE = "single_modal_choice_mode";
-    private static final String KEY_CHECKED_ID = "checked_id";
+/**
+ * {@link ChoiceMode} that allows multiple choices in a modal selection mode.
+ */
+public class MultipleModalChoiceMode extends ObservableChoiceMode {
+
+    private static final String KEY_MULTIPLE_CHOICE_MODE = "multiple_choice_mode";
+    private static final String KEY_CHECKED_IDS = "checked_ids";
 
     @NonNull
     private final ActionModeCompat mActionModeCompat;
@@ -48,26 +49,38 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
     private ActionMode mActionMode;
 
     /**
-     * Running state of which ID are currently checked.
+     * Running state of which IDs are currently checked.
+     * If there is a value for a given key, the checked state for that ID is true.
      */
-    private long mCheckedId = RecyclerView.NO_ID;
+    @NonNull
+    private final LongArrayList mCheckedIds;
 
-    public SingleModalChoiceMode(@NonNull final ActionModeCompat actionModeCompat,
-                                 @NonNull final ModalChoiceModeListener listener) {
+    public MultipleModalChoiceMode(@NonNull final ActionModeCompat actionModeCompat,
+                                   @NonNull final ModalChoiceModeListener listener) {
         this(actionModeCompat, listener, null);
     }
 
-    public SingleModalChoiceMode(@NonNull final ActionModeCompat actionModeCompat,
-                                 @NonNull final ModalChoiceModeListener listener,
-                                 @Nullable final Bundle savedInstanceState) {
+    public MultipleModalChoiceMode(@NonNull final ActionModeCompat actionModeCompat,
+                                   @NonNull final ModalChoiceModeListener listener,
+                                   @Nullable final Bundle savedInstanceState) {
         super();
         mActionModeCompat = actionModeCompat;
         mActionModeCallbacks = new ActionModeCallbacks(listener);
+        mCheckedIds = new LongArrayList();
 
         final Bundle state = (savedInstanceState != null ?
-                savedInstanceState.getBundle(KEY_SINGLE_MODAL_CHOICE_MODE) : null);
+                savedInstanceState.getBundle(KEY_MULTIPLE_CHOICE_MODE) : null);
         if (state != null) {
-            mCheckedId = state.getLong(KEY_CHECKED_ID, RecyclerView.NO_ID);
+            final LongArrayList checkedIdStates = state.getParcelable(KEY_CHECKED_IDS);
+            if (checkedIdStates == null) {
+                throw new IllegalArgumentException("Did you put checked id states to the saved state?");
+            }
+
+            final int count = checkedIdStates.size();
+            mCheckedIds.clear();
+            for (int i = 0; i < count; i++) {
+                mCheckedIds.add(checkedIdStates.get(i));
+            }
         }
     }
 
@@ -117,7 +130,7 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
     @IntRange(from = 0, to = 1)
     @Override
     public int getCheckedItemCount() {
-        return (mCheckedId != RecyclerView.NO_ID ? 1 : 0);
+        return mCheckedIds.size();
     }
 
     /**
@@ -125,7 +138,7 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
      */
     @Override
     public boolean isItemChecked(final long itemId) {
-        return (mCheckedId == itemId);
+        return mCheckedIds.contains(itemId);
     }
 
     /**
@@ -142,23 +155,27 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
             startActionMode(fromUser);
         }
 
-        final long checkedId = mCheckedId;
-        mCheckedId = (checked ? itemId : RecyclerView.NO_ID);
+        final int indexOf = mCheckedIds.indexOf(itemId);
+        if (indexOf > -1) {
+            mCheckedIds.removeAt(indexOf);
+        }
+        if (checked) {
+            mCheckedIds.add(itemId);
+        }
 
         if (mActionMode != null) {
             mActionModeCallbacks.onItemCheckedStateChanged(mActionMode, itemId, checked, fromUser);
         }
-
-        notifyItemCheckedChanged(checkedId, fromUser);
-        notifyItemCheckedChanged(mCheckedId, fromUser);
+        notifyItemCheckedChanged(itemId, fromUser);
     }
 
     /**
-     * Returns an identifier of checked item or
-     * {@link RecyclerView#NO_ID} if no item is checked.
+     * Returns an unsorted {@link LongArrayList} of checked item ids.
+     * Don't modify it without copying.
      */
-    public long getCheckedItem() {
-        return mCheckedId;
+    @NonNull
+    public LongArrayList getCheckedItems() {
+        return mCheckedIds;
     }
 
     /**
@@ -166,14 +183,13 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
      */
     @Override
     public void clearChoices() {
-        final long itemId = mCheckedId;
-        mCheckedId = RecyclerView.NO_ID;
-        notifyItemCheckedChanged(itemId, false);
+        mCheckedIds.clear();
+        notifyAllItemsCheckedChanged(false);
         if (mActionMode != null) {
             // TODO: if (mFinishActionModeOnClearEnabled) {
-            //mActionMode.finish();
+                //mActionMode.finish();
             //} else {
-            mActionMode.invalidate();
+                mActionMode.invalidate();
             //}
         }
     }
@@ -207,7 +223,7 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
         super.registerChoiceModeObserver(observer);
 
         // Restore action mode when choice mode is registered
-        if (mCheckedId != RecyclerView.NO_ID) {
+        if (!mCheckedIds.isEmpty()) {
             startActionMode(false);
         }
     }
@@ -256,8 +272,8 @@ public class SingleModalChoiceMode extends ObservableChoiceMode {
      */
     public void onSaveInstanceState(@NonNull final Bundle outState) {
         final Bundle state = new Bundle();
-        state.putLong(KEY_CHECKED_ID, mCheckedId);
-        outState.putBundle(KEY_SINGLE_MODAL_CHOICE_MODE, state);
+        state.putParcelable(KEY_CHECKED_IDS, new LongArrayList(mCheckedIds));
+        outState.putBundle(KEY_MULTIPLE_CHOICE_MODE, state);
     }
 
     private class ActionModeCallbacks implements ModalChoiceModeListener {

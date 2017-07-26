@@ -24,4 +24,10 @@
         android:layout_height="wrap_content"
         android:text="@string/multiple_choice_mode_example"/>
 
+    <Button
+        android:id="@+id/multiple_modal_choice_mode_example"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/multiple_modal_choice_mode_example"/>
+
 </LinearLayout>

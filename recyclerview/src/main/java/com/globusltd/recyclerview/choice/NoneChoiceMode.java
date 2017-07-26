@@ -27,7 +27,23 @@ public final class NoneChoiceMode implements ChoiceMode {
     public NoneChoiceMode() {
         super();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean requiresStableIds() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean requiresLongpress() {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */

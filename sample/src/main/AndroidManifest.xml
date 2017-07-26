@@ -49,6 +49,10 @@
             android:name=".choicemode.MultipleChoiceModeExampleActivity"
             android:label="@string/multiple_choice_mode_example"/>
 
+        <activity
+            android:name=".choicemode.MultipleModalChoiceModeExampleActivity"
+            android:label="@string/multiple_modal_choice_mode_example"/>
+
     </application>
 
 </manifest>
