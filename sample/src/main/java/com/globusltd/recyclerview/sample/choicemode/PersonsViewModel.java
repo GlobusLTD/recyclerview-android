@@ -26,16 +26,14 @@ import com.globusltd.recyclerview.sample.data.PersonGenerator;
 public class PersonsViewModel extends ViewModel {
     
     @NonNull
-    private final PersonGenerator mPersonGenerator;
-    
-    @NonNull
     private final ListDatasource<Person> mDatasource;
     
     public PersonsViewModel() {
-        mPersonGenerator = new PersonGenerator();
         mDatasource = new ListDatasource<>();
+
+        final PersonGenerator personGenerator = new PersonGenerator();
         for (int i = 0; i < 50; i++) {
-            mDatasource.add(mPersonGenerator.generate());
+            mDatasource.add(personGenerator.generate());
         }
     }
     

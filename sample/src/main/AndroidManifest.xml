@@ -53,6 +53,10 @@
             android:name=".choicemode.MultipleModalChoiceModeExampleActivity"
             android:label="@string/multiple_modal_choice_mode_example"/>
 
+        <activity
+            android:name=".lifecycle.LifecycleExampleActivity"
+            android:label="@string/lifecycle_example"/>
+
     </application>
 
 </manifest>

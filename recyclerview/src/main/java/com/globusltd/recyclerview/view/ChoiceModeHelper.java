@@ -163,17 +163,17 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
     private class ChoiceModeViewHolderObserver implements ViewHolderObserver {
 
         @Override
-        public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        public void onAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
             onViewHolderCheckedChanged(viewHolder, false);
         }
 
         @Override
-        public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        public void onPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
             onViewHolderCheckedChanged(viewHolder, false);
         }
 
         @Override
-        public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        public void onDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
             setViewHolderChecked(viewHolder, false);
             updateCheckableViewHolder(viewHolder, false, false, false);
         }

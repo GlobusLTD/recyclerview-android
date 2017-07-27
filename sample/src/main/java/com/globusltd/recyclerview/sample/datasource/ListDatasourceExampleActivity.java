@@ -27,9 +27,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import com.globusltd.recyclerview.ViewHolderTracker;
 import com.globusltd.recyclerview.datasource.Datasource;
 import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.sample.data.Person;
+import com.globusltd.recyclerview.view.RecursiveEnableBehavior;
 import com.globusltd.recyclerview.view.ItemClickHelper;
 
 public class ListDatasourceExampleActivity extends AppCompatActivity {
@@ -38,6 +40,7 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private ItemClickHelper<Person> mItemClickHelper;
+    private ViewHolderTracker mViewHolderTracker;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -54,10 +57,16 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(adapter);
 
+        // Add click support to RecyclerView. Adapter implements ItemClickHelper.Callback
         mItemClickHelper = new ItemClickHelper<>(adapter);
         mItemClickHelper.setOnItemClickListener(this::onItemClick);
         mItemClickHelper.setOnItemLongClickListener(this::onItemLongClick);
         mItemClickHelper.setRecyclerView(mRecyclerView);
+
+        // Add enable view holder behavior. Adapter implements SimpleEnableBehavior.Callback
+        mViewHolderTracker = new ViewHolderTracker();
+        mViewHolderTracker.registerViewHolderObserver(new RecursiveEnableBehavior(adapter));
+        mViewHolderTracker.setRecyclerView(mRecyclerView);
 
         findViewById(R.id.action_add_item).setOnClickListener(v -> mViewModel.addSingleItem());
         findViewById(R.id.action_add_multiple_items).setOnClickListener(v -> mViewModel.addMultipleItems());
@@ -84,6 +93,7 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        mViewHolderTracker.setRecyclerView(null);
         mItemClickHelper.setRecyclerView(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();

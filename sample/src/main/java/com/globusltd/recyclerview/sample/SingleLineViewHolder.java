@@ -16,6 +16,7 @@
 package com.globusltd.recyclerview.sample;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,5 +43,9 @@ public class SingleLineViewHolder extends RecyclerView.ViewHolder {
     public void setText1(@NonNull final CharSequence text) {
         mTextView1.setText(text);
     }
-    
+
+    public void setText1(@StringRes final int resId) {
+        mTextView1.setText(resId);
+    }
+
 }

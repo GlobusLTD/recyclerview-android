@@ -17,15 +17,11 @@ package com.globusltd.recyclerview.sample.choicemode;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.globusltd.recyclerview.Adapter;
 import com.globusltd.recyclerview.datasource.Datasource;
-import com.globusltd.recyclerview.diff.DiffCallback;
-import com.globusltd.recyclerview.diff.DiffCallbackFactory;
-import com.globusltd.recyclerview.diff.SimpleDatasourcesDiffCallback;
 import com.globusltd.recyclerview.sample.data.Person;
 import com.globusltd.recyclerview.sample.util.TouchFeedback;
 import com.globusltd.recyclerview.view.ClickableViews;
@@ -35,7 +31,7 @@ class ActivatedPersonsAdapter extends Adapter<Person, ActivatedViewHolder>
         implements ItemClickHelper.Callback<Person> {
     
     ActivatedPersonsAdapter(@NonNull final Datasource<Person> datasource) {
-        super(datasource, new PersonDiffCallbackFactory());
+        super(datasource);
         setHasStableIds(true);
     }
     
@@ -77,29 +73,5 @@ class ActivatedPersonsAdapter extends Adapter<Person, ActivatedViewHolder>
     }
 
     /* End of ItemClickHelper.Callback */
-    
-    private static class PersonDiffCallbackFactory implements DiffCallbackFactory<Person> {
-        
-        @NonNull
-        @Override
-        public DiffCallback createDiffCallback(@NonNull final Datasource<? extends Person> oldDatasource,
-                                               @NonNull final Datasource<? extends Person> newDatasource) {
-            return new SimpleDatasourcesDiffCallback<Person>(oldDatasource, newDatasource) {
-                
-                @Override
-                public boolean areItemsTheSame(@NonNull final Person oldItem, @NonNull final Person newItem) {
-                    return oldItem.getId() == newItem.getId();
-                }
-                
-                @Override
-                public boolean areContentsTheSame(@NonNull final Person oldItem, @NonNull final Person newItem) {
-                    return TextUtils.equals(oldItem.getFirstName(), newItem.getFirstName()) &&
-                            TextUtils.equals(oldItem.getLastName(), newItem.getLastName());
-                }
-                
-            };
-        }
-        
-    }
     
 }

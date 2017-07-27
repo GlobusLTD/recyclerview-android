@@ -20,7 +20,6 @@
     <string name="action_clear_choices">Clear choices</string>
     <string name="action_get_checked_item">Get checked item</string>
     <string name="action_get_checked_items">Get checked items</string>
-
     <string name="action_mode_no_items_selected">No items selected</string>
     <plurals name="action_mode_x_items_selected">
         <item quantity="zero">No items selected</item>
@@ -30,5 +29,11 @@
         <item quantity="many">%s items selected</item>
         <item quantity="other">%s items selected</item>
     </plurals>
+
+    <string name="lifecycle_example">Lifecycle Example</string>
+    <string name="lifecycle_started">Started</string>
+    <string name="lifecycle_resumed">Resumed</string>
+    <string name="lifecycle_paused">Paused</string>
+    <string name="lifecycle_stopped">Stopped</string>
 
 </resources>

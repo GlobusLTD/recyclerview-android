@@ -18,4 +18,10 @@
         android:layout_height="wrap_content"
         android:text="@string/choice_mode_examples"/>
 
+    <Button
+        android:id="@+id/lifecycle_example"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lifecycle_example"/>
+
 </LinearLayout>

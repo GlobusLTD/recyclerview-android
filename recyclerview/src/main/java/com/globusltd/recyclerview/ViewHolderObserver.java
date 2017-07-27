@@ -31,9 +31,9 @@ public interface ViewHolderObserver {
      * Keep in mind that same data may be attached to the same ViewHolder multiple times.
      *
      * @param viewHolder Holder of the view being attached.
-     * @see #onViewHolderDetached(RecyclerView.ViewHolder)
+     * @see #onDetached(RecyclerView.ViewHolder)
      */
-    void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder);
+    void onAttached(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view holder position has been changed,
@@ -41,14 +41,14 @@ public interface ViewHolderObserver {
      *
      * @param viewHolder A view holder whose position has been changed.
      */
-    void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder);
+    void onPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view created by adapter has been detached from its data.
      *
      * @param viewHolder Holder of the view being detached.
-     * @see #onViewHolderAttached(RecyclerView.ViewHolder)
+     * @see #onAttached(RecyclerView.ViewHolder)
      */
-    void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder);
+    void onDetached(@NonNull final RecyclerView.ViewHolder viewHolder);
     
 }

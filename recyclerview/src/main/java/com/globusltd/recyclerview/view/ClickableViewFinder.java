@@ -95,7 +95,7 @@ class ClickableViewFinder {
 
     @Nullable
     private View findViewAt(@NonNull final View view, final float x, final float y) {
-        if (!view.isShown() || !isViewAt(view, x, y)) {
+        if (!view.isShown() || !view.isEnabled() || !isViewAt(view, x, y)) {
             return null;
         }
 

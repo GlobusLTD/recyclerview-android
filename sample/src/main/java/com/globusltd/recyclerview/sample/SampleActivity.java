@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.globusltd.recyclerview.sample.choicemode.ChoiceModeExamplesActivity;
 import com.globusltd.recyclerview.sample.datasource.DatasourceExamplesActivity;
+import com.globusltd.recyclerview.sample.lifecycle.LifecycleExampleActivity;
 
 public class SampleActivity extends AppCompatActivity {
 
@@ -35,6 +36,9 @@ public class SampleActivity extends AppCompatActivity {
 
         findViewById(R.id.choice_mode_examples)
                 .setOnClickListener(v -> startActivity(new Intent(this, ChoiceModeExamplesActivity.class)));
+
+        findViewById(R.id.lifecycle_example)
+                .setOnClickListener(v -> startActivity(new Intent(this, LifecycleExampleActivity.class)));
     }
 
 }

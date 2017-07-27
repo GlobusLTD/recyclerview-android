@@ -31,10 +31,11 @@ import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.sample.TwoLinesViewHolder;
 import com.globusltd.recyclerview.sample.data.Person;
 import com.globusltd.recyclerview.view.ClickableViews;
+import com.globusltd.recyclerview.view.SimpleEnableBehavior;
 import com.globusltd.recyclerview.view.ItemClickHelper;
 
 class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonViewHolder>
-        implements ItemClickHelper.Callback<Person> {
+        implements ItemClickHelper.Callback<Person>, SimpleEnableBehavior.Callback {
 
     PersonsAdapter(@NonNull final Datasource<Person> datasource) {
         super(datasource, new PersonDiffCallbackFactory());
@@ -62,6 +63,15 @@ class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonVie
         holder.setText2(person.getFirstName());
     }
 
+    /* SimpleEnableBehavior.Callback */
+
+    @Override
+    public boolean isEnabled(@IntRange(from = 0) final int position) {
+        return !get(position).getFullName().contains("ad");
+    }
+
+    /* End of SimpleEnableBehavior.Callback */
+
     /* ItemClickHelper.Callback */
 
     @NonNull
@@ -74,7 +84,11 @@ class PersonsAdapter extends Adapter<Person, PersonsAdapter.TwoLinesAndButtonVie
     @Override
     public ClickableViews getClickableViews(@IntRange(from = 0) final int position,
                                             final int viewType) {
-        return TwoLinesAndButtonViewHolder.CLICKABLE_VIEWS;
+        if (isEnabled(position)) {
+            return TwoLinesAndButtonViewHolder.CLICKABLE_VIEWS;
+        } else {
+            return ClickableViews.NONE;
+        }
     }
 
     /* End of ItemClickHelper.Callback */

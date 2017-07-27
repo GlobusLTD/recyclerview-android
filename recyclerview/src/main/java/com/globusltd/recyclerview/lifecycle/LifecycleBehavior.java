@@ -43,7 +43,7 @@ public class LifecycleBehavior implements ViewHolderObserver {
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
@@ -54,7 +54,7 @@ public class LifecycleBehavior implements ViewHolderObserver {
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         // Do nothing
     }
 
@@ -62,7 +62,7 @@ public class LifecycleBehavior implements ViewHolderObserver {
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
             mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);

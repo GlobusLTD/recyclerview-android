@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * {@link LifecycleComposite} provides activity or fragment lifecycle events to
+ * {@link LifecycleComposite} provides lifecycle events to
  * the registered {@link LifecycleCallbacks} objects.
  */
 @MainThread

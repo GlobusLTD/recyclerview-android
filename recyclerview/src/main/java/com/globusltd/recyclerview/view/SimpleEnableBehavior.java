@@ -27,10 +27,10 @@ import com.globusltd.recyclerview.ViewHolderObserver;
  * according to enabled state returned by {@link Callback#isEnabled(int)}.
  */
 @MainThread
-public class EnableBehavior implements ViewHolderObserver {
+public class SimpleEnableBehavior implements ViewHolderObserver {
 
     /**
-     * This interface is the contract between EnableBehavior and your application.
+     * This interface is the contract between SimpleEnableBehavior and your application.
      * It lets you control which enabled state is enabled per each ViewHolder.
      * <p>
      * To control in which enabled state view can be, you should override
@@ -50,46 +50,58 @@ public class EnableBehavior implements ViewHolderObserver {
         boolean isEnabled(@IntRange(from = 0) final int position);
 
     }
-    
+
     @NonNull
     private final Callback mCallback;
-    
-    public EnableBehavior(@NonNull final Callback callback) {
+
+    public SimpleEnableBehavior(@NonNull final Callback callback) {
         mCallback = callback;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        updateItemViewEnabled(viewHolder);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+    public void onAttached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         updateItemViewEnabled(viewHolder);
     }
 
-    private void updateItemViewEnabled(final @NonNull RecyclerView.ViewHolder viewHolder) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        updateItemViewEnabled(viewHolder);
+    }
+
+    private void updateItemViewEnabled(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int position = viewHolder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION) {
             final boolean isEnabled = mCallback.isEnabled(position);
-            viewHolder.itemView.setEnabled(isEnabled);
+            onEnabledChanged(viewHolder, isEnabled);
         } else {
-            viewHolder.itemView.setEnabled(false);
+            onEnabledChanged(viewHolder, false);
         }
     }
 
     /**
+     * Called when enabled state is changed. Default implementation enables or disables
+     * {@link RecyclerView.ViewHolder#itemView}.
+     *
+     * @param viewHolder {@link RecyclerView.ViewHolder} instance.
+     * @param enabled    {@code true} if view should be enabled, {@code false} otherwise.
+     */
+    protected void onEnabledChanged(@NonNull final RecyclerView.ViewHolder viewHolder,
+                                    final boolean enabled) {
+        viewHolder.itemView.setEnabled(enabled);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewHolderDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setEnabled(false);
+    public void onDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        onEnabledChanged(viewHolder, false);
     }
-    
+
 }

@@ -15,50 +15,49 @@
  */
 package com.globusltd.recyclerview.sample.lifecycle;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Toast;
 
+import com.globusltd.recyclerview.ViewHolderTracker;
+import com.globusltd.recyclerview.datasource.Datasource;
+import com.globusltd.recyclerview.lifecycle.LifecycleBehavior;
 import com.globusltd.recyclerview.sample.R;
 import com.globusltd.recyclerview.lifecycle.LifecycleComposite;
-import com.globusltd.recyclerview.view.OnItemClickListener;
-import com.globusltd.recyclerview.view.OnItemLongClickListener;
+import com.globusltd.recyclerview.sample.data.Person;
 
-public class MainActivity extends AppCompatActivity implements OnItemClickListener<CharSequence>,
-        OnItemLongClickListener<CharSequence> {
+public class LifecycleExampleActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-
     private LifecycleComposite mLifecycleComposite;
+    private ViewHolderTracker mViewHolderTracker;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_lifecycle_example);
 
-        mLifecycleComposite = new LifecycleComposite();
+        final LifecycleExampleViewModel viewModel = ViewModelProviders.of(this)
+                .get(LifecycleExampleViewModel.class);
+        final Datasource<Person> datasource = viewModel.getDatasource();
 
-        /*final ListDatasource<String> datasource = new ListDatasource<>();
-        for (int i = 1; i < 101; i++) {
-            datasource.add(String.format(Locale.getDefault(), "Test%1$s String", i));
-        }
-
-        final SampleAdapter adapter = new SampleAdapter(datasource);
-        adapter.setOnItemClickListener(this);
-        adapter.setOnItemLongClickListener(this);
-        adapter.registerViewHolderObserver(new EnableBehavior(adapter));
-        adapter.registerViewHolderObserver(new LifecycleBehavior(mLifecycleComposite));
+        final LifecyclePersonAdapter adapter = new LifecyclePersonAdapter(datasource);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);*/
+        mRecyclerView.setAdapter(adapter);
+
+        mLifecycleComposite = new LifecycleComposite();
+
+        mViewHolderTracker = new ViewHolderTracker();
+        mViewHolderTracker.registerViewHolderObserver(new LifecycleBehavior(mLifecycleComposite));
+        mViewHolderTracker.setRecyclerView(mRecyclerView);
 
         findViewById(R.id.pause).setOnClickListener(v -> pauseActivity());
     }
@@ -82,20 +81,6 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     }
 
     @Override
-    public boolean onItemClick(@NonNull final View view, @NonNull final CharSequence item,
-                               @IntRange(from = 0) final int position) {
-        Toast.makeText(this, "Clicked: " + item, Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
-    @Override
-    public boolean onItemLongClick(@NonNull final View view, @NonNull final CharSequence item,
-                                   @IntRange(from = 0) final int position) {
-        Toast.makeText(this, "Long clicked: " + item, Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
-    @Override
     protected void onPause() {
         mLifecycleComposite.onPause();
         super.onPause();
@@ -109,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
     @Override
     protected void onDestroy() {
+        mViewHolderTracker.setRecyclerView(null);
         mRecyclerView.setAdapter(null);
         super.onDestroy();
     }
