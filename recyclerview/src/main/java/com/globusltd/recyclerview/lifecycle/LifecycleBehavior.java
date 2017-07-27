@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.view;
+package com.globusltd.recyclerview.lifecycle;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -22,20 +22,23 @@ import android.util.SparseBooleanArray;
 
 import com.globusltd.recyclerview.ViewHolderObserver;
 
+/**
+ * This is a class to provide common lifecycle events to the {@link RecyclerView.ViewHolder}.
+ */
 @MainThread
 public class LifecycleBehavior implements ViewHolderObserver {
-    
+
     @NonNull
     private final LifecycleComposite mLifecycleComposite;
-    
+
     @NonNull
     private final SparseBooleanArray mLifecycleCallbacksTypes;
-    
+
     public LifecycleBehavior(@NonNull final LifecycleComposite lifecycleComposite) {
         mLifecycleComposite = lifecycleComposite;
         mLifecycleCallbacksTypes = new SparseBooleanArray();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -46,7 +49,7 @@ public class LifecycleBehavior implements ViewHolderObserver {
             mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -54,7 +57,7 @@ public class LifecycleBehavior implements ViewHolderObserver {
     public void onViewHolderPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
         // Do nothing
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -65,17 +68,17 @@ public class LifecycleBehavior implements ViewHolderObserver {
             mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);
         }
     }
-    
+
     private boolean isLifecycleCallbacks(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int viewType = viewHolder.getItemViewType();
         if (mLifecycleCallbacksTypes.indexOfKey(viewType) >= 0) {
             return mLifecycleCallbacksTypes.get(viewType);
-            
+
         } else {
             final boolean isLifecycleCallbacks = LifecycleCallbacks.class.isInstance(viewHolder);
             mLifecycleCallbacksTypes.put(viewType, isLifecycleCallbacks);
             return isLifecycleCallbacks;
         }
     }
-    
+
 }

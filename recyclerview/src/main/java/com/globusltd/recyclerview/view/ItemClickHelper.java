@@ -53,8 +53,6 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     @Nullable
     private EnchancedGestureDetector mGestureDetector;
 
-    private boolean mLongpressEnabled;
-
     public ItemClickHelper(@NonNull final Callback<E> callback) {
         mCallback = callback;
         mOnItemTouchListener = new OnItemTouchListener();
@@ -76,17 +74,22 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
      */
     public void setOnItemLongClickListener(@Nullable final OnItemLongClickListener<E> onItemLongClickListener) {
         mOnItemLongClickListener = onItemLongClickListener;
-        setLongpressEnabled(mLongpressEnabled);
+        notifyLongpressEnabledChanged();
     }
 
-    private boolean hasOnItemLongClickListener() {
+    /**
+     * @return true if longpress is enabled, else false.
+     */
+    protected boolean isLongPressEnabled() {
         return mOnItemClickListener != null;
     }
 
-    protected void setLongpressEnabled(final boolean enabled) {
-        mLongpressEnabled = enabled;
+    /**
+     * Notify {@link ItemClickHelper} that long press enabled state has changed.
+     */
+    protected void notifyLongpressEnabledChanged() {
         if (mGestureDetector != null) {
-            mGestureDetector.setLongpressEnabled(enabled || hasOnItemLongClickListener());
+            mGestureDetector.setLongpressEnabled(isLongPressEnabled());
         }
     }
 
@@ -98,7 +101,7 @@ public class ItemClickHelper<E> extends RecyclerViewOwner {
     protected void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         final EnchancedGestureDetector.OnGestureListener onGestureListener = new DefaultGestureListener(recyclerView);
         mGestureDetector = new EnchancedGestureDetector(recyclerView.getContext(), onGestureListener);
-        mGestureDetector.setLongpressEnabled(mLongpressEnabled || hasOnItemLongClickListener());
+        mGestureDetector.setLongpressEnabled(isLongPressEnabled());
         recyclerView.addOnItemTouchListener(mOnItemTouchListener);
     }
 

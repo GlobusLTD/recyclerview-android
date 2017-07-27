@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.globusltd.recyclerview.view;
+package com.globusltd.recyclerview.lifecycle;
 
 import android.support.annotation.MainThread;
 
+/**
+ * The set of lifecycle callback APIs that are common to all UI components
+ * ({@link android.app.Activity}, {@link android.app.Fragment},
+ * {@link android.support.v4.app.Fragment}).
+ */
 @MainThread
 public interface LifecycleCallbacks {
 

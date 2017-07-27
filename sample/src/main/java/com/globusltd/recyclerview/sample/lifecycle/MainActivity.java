@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.globusltd.recyclerview.sample.R;
-import com.globusltd.recyclerview.view.LifecycleComposite;
+import com.globusltd.recyclerview.lifecycle.LifecycleComposite;
 import com.globusltd.recyclerview.view.OnItemClickListener;
 import com.globusltd.recyclerview.view.OnItemLongClickListener;
 

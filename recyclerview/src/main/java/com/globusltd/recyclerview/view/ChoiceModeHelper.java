@@ -85,7 +85,7 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
         final RecyclerView recyclerView = getRecyclerView();
         if (recyclerView != null) {
             checkIfAdapterCompatibleToChoiceModeOrThrow(recyclerView, mChoiceMode);
-            setLongpressEnabled(mChoiceMode.requiresLongpress());
+            notifyLongpressEnabledChanged();
             mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
             mChoiceModeObserver.notifyAllItemsCheckedChanged(false);
         }
@@ -99,7 +99,6 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
         super.onAttachedToRecyclerView(recyclerView);
 
         checkIfAdapterCompatibleToChoiceModeOrThrow(recyclerView, mChoiceMode);
-        setLongpressEnabled(mChoiceMode.requiresLongpress());
         mChoiceMode.registerChoiceModeObserver(mChoiceModeObserver);
         mViewHolderTracker.registerViewHolderObserver(mViewHolderObserver);
         mViewHolderTracker.setRecyclerView(recyclerView);
@@ -129,6 +128,14 @@ public class ChoiceModeHelper<E> extends ItemClickHelper<E> {
         mChoiceMode.unregisterChoiceModeObserver(mChoiceModeObserver);
         mViewHolderTracker.unregisterViewHolderObserver(mViewHolderObserver);
         mViewHolderTracker.setRecyclerView(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isLongPressEnabled() {
+        return mChoiceMode.requiresLongpress() || super.isLongPressEnabled();
     }
 
     /**

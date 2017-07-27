@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Interface describes {@link RecyclerView.ViewHolder} attachable behavior.
+ * Interface to observe {@link RecyclerView.ViewHolder}'s lifecycle events.
  */
 @MainThread
 public interface ViewHolderObserver {
