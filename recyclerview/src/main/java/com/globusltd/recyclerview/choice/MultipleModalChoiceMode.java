@@ -93,8 +93,8 @@ public class MultipleModalChoiceMode extends ObservableChoiceMode {
     }
 
     /**
-     * Allows to stay action mode be opened when no items are checked.
-     * By default is true.
+     * Allows action mode be opened when no items are checked.
+     * By default is enabled.
      */
     public void setFinishActionModeOnClearEnabled(final boolean enabled) {
         mFinishActionModeOnClearEnabled = enabled;
@@ -183,17 +183,22 @@ public class MultipleModalChoiceMode extends ObservableChoiceMode {
      */
     @Override
     public void clearChoices() {
+        clearChoicesInternal(false);
+    }
+    
+    private void clearChoicesInternal(final boolean fromDestroyCallback) {
         mCheckedIds.clear();
         notifyAllItemsCheckedChanged(false);
-        if (mActionMode != null) {
-            // TODO: if (mFinishActionModeOnClearEnabled) {
-                //mActionMode.finish();
-            //} else {
+        
+        if (!fromDestroyCallback && mActionMode != null) {
+            if (mFinishActionModeOnClearEnabled) {
+                mActionMode.finish();
+            } else {
                 mActionMode.invalidate();
-            //}
+            }
         }
     }
-
+    
     @Override
     public boolean onClick(final long itemId) {
         if (mActionMode == null && mStartOnSingleTapEnabled) {
@@ -253,7 +258,7 @@ public class MultipleModalChoiceMode extends ObservableChoiceMode {
      * have its {@link ModalChoiceModeListener#onDestroyActionMode(ActionMode)} method called.
      */
     public void finish() {
-        clearChoices();
+        clearChoicesInternal(true);
         finishActionMode();
     }
 
@@ -305,7 +310,7 @@ public class MultipleModalChoiceMode extends ObservableChoiceMode {
         @Override
         public void onDestroyActionMode(final ActionMode mode) {
             // Ending selection mode means deselecting everything
-            clearChoices();
+            clearChoicesInternal(true);
 
             mModalChoiceModeListener.onDestroyActionMode(mode);
             mActionMode = null;
