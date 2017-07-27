@@ -9,6 +9,8 @@
     <string name="cursor_datasource_example">CursorDatasource Example</string>
     <string name="action_add_item">Add item</string>
     <string name="action_add_multiple_items">Add multiple items</string>
+    <string name="rationale_request_call_log_permisson">Please allow application read call log</string>
+    <string name="action_open_settings">Open settings</string>
 
     <string name="choice_mode_examples">ChoiceMode Examples</string>
     <string name="single_choice_mode_example">SingleChoiceMode Example</string>
