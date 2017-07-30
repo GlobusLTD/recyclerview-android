@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 import com.globusltd.collections.LongArrayList;
 
 /**
- * {@link ChoiceMode} that allows any number of items to be chosen
+ * {@link ChoiceMode} that allows any number of items to be chosen.
  */
 public class MultipleChoiceMode  extends ObservableChoiceMode {
 
