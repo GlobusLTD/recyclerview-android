@@ -13,8 +13,11 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile ('com.android.support:appcompat-v7:25.3.1') {
+        exclude module: 'animated-vector-drawable'
+        exclude module: 'support-vector-drawable'
+        exclude module: 'support-media-compat'
+    }
     compile 'com.android.support:recyclerview-v7:25.3.1'
 
     compile 'com.globus-ltd:collections:1.0.1'

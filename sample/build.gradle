@@ -30,8 +30,11 @@ dependencies {
     compile project(':recyclerview')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
+    compile ('com.android.support:design:25.3.1') {
+        exclude module: 'transition'
+    }
+
+    //compile 'com.globus-ltd:recyclerview:1.0.1'
 
     compile "android.arch.lifecycle:runtime:1.0.0-alpha3"
     compile "android.arch.lifecycle:extensions:1.0.0-alpha3"

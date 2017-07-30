@@ -1,7 +1,7 @@
 # RecyclerView
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.globus-ltd/recyclerview/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.globus-ltd/recyclerview)
 
-Simple and powerful library that brings ListView's features like item clicks and choice modes to RecyclerView.
+Simple and powerful library that brings ListView features like item clicks and choice modes to RecyclerView.
 
 # Download
 Gradle:
@@ -95,7 +95,7 @@ class MyActivity extends AppCompatActivity implements LoaderManager.LoaderCallba
 }
 ```
 
-* [<tt>Datasources.EmptyDatasource</tt>](./recyclerview/src/main/java/com/globusltd/recyclerview/datasource/Datasources.java) is designed to be a [Null object](https://en.wikipedia.org/wiki/Null_Object_pattern) when you needs empty <tt>Datasource</tt> instance. Call <tt>Datasources#empty()</tt> to obtain an empty and immutable <tt>Datasource</tt> instance in a memory-efficient way. 
+* [<tt>Datasources.EmptyDatasource</tt>](./recyclerview/src/main/java/com/globusltd/recyclerview/datasource/Datasources.java) is designed to be a [Null object](https://en.wikipedia.org/wiki/Null_Object_pattern) when you need empty <tt>Datasource</tt> instance. Call <tt>Datasources#empty()</tt> to obtain an empty and immutable <tt>Datasource</tt> instance in a memory-efficient way. 
 
 ### 2. Implement your adapter
 Extend [<tt>Adapter</tt>](./recyclerview/src/main/java/com/globusltd/recyclerview/Adapter.java), provide suitable constructor and [<tt>DiffCallbackFactory</tt>](./recyclerview/src/main/java/com/globusltd/recyclerview/diff/DiffCallbackFactory.java) (optional). 
