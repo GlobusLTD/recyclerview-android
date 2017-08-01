@@ -178,7 +178,6 @@ public abstract class Adapter<E, VH extends RecyclerView.ViewHolder>
                                        final List<Object> payloads) {
         final E item = getDatasource().get(position);
         onBindViewHolder(holder, item, position, payloads);
-        super.onBindViewHolder(holder, position, payloads);
     }
 
     /**

@@ -60,5 +60,14 @@ public class ListDatasourceExampleViewModel extends ViewModel {
     void removeItemAtPosition(@IntRange(from = 0) final int position) {
         mDatasource.remove(position);
     }
+
+    void moveUp(@IntRange(from = 0) final int fromPosition) {
+        final int toPosition = Math.max(0, fromPosition - 1);
+        if (fromPosition == toPosition) {
+            mDatasource.set(fromPosition, mDatasource.get(fromPosition));
+        } else {
+            mDatasource.move(fromPosition, toPosition);
+        }
+    }
     
 }

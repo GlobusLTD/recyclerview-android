@@ -42,6 +42,13 @@ public interface ViewHolderObserver {
      * @param viewHolder A view holder whose position has been changed.
      */
     void onPositionChanged(@NonNull final RecyclerView.ViewHolder viewHolder);
+
+    /**
+     * Called when a view holder data item has been changed.
+     *
+     * @param viewHolder A view holder whose data item has been changed.
+     */
+    void onChanged(@NonNull final RecyclerView.ViewHolder viewHolder);
     
     /**
      * Called when a view created by adapter has been detached from its data.

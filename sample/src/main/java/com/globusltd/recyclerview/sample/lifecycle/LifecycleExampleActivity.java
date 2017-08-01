@@ -45,12 +45,14 @@ public class LifecycleExampleActivity extends AppCompatActivity {
         final LifecycleExampleViewModel viewModel = ViewModelProviders.of(this)
                 .get(LifecycleExampleViewModel.class);
         final Datasource<Person> datasource = viewModel.getDatasource();
-
         final LifecyclePersonAdapter adapter = new LifecyclePersonAdapter(datasource);
+
+        final DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setSupportsChangeAnimations(false);
 
         mRecyclerView = (RecyclerView) findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(itemAnimator);
         mRecyclerView.setAdapter(adapter);
 
         mLifecycleComposite = new LifecycleComposite();

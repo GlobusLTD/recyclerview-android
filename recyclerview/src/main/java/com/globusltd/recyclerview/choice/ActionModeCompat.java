@@ -71,7 +71,7 @@ public abstract class ActionModeCompat {
         @NonNull
         private final Fragment mFragment;
         
-        /* package */ FragmentActionModeCompat(@NonNull final Fragment fragment) {
+        FragmentActionModeCompat(@NonNull final Fragment fragment) {
             super();
             mFragment = fragment;
         }
@@ -95,7 +95,7 @@ public abstract class ActionModeCompat {
         @NonNull
         private final AppCompatActivity mActivity;
         
-        /* package */  ActivityActionModeCompat(@NonNull final AppCompatActivity activity) {
+        ActivityActionModeCompat(@NonNull final AppCompatActivity activity) {
             super();
             mActivity = activity;
         }

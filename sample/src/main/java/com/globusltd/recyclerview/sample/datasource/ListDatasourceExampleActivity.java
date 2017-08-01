@@ -87,7 +87,7 @@ public class ListDatasourceExampleActivity extends AppCompatActivity {
 
     public boolean onItemLongClick(@NonNull final View view, @NonNull final Person person,
                                    @IntRange(from = 0) final int position) {
-        Toast.makeText(this, "Long clicked: " + person.getFullName(), Toast.LENGTH_SHORT).show();
+        mViewModel.moveUp(position);
         return true;
     }
 

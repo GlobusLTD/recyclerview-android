@@ -15,18 +15,14 @@
  */
 package com.globusltd.recyclerview;
 
-import android.support.annotation.IntRange;
+import android.graphics.Rect;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewTreeObserver;
 
-import com.globusltd.recyclerview.util.ArrayPool;
 import com.globusltd.recyclerview.util.Observable;
-import com.globusltd.recyclerview.util.Pool;
 
 /**
  * {@link ViewHolderTracker} provides view holder attach/detach events to
@@ -40,6 +36,9 @@ public class ViewHolderTracker extends RecyclerViewOwner {
 
     @Nullable
     private OnChildAttachStateChangeListener mOnChildAttachStateChangeListener;
+
+    @Nullable
+    private RecyclerView.ItemDecoration mItemDecoration;
 
     public ViewHolderTracker() {
         mViewHolderObservable = new ViewHolderObservable();
@@ -72,6 +71,9 @@ public class ViewHolderTracker extends RecyclerViewOwner {
         mOnChildAttachStateChangeListener = new OnChildAttachStateChangeListener(recyclerView);
         mOnChildAttachStateChangeListener.onAttachedToRecyclerView();
         recyclerView.addOnChildAttachStateChangeListener(mOnChildAttachStateChangeListener);
+
+        mItemDecoration = new ItemDecoration();
+        recyclerView.addItemDecoration(mItemDecoration);
     }
 
     /**
@@ -84,6 +86,10 @@ public class ViewHolderTracker extends RecyclerViewOwner {
             mOnChildAttachStateChangeListener.onDetachedFromRecyclerView();
             mOnChildAttachStateChangeListener = null;
         }
+        if (mItemDecoration != null) {
+            recyclerView.removeItemDecoration(mItemDecoration);
+            mItemDecoration = null;
+        }
     }
 
     private class OnChildAttachStateChangeListener implements RecyclerView.OnChildAttachStateChangeListener {
@@ -91,21 +97,13 @@ public class ViewHolderTracker extends RecyclerViewOwner {
         @NonNull
         private final RecyclerView mHostView;
 
-        @NonNull
-        private final Pool<OnViewHolderPositionChangeListener> mPool;
-
-        @NonNull
-        private final SimpleArrayMap<View, OnViewHolderPositionChangeListener> mOnPositionChangeListeners;
-
         private OnChildAttachStateChangeListener(@NonNull final RecyclerView recyclerView) {
             mHostView = recyclerView;
-            mPool = new ArrayPool<>(new OnViewHolderPositionChangeListenerFactory());
-            mOnPositionChangeListeners = new SimpleArrayMap<>();
         }
 
         void onAttachedToRecyclerView() {
             final int childCount = mHostView.getChildCount();
-            for (int index = 0; index < childCount - 1; index++) {
+            for (int index = 0; index < childCount; index++) {
                 final View child = mHostView.getChildAt(index);
                 onChildViewAttachedToWindow(child);
             }
@@ -114,70 +112,52 @@ public class ViewHolderTracker extends RecyclerViewOwner {
         @Override
         public void onChildViewAttachedToWindow(final View view) {
             final RecyclerView.ViewHolder viewHolder = mHostView.findContainingViewHolder(view);
-            if (viewHolder != null && !mOnPositionChangeListeners.containsKey(view)) {
-                final OnViewHolderPositionChangeListener listener = mPool.obtain();
-                listener.viewHolder = viewHolder;
-                listener.position = viewHolder.getAdapterPosition();
-                view.getViewTreeObserver().addOnPreDrawListener(listener);
-                mOnPositionChangeListeners.put(view, listener);
-
+            if (viewHolder != null) {
                 mViewHolderObservable.notifyAttached(viewHolder);
             }
         }
 
         @Override
         public void onChildViewDetachedFromWindow(final View view) {
-            final OnViewHolderPositionChangeListener listener = mOnPositionChangeListeners.remove(view);
-            if (listener != null && listener.viewHolder != null) {
-                view.getViewTreeObserver().removeOnPreDrawListener(listener);
-
-                mViewHolderObservable.notifyDetached(listener.viewHolder);
-
-                listener.viewHolder = null;
-                listener.position = RecyclerView.NO_POSITION;
-                mPool.recycle(listener);
+            final RecyclerView.ViewHolder viewHolder = mHostView.findContainingViewHolder(view);
+            if (viewHolder != null) {
+                mViewHolderObservable.notifyDetached(viewHolder);
             }
         }
 
         void onDetachedFromRecyclerView() {
-            final int size = mOnPositionChangeListeners.size();
-            for (int index = size - 1; index >= 0; index--) {
-                final View view = mOnPositionChangeListeners.keyAt(index);
-                onChildViewDetachedFromWindow(view);
+            final int childCount = mHostView.getChildCount();
+            for (int index = 0; index < childCount; index++) {
+                final View child = mHostView.getChildAt(index);
+                onChildViewAttachedToWindow(child);
             }
         }
 
     }
 
-    private class OnViewHolderPositionChangeListenerFactory implements
-            Pool.Factory<OnViewHolderPositionChangeListener> {
-
-        @NonNull
-        @Override
-        public OnViewHolderPositionChangeListener create() {
-            return new OnViewHolderPositionChangeListener();
-        }
-
-    }
-
-    private class OnViewHolderPositionChangeListener implements ViewTreeObserver.OnPreDrawListener {
-
-        @Nullable
-        RecyclerView.ViewHolder viewHolder;
-
-        @IntRange(from = RecyclerView.NO_POSITION)
-        int position;
+    private class ItemDecoration extends RecyclerView.ItemDecoration {
 
         @Override
-        public boolean onPreDraw() {
-            final boolean isPositionChanged = (viewHolder != null && viewHolder.getAdapterPosition() != position);
-            if (isPositionChanged) {
-                position = viewHolder.getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
+        public void getItemOffsets(final Rect outRect, final View itemView,
+                                   final RecyclerView parent, final RecyclerView.State state) {
+            if (state.isMeasuring()) {
+                return;
+            }
+
+            final RecyclerView.ViewHolder viewHolder = parent.findContainingViewHolder(itemView);
+            if (viewHolder == null) {
+                return;
+            }
+
+            final int position = viewHolder.getAdapterPosition();
+            if (state.isPreLayout()) {
+                final int oldPosition = viewHolder.getOldPosition();
+                if (position > RecyclerView.NO_POSITION && position != oldPosition) {
                     mViewHolderObservable.notifyPositionChanged(viewHolder);
                 }
+            } else {
+                mViewHolderObservable.notifyChanged(viewHolder);
             }
-            return true;
         }
 
     }
@@ -197,6 +177,14 @@ public class ViewHolderTracker extends RecyclerViewOwner {
             for (int i = size - 1; i >= 0; i--) {
                 final ViewHolderObserver behavior = mObservers.get(i);
                 behavior.onPositionChanged(viewHolder);
+            }
+        }
+
+        void notifyChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+            final int size = mObservers.size();
+            for (int i = size - 1; i >= 0; i--) {
+                final ViewHolderObserver behavior = mObservers.get(i);
+                behavior.onChanged(viewHolder);
             }
         }
 

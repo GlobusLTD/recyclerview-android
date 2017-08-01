@@ -62,6 +62,18 @@ public class LifecycleBehavior implements ViewHolderObserver {
      * {@inheritDoc}
      */
     @Override
+    public void onChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        if (isLifecycleCallbacks(viewHolder)) {
+            final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;
+            mLifecycleComposite.unregisterLifecycleCallbacks(lifecycleCallbacks);
+            mLifecycleComposite.registerLifecycleCallbacks(lifecycleCallbacks);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onDetached(@NonNull final RecyclerView.ViewHolder viewHolder) {
         if (isLifecycleCallbacks(viewHolder)) {
             final LifecycleCallbacks lifecycleCallbacks = (LifecycleCallbacks) viewHolder;

@@ -28,12 +28,12 @@ import com.globusltd.recyclerview.sample.SingleLineViewHolder;
 import com.globusltd.recyclerview.sample.TwoLinesViewHolder;
 import com.globusltd.recyclerview.sample.data.Person;
 
-public class LifecyclePersonAdapter extends Adapter<Person, SingleLineViewHolder> {
+class LifecyclePersonAdapter extends Adapter<Person, SingleLineViewHolder> {
 
     private static final int VIEW_TYPE_SINGLE_LINE = 0;
     private static final int VIEW_TYPE_TWO_LINES = 1;
 
-    public LifecyclePersonAdapter(@NonNull final Datasource<? extends Person> datasource) {
+    LifecyclePersonAdapter(@NonNull final Datasource<? extends Person> datasource) {
         super(datasource);
     }
 

@@ -74,6 +74,14 @@ public class SimpleEnableBehavior implements ViewHolderObserver {
         updateItemViewEnabled(viewHolder);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onChanged(@NonNull final RecyclerView.ViewHolder viewHolder) {
+        updateItemViewEnabled(viewHolder);
+    }
+
     private void updateItemViewEnabled(@NonNull final RecyclerView.ViewHolder viewHolder) {
         final int position = viewHolder.getAdapterPosition();
         if (position > RecyclerView.NO_POSITION) {
